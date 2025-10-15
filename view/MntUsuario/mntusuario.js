@@ -33,6 +33,15 @@ function initBootstrapValidation() {
         validatePassword(this);
     });
     
+    // Manejar campo de contraseña en modo edición
+    $('#usu_pass').on('focus', function() {
+        if ($(this).attr('data-editing') === 'true') {
+            // En modo edición, el campo funciona normalmente
+            // La contraseña se muestra con puntos por ser tipo password
+            console.log('Campo contraseña enfocado en modo edición');
+        }
+    });
+    
     // Validación para select
     $('#rol_id').on('change', function() {
         validateSelect(this);
@@ -159,32 +168,37 @@ function guardaryeditar(e){
     var formData = new FormData($("#mantenimiento_form")[0]);
     
     /**
-     * FUNCIONALIDAD FRONTEND: PRESERVACIÓN DE CONTRASEÑA EN MODO EDICIÓN
+     * FUNCIONALIDAD FRONTEND: MANEJO NORMAL DE CONTRASEÑA EN MODO EDICIÓN
      * 
-     * PROBLEMA ORIGINAL:
-     * Al editar un usuario, el campo contraseña (que muestra asteriscos) se enviaba
-     * vacío al backend, causando que la contraseña se borrara en la base de datos.
-     * 
-     * SOLUCIÓN IMPLEMENTADA:
-     * 1. Detectar si estamos en modo edición usando el atributo 'data-editing'
-     * 2. Si es edición: ELIMINAR completamente el campo 'usu_pass' del FormData
-     * 3. Si es nuevo registro: MANTENER el campo 'usu_pass' en el FormData
+     * FUNCIONAMIENTO:
+     * 1. En modo edición: La contraseña se carga normalmente y se puede modificar
+     * 2. Si la contraseña no se modifica: Se mantiene la original
+     * 3. Si la contraseña se modifica: Se usa la nueva
+     * 4. En modo nuevo: Se usa la contraseña ingresada
      * 
      * RESULTADO:
-     * - Modo edición: Backend recibe datos SIN campo contraseña → usa método sin contraseña
-     * - Modo nuevo: Backend recibe datos CON campo contraseña → usa método normal
+     * - Modo edición: Backend recibe la contraseña actual del campo (original o modificada)
+     * - Modo nuevo: Backend recibe la contraseña ingresada
      */
     
     // Detectar si estamos en modo edición basado en el atributo del campo contraseña
     const isEditing = $('#usu_pass').attr('data-editing') === 'true';
+    const currentPassword = $('#usu_pass').val();
+    const originalPassword = $('#usu_pass').attr('data-original-password');
     
     if (isEditing) {
-        // MODO EDICIÓN: Eliminar campo contraseña para preservar la contraseña original
-        formData.delete('usu_pass');
-        console.log('Modo edición: Campo contraseña eliminado del FormData - Se preservará contraseña original');
+        // MODO EDICIÓN: Usar la contraseña actual del campo
+        // Si no se modificó, será la original; si se modificó, será la nueva
+        formData.set('usu_pass', currentPassword);
+        
+        if (currentPassword === originalPassword) {
+            console.log('Modo edición: Manteniendo contraseña original');
+        } else {
+            console.log('Modo edición: Usando nueva contraseña modificada');
+        }
     } else {
-        // MODO NUEVO REGISTRO: Mantener campo contraseña para crear usuario con contraseña
-        console.log('Modo nuevo registro: Contraseña incluida en FormData - Se creará usuario con nueva contraseña');
+        // MODO NUEVO REGISTRO: Usar la contraseña ingresada
+        console.log('Modo nuevo registro: Usando contraseña ingresada');
     }
     
     $.ajax({
@@ -313,19 +327,18 @@ function editar(usu_id){
         $('#rol_id').val(data.ROL_ID);
         
         // Configurar campos editables según las reglas de negocio
-        // Solo permitir editar: Nombre, Apellido, DNI, Correo, Rol
-        // La contraseña se muestra con asteriscos pero no se modifica en BD
+        // Solo permitir editar: Nombre, Apellido, DNI, Correo, Rol, Contraseña
         
-        // Mostrar asteriscos equivalentes a la longitud de la contraseña (solo visual)
-        const passwordLength = data.USU_PASS ? data.USU_PASS.length : 8;
-        $('#usu_pass').val('*'.repeat(passwordLength));
+        // Cargar la contraseña real pero mostrarla como tipo password (con puntos)
+        $('#usu_pass').val(data.USU_PASS || '');
         
-        // Marcar que estamos en modo edición y bloquear el campo de contraseña
+        // Marcar que estamos en modo edición y guardar la contraseña original
         $('#usu_pass').attr('data-editing', 'true');
-        $('#usu_pass').attr('data-original-length', passwordLength);
-        $('#usu_pass').prop('readonly', true);
-        $('#usu_pass').addClass('bg-light');
-        $('#usu_pass').attr('title', 'La contraseña no se modifica durante la edición');
+        $('#usu_pass').attr('data-original-password', data.USU_PASS || '');
+        $('#usu_pass').prop('readonly', false);
+        $('#usu_pass').removeClass('bg-light');
+        $('#usu_pass').attr('title', 'Puede modificar la contraseña o mantener la actual');
+        $('#usu_pass').attr('placeholder', 'Modifique la contraseña si desea cambiarla');
         
         console.log('Modo edición activado: Contraseña protegida');
         
@@ -507,8 +520,9 @@ $(document).on("click","#btnnuevo",function(){
     
     // Limpiar atributos de edición de contraseña y habilitar el campo
     $('#usu_pass').removeAttr('data-editing');
-    $('#usu_pass').removeAttr('data-original-length');
+    $('#usu_pass').removeAttr('data-original-password');
     $('#usu_pass').removeAttr('title');
+    $('#usu_pass').removeAttr('placeholder');
     $('#usu_pass').prop('readonly', false);
     $('#usu_pass').removeClass('bg-light');
     
