@@ -1,9 +1,9 @@
 <?php
 require_once("config/conexion.php");
 if (isset($_POST["enviar"]) and $_POST["enviar"] == "si") {
-    require_once("models/Usuario.php");
-    $persona = new Usuario();
-    $persona->login();
+    require_once("controller/auth.php");
+    $authController = new AuthController();
+    $authController->login();
 }
 ?>
 
@@ -96,6 +96,13 @@ if (isset($_POST["enviar"]) and $_POST["enviar"] == "si") {
                                                 ?>
                                                 <div class="alert alert-warning alert-solid" role="alert">
                                                 <strong>Los campos estan vacios!</strong>
+                                                </div>
+                                        <?php
+                                                    break;
+                                                     case "3";
+                                                ?>
+                                                <div class="alert alert-warning alert-solid" role="alert">
+                                                <strong>El email estan vacios!</strong>
                                                 </div>
                                         <?php
                                                     break;

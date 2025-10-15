@@ -1,14 +1,16 @@
 <?php
-class Menu extends Conectar {
-    
-    public function get_menu_x_rol_id($idUsuario) {
+class Menu extends Conectar
+{
+
+    public function get_menu_x_rol_id($idUsuario)
+    {
         $conectar = parent::conexion();
         parent::set_names();
-        
-        
+
+
         // Menús básicos según el tipo de persona
         $menus = array();
-        
+
         if ($idUsuario == 1) { // Administrador
             $menus = array(
                 array(
@@ -38,6 +40,20 @@ class Menu extends Conectar {
                     "MEN_GRUPO" => "Mantenimiento",
                     "MEND_PERMI" => "Si",
                     "MEN_IDENTI" => "pisos"
+                ),
+                array(
+                    "MEN_NOM" => "Usuario",
+                    "MEN_RUTA" => "../MntUsuario/",
+                    "MEN_GRUPO" => "Usuarios",
+                    "MEND_PERMI" => "Si",
+                    "MEN_IDENTI" => "usuario"
+                ),
+                array(
+                    "MEN_NOM" => "Rol",
+                    "MEN_RUTA" => "../MntRol/",
+                    "MEN_GRUPO" => "Usuarios",
+                    "MEND_PERMI" => "Si",
+                    "MEN_IDENTI" => "rol"
                 )
             );
         } else if ($idUsuario == 2) { // Empleado
@@ -58,27 +74,28 @@ class Menu extends Conectar {
                 )
             );
         }
-        
+
         return $menus;
     }
-    
-    public function get_tipo_usuario_descripcion($idUsuario) {
+
+    public function get_tipo_usuario_descripcion($idUsuario)
+    {
         try {
             $conectar = parent::conexion();
             parent::set_names();
-            
+
             $sql = "SELECT Descripcion FROM rol WHERE IdRol = ? AND Estado = 1";
             $sql = $conectar->prepare($sql);
             $sql->bindValue(1, $idUsuario);
             $sql->execute();
-            
+
             $result = $sql->fetch(PDO::FETCH_ASSOC);
-            
+
             if ($result) {
                 return $result;
             } else {
                 // Si no se encuentra en la base de datos, devolver según el ID
-                if ($idUsuario == 1) {  
+                if ($idUsuario == 1) {
                     return array('Descripcion' => 'Administrador');
                 } else if ($idUsuario == 2) {
                     return array('Descripcion' => 'Empleado');
@@ -88,7 +105,7 @@ class Menu extends Conectar {
             }
         } catch (Exception $e) {
             // En caso de error, devolver según el ID
-            if ($idUsuario == 1) {              
+            if ($idUsuario == 1) {
                 return array('Descripcion' => 'Administrador');
             } else if ($idUsuario == 2) {
                 return array('Descripcion' => 'Empleado');
@@ -98,4 +115,3 @@ class Menu extends Conectar {
         }
     }
 }
-?>

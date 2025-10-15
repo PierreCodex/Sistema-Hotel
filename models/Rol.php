@@ -1,0 +1,92 @@
+<?php
+class Rol extends Conectar{
+
+    /* Listar todos los roles activos */
+    public function get_rol(){
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_L_ROL_01()";
+        $sql = $conectar->prepare($sql);
+        $sql->execute();
+        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /* Obtener rol por ID */
+    public function get_rol_x_rol_id($rol_id){
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_L_ROL_02(?)";
+        $sql = $conectar->prepare($sql);
+        $sql->bindValue(1, $rol_id);
+        $sql->execute();
+        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /* Eliminar rol (cambio de estado) */
+    public function delete_rol($rol_id){
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_D_ROL_01(?)";
+        $sql = $conectar->prepare($sql);
+        $sql->bindValue(1, $rol_id);
+        $sql->execute();
+        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /* Insertar nuevo rol */
+    public function insert_rol($rol_nom){
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_I_ROL_01(?)";
+        $sql = $conectar->prepare($sql);
+        $sql->bindValue(1, $rol_nom);
+        $sql->execute();
+        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /* Actualizar rol */
+    public function update_rol($rol_id, $rol_nom){
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_U_ROL_01(?,?)";
+        $sql = $conectar->prepare($sql);
+        $sql->bindValue(1, $rol_id);
+        $sql->bindValue(2, $rol_nom);
+        $sql->execute();
+        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /* Listar todos los roles (activos e inactivos) */
+    public function get_rol_all(){
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_L_ROL_03()";
+        $sql = $conectar->prepare($sql);
+        $sql->execute();
+        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /* Reactivar rol */
+    public function activate_rol($rol_id){
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_A_ROL_01(?)";
+        $sql = $conectar->prepare($sql);
+        $sql->bindValue(1, $rol_id);
+        $sql->execute();
+        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /* Buscar roles por descripción */
+    public function search_rol($buscar){
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_S_ROL_01(?)";
+        $sql = $conectar->prepare($sql);
+        $sql->bindValue(1, $buscar);
+        $sql->execute();
+        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+}
+?>

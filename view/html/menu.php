@@ -93,6 +93,32 @@
                         </ul>
                     </div>
                 </li> <!-- end Mantenimiento Menu -->
+                
+                
+                
+                <!-- Mantenimiento Usuario -->
+                  <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarUsuario" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarUsuario">
+                        <i class="ri-settings-3-line"></i> <span data-key="t-mantenimiento">Usuarios</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarUsuario">
+                        <ul class="nav nav-sm flex-column">
+                            <?php
+                                foreach ($datos as $row) {
+                                   if ($row["MEN_GRUPO"]=="Usuarios" && $row["MEND_PERMI"]=="Si"){
+                                        ?>
+                                            <li class="nav-item">
+                                                <a href="<?php echo $row["MEN_RUTA"];?>" class="nav-link" data-key="t-<?php echo strtolower($row["MEN_NOM"]);?>">
+                                                    <?php echo $row["MEN_NOM"];?>
+                                                </a>
+                                            </li>
+                                        <?php
+                                    }
+                                }
+                            ?>
+                        </ul>
+                    </div>
+                </li> <!-- end Mantenimiento Usuario -->
 
 
 
