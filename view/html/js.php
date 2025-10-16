@@ -645,5 +645,32 @@
 <!-- Modal Js -->
 <script src="../../assets/js/pages/modal.init.js"></script>
 
+<!-- Session Manager -->
+<script src="../../assets/js/session-manager.js"></script>
+
 <!-- App js -->
 <script src="../../assets/js/app.js"></script>
+
+<!-- Inicializar Session Manager -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Solo inicializar si el usuario está autenticado
+    <?php if(isset($_SESSION["IdUsuario"]) && !empty($_SESSION["IdUsuario"])): ?>
+    
+    // Configuración del Session Manager
+    const sessionConfig = {
+        baseUrl: '<?php echo Conectar::ruta(); ?>',
+        checkInterval: 60000, // Verificar cada minuto
+        warningTime: <?php echo SessionManager::WARNING_TIME; ?>, // Tiempo de advertencia dinámico
+        renewUrl: 'middleware/SessionMiddleware.php',
+        loginUrl: 'index.php'
+    };
+    
+    // Inicializar el gestor de sesiones
+    window.sessionManager = new SessionManager(sessionConfig);
+    
+    console.log('Session Manager inicializado para usuario:', '<?php echo $_SESSION["Nombre"] ?? ""; ?>');
+    
+    <?php endif; ?>
+});
+</script>

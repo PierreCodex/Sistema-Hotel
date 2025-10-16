@@ -6,6 +6,67 @@ function init(){
 
 function guardaryeditar(e){
     e.preventDefault();
+    
+    // Validaciones del lado del cliente
+    var rol_nom = $('#rol_nom').val().trim();
+    
+    // Limpiar clases de validación previas
+    $('#rol_nom').removeClass('is-invalid is-valid');
+    
+    // Validar campo vacío
+    if(rol_nom === ''){
+        $('#rol_nom').addClass('is-invalid');
+        swal.fire({
+            title: 'Error de Validación',
+            text: 'El nombre del rol es obligatorio',
+            icon: 'warning',
+            confirmButtonText: 'Entendido'
+        });
+        $('#rol_nom').focus();
+        return false;
+    }
+    
+    // Validar longitud mínima
+    if(rol_nom.length < 2){
+        $('#rol_nom').addClass('is-invalid');
+        swal.fire({
+            title: 'Error de Validación',
+            text: 'El nombre del rol debe tener al menos 2 caracteres',
+            icon: 'warning',
+            confirmButtonText: 'Entendido'
+        });
+        $('#rol_nom').focus();
+        return false;
+    }
+    
+    // Validar longitud máxima
+    if(rol_nom.length > 50){
+        $('#rol_nom').addClass('is-invalid');
+        swal.fire({
+            title: 'Error de Validación',
+            text: 'El nombre del rol no puede exceder 50 caracteres',
+            icon: 'warning',
+            confirmButtonText: 'Entendido'
+        });
+        $('#rol_nom').focus();
+        return false;
+    }
+    
+    // Si pasa todas las validaciones, marcar como válido
+    $('#rol_nom').addClass('is-valid');
+    
+    // Mostrar indicador de carga
+    swal.fire({
+        title: 'Procesando...',
+        text: 'Guardando información del rol',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            swal.showLoading();
+        }
+    });
+    
     var formData = new FormData($("#mantenimiento_form")[0]);
     $.ajax({
         url:"../../controller/rol.php?op=guardaryeditar",
@@ -14,13 +75,42 @@ function guardaryeditar(e){
         contentType:false,
         processData:false,
         success:function(data){
-            $('#table_data').DataTable().ajax.reload();
-            $('#modalmantenimiento').modal('hide');
-
+            try {
+                var response = JSON.parse(data);
+                
+                if(response.status === 'success'){
+                    $('#table_data').DataTable().ajax.reload();
+                    $('#modalmantenimiento').modal('hide');
+                    
+                    swal.fire({
+                        title: 'Éxito',
+                        text: response.message,
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    });
+                } else {
+                    swal.fire({
+                        title: 'Error',
+                        text: response.message,
+                        icon: 'error',
+                        confirmButtonText: 'Entendido'
+                    });
+                }
+            } catch (e) {
+                swal.fire({
+                    title: 'Error',
+                    text: 'Error al procesar la respuesta del servidor',
+                    icon: 'error',
+                    confirmButtonText: 'Entendido'
+                });
+            }
+        },
+        error: function(xhr, status, error) {
             swal.fire({
-                title:'Rol',
-                text: 'Registro Confirmado',
-                icon: 'success'
+                title: 'Error de Conexión',
+                text: 'No se pudo conectar con el servidor. Por favor, intente nuevamente.',
+                icon: 'error',
+                confirmButtonText: 'Entendido'
             });
         }
     });
@@ -79,9 +169,20 @@ function editar(rol_id){
         data=JSON.parse(data);
         $('#rol_id').val(data.ROL_ID);
         $('#rol_nom').val(data.ROL_NOM);
+        
+        // Limpiar clases de validación
+        $('#rol_nom').removeClass('is-invalid is-valid');
+        
+        // Validar el valor cargado
+        validarRolNombre();
     });
     $('#lbltitulo').html('Editar Registro');
     $('#modalmantenimiento').modal('show');
+    
+    // Enfocar en el campo de nombre cuando se muestre el modal
+    $('#modalmantenimiento').on('shown.bs.modal', function () {
+        $('#rol_nom').focus();
+    });
 }
 
 function eliminar(rol_id){
@@ -134,12 +235,48 @@ function activar(rol_id){
     });
 }
 
+// Función para validar el nombre del rol en tiempo real
+function validarRolNombre(){
+    var rol_nom = $('#rol_nom').val().trim();
+    
+    // Limpiar clases previas
+    $('#rol_nom').removeClass('is-invalid is-valid');
+    
+    if(rol_nom === ''){
+        $('#rol_nom').addClass('is-invalid');
+        return false;
+    } else if(rol_nom.length < 2){
+        $('#rol_nom').addClass('is-invalid');
+        return false;
+    } else if(rol_nom.length > 50){
+        $('#rol_nom').addClass('is-invalid');
+        return false;
+    } else {
+        $('#rol_nom').addClass('is-valid');
+        return true;
+    }
+}
+
 $(document).on("click","#btnnuevo",function(){
     $('#rol_id').val('');
     $('#rol_nom').val('');
     $('#lbltitulo').html('Nuevo Registro');
     $("#mantenimiento_form")[0].reset();
+    
+    // Limpiar clases de validación
+    $('#rol_nom').removeClass('is-invalid is-valid');
+    
     $('#modalmantenimiento').modal('show');
+    
+    // Enfocar en el campo de nombre cuando se muestre el modal
+    $('#modalmantenimiento').on('shown.bs.modal', function () {
+        $('#rol_nom').focus();
+    });
+});
+
+// Validación en tiempo real mientras el usuario escribe
+$(document).on('input', '#rol_nom', function(){
+    validarRolNombre();
 });
 
 init();

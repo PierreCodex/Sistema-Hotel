@@ -1,7 +1,7 @@
 -- =============================================
 -- STORED PROCEDURES PARA TABLA ROL
 -- Estructura: IdRol, Descripcion, Estado, FechaCreacion
--- SIN SUC_ID - Solo maneja IdRol
+--  - Solo maneja IdRol
 -- =============================================
 
 -- 1. Listar todos los roles activos
@@ -45,25 +45,6 @@ DELIMITER ;
 
 -- 4. Insertar nuevo rol
 DELIMITER $$
-CREATE PROCEDURE SP_I_ROL_01(IN ROL_NOM VARCHAR(50))
-BEGIN
-    INSERT INTO rol (Descripcion, Estado, FechaCreacion) 
-    VALUES (ROL_NOM, 1, NOW());
-END$$
-DELIMITER ;
-
--- 5. Actualizar rol existente
-DELIMITER $$
-CREATE PROCEDURE SP_U_ROL_01(IN ROL_ID INT, IN ROL_NOM VARCHAR(50))
-BEGIN
-    UPDATE rol 
-    SET Descripcion = ROL_NOM 
-    WHERE IdRol = ROL_ID;
-END$$
-DELIMITER ;
-
--- Procedimiento de inserción modificado con validación
-DELIMITER $$
 CREATE PROCEDURE SP_I_ROL_01(
     IN ROL_NOM VARCHAR(50)
 )
@@ -91,6 +72,17 @@ BEGIN
         
         SELECT LAST_INSERT_ID() as IdRol, 'Registro creado' as Mensaje;
     END IF;
+END$$
+DELIMITER ;
+
+
+-- 5. Actualizar rol existente
+DELIMITER $$
+CREATE PROCEDURE SP_U_ROL_01(IN ROL_ID INT, IN ROL_NOM VARCHAR(50))
+BEGIN
+    UPDATE rol 
+    SET Descripcion = ROL_NOM 
+    WHERE IdRol = ROL_ID;
 END$$
 DELIMITER ;
 

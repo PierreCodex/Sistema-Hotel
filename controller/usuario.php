@@ -47,7 +47,7 @@
                         $sub_array[] = $row["USU_DNI"];
                         $sub_array[] = $row["USU_CORREO"];
                         $sub_array[] = $row["ROL_NOM"];
-                        $sub_array[] = $row["FECH_CREA"];
+                        $sub_array[] = ($row["EST"] == 1) ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>';
                         $sub_array[] = '<button type="button" onClick="editar('.$row["USU_ID"].');"  id="'.$row["USU_ID"].'" class="btn btn-outline-warning btn-icon waves-effect waves-light"><i class="ri-edit-line"></i></button>';
                         $sub_array[] = '<button type="button" onClick="eliminar('.$row["USU_ID"].');"  id="'.$row["USU_ID"].'" class="btn btn-outline-danger btn-icon waves-effect waves-light"><i class="ri-delete-bin-5-line"></i></button>';
                         $data[] = $sub_array;
@@ -103,7 +103,7 @@
                 $sub_array[] = $row["USU_DNI"];
                 $sub_array[] = $row["USU_CORREO"];
                 $sub_array[] = $row["ROL_NOM"];
-                $sub_array[] = $row["FECH_CREA"];
+                $sub_array[] = ($row["EST"] == 1) ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>';
                 $sub_array[] = '<button type="button" onClick="editar('.$row["USU_ID"].')" id="'.$row["USU_ID"].'" class="btn btn-warning btn-icon waves-effect waves-light"><i class="ri-edit-2-line"></i></button>';
                 $sub_array[] = '<button type="button" onClick="eliminar('.$row["USU_ID"].')" id="'.$row["USU_ID"].'" class="btn btn-danger btn-icon waves-effect waves-light"><i class="ri-delete-bin-5-line"></i></button>';
                 $data[] = $sub_array;

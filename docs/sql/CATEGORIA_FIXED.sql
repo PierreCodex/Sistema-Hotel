@@ -1,8 +1,14 @@
 -- =============================================
--- STORED PROCEDURES PARA TABLA CATEGORIA
+-- STORED PROCEDURES CORREGIDOS PARA TABLA CATEGORIA
 -- Estructura: IdCategoria, Descripcion, Estado, FechaCreacion
--- SIN SUC_ID - Solo maneja IdCategoria
 -- =============================================
+
+-- Eliminar procedimientos existentes si existen
+DROP PROCEDURE IF EXISTS SP_L_CATEGORIA_01;
+DROP PROCEDURE IF EXISTS SP_L_CATEGORIA_02;
+DROP PROCEDURE IF EXISTS SP_D_CATEGORIA_01;
+DROP PROCEDURE IF EXISTS SP_I_CATEGORIA_01;
+DROP PROCEDURE IF EXISTS SP_U_CATEGORIA_01;
 
 -- 1. Listar todas las categorías activas
 DELIMITER $$
@@ -43,37 +49,16 @@ BEGIN
 END$$
 DELIMITER ;
 
--- 4. Insertar nueva categoría
+-- 4. Insertar nueva categoría (versión mejorada)
 DELIMITER $$
-CREATE PROCEDURE SP_I_CATEGORIA_01(IN CAT_NOM VARCHAR(50))
-BEGIN
-    INSERT INTO categoria (Descripcion, Estado, FechaCreacion) 
-    VALUES (CAT_NOM, 1, NOW());
-END$$
-DELIMITER ;
-
--- 5. Actualizar categoría existente
-DELIMITER $$
-CREATE PROCEDURE SP_U_CATEGORIA_01(IN CAT_ID INT, IN CAT_NOM VARCHAR(50))
-BEGIN
-    UPDATE categoria 
-    SET Descripcion = CAT_NOM 
-    WHERE IdCategoria = CAT_ID;
-END$$
-DELIMITER ;
-
--- Procedimiento de inserción modificado
-DELIMITER $$
-CREATE PROCEDURE SP_I_CATEGORIA_01(
-    IN CAT_NOM VARCHAR(150)
-)
+CREATE PROCEDURE SP_I_CATEGORIA_01(IN CAT_NOM VARCHAR(150))
 BEGIN
     DECLARE existing_id INT DEFAULT 0;
     
     -- Verificar si existe un registro con el mismo nombre (activo o inactivo)
     SELECT IdCategoria INTO existing_id 
     FROM categoria 
-    WHERE Descripcion = CAT_NOM 
+    WHERE UPPER(TRIM(Descripcion)) = UPPER(TRIM(CAT_NOM))
     LIMIT 1;
     
     IF existing_id > 0 THEN
@@ -93,3 +78,16 @@ BEGIN
     END IF;
 END$$
 DELIMITER ;
+
+-- 5. Actualizar categoría existente
+DELIMITER $$
+CREATE PROCEDURE SP_U_CATEGORIA_01(IN CAT_ID INT, IN CAT_NOM VARCHAR(150))
+BEGIN
+    UPDATE categoria 
+    SET Descripcion = CAT_NOM 
+    WHERE IdCategoria = CAT_ID AND Estado = 1;
+END$$
+DELIMITER ;
+
+-- Verificar que los procedimientos se crearon correctamente
+SHOW PROCEDURE STATUS WHERE Name LIKE 'SP_%CATEGORIA%';

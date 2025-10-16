@@ -12,10 +12,22 @@
                     <div class="row gy-2">
                         <div class="col-md-12">
                             <div>
-                                <label for="valueInput" class="form-label">Nombre</label>
-                                <input type="text" class="form-control" id="cat_nom" name="cat_nom" required/>
+                                <label for="cat_nom" class="form-label">Nombre <span class="text-danger">*</span></label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="cat_nom" 
+                                       name="cat_nom" 
+                                       required
+                                       minlength="2"
+                                       maxlength="50"
+                                       placeholder="Ingrese el nombre de la categoría"
+                                       autocomplete="off"/>
+                                <div class="form-text">
+                                    <small class="text-muted">Mínimo 2 caracteres, máximo 50 caracteres</small>
+                                </div>
                             </div>
                         </div>
+
                     </div>
 
                 </div>

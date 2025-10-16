@@ -12,8 +12,17 @@
                     <div class="row gy-2">
                         <div class="col-md-12">
                             <div>
-                                <label for="valueInput" class="form-label">Nombre</label>
-                                <input type="text" class="form-control" id="rol_nom" name="rol_nom" required/>
+                                <label for="rol_nom" class="form-label">Nombre del Rol</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="rol_nom" 
+                                       name="rol_nom" 
+                                       required
+                                       minlength="2"
+                                       maxlength="50"
+                                       placeholder="Ingrese el nombre del rol"
+                                       autocomplete="off"/>
+                                <small class="text-muted">Mínimo 2 caracteres, máximo 50 caracteres</small>
                             </div>
                         </div>
                     </div>

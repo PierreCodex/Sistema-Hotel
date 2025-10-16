@@ -56,5 +56,28 @@ class Categoria extends Conectar{
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /* Verificar si existe una categoría con el mismo nombre */
+    public function verificar_categoria_existente($cat_nom, $cat_id = null){
+        $conectar = parent::conexion();
+        parent::set_names();
+        
+        if($cat_id == null){
+            // Para inserción - verificar si existe el nombre (solo activos)
+            $sql = "SELECT COUNT(*) as total FROM categoria WHERE UPPER(TRIM(Descripcion)) = UPPER(TRIM(?)) AND Estado = 1";
+            $sql = $conectar->prepare($sql);
+            $sql->bindValue(1, $cat_nom);
+        } else {
+            // Para actualización - verificar si existe el nombre en otro registro (solo activos)
+            $sql = "SELECT COUNT(*) as total FROM categoria WHERE UPPER(TRIM(Descripcion)) = UPPER(TRIM(?)) AND IdCategoria != ? AND Estado = 1";
+            $sql = $conectar->prepare($sql);
+            $sql->bindValue(1, $cat_nom);
+            $sql->bindValue(2, $cat_id);
+        }
+        
+        $sql->execute();
+        $resultado = $sql->fetch(PDO::FETCH_ASSOC);
+        return $resultado['total'] > 0;
+    }
+
 }
 ?>

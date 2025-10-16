@@ -1,5 +1,9 @@
 <?php
-    session_start();
+    // Incluir el manejador de sesiones
+    require_once("session.php");
+    
+    // Inicializar el sistema de sesiones
+    SessionManager::init();
 
     class Conectar{
         protected $dbh;

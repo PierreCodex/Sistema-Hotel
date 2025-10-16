@@ -88,5 +88,28 @@ class Rol extends Conectar{
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /* Verificar si existe un rol con el mismo nombre */
+    public function verificar_rol_existente($rol_nom, $rol_id = null){
+        $conectar = parent::conexion();
+        parent::set_names();
+        
+        if($rol_id == null){
+            // Para inserción - verificar si existe el nombre
+            $sql = "SELECT COUNT(*) as total FROM rol WHERE UPPER(TRIM(Descripcion)) = UPPER(TRIM(?)) AND Estado = 1";
+            $sql = $conectar->prepare($sql);
+            $sql->bindValue(1, $rol_nom);
+        } else {
+            // Para actualización - verificar si existe el nombre en otro registro
+            $sql = "SELECT COUNT(*) as total FROM rol WHERE UPPER(TRIM(Descripcion)) = UPPER(TRIM(?)) AND IdRol != ? AND Estado = 1";
+            $sql = $conectar->prepare($sql);
+            $sql->bindValue(1, $rol_nom);
+            $sql->bindValue(2, $rol_id);
+        }
+        
+        $sql->execute();
+        $resultado = $sql->fetch(PDO::FETCH_ASSOC);
+        return $resultado['total'] > 0;
+    }
+
 }
 ?>

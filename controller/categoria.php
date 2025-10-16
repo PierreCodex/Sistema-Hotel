@@ -8,23 +8,59 @@
     switch($_GET["op"]){
         /* TODO: Guardar y editar, guardar cuando el ID este vacio, y Actualizar cuando se envie el ID */
         case "guardaryeditar":
-            if(empty($_POST["cat_id"])){
-                $categoria->insert_categoria($_POST["cat_nom"]);
-            }else{
-                $categoria->update_categoria($_POST["cat_id"],$_POST["cat_nom"]);
+            // Validar que el nombre no esté vacío
+            if(empty(trim($_POST["cat_nom"]))){
+                echo json_encode(array(
+                    'status' => 'error',
+                    'message' => 'El nombre de la categoría es obligatorio'
+                ));
+                break;
+            }
+
+            // Verificar si ya existe una categoría con el mismo nombre
+            $existe = $categoria->verificar_categoria_existente($_POST["cat_nom"], 
+                empty($_POST["cat_id"]) ? null : $_POST["cat_id"]);
+            
+            if($existe){
+                echo json_encode(array(
+                    'status' => 'error',
+                    'message' => 'Ya existe una categoría con este nombre'
+                ));
+                break;
+            }
+
+            try {
+                if(empty($_POST["cat_id"])){
+                    $categoria->insert_categoria($_POST["cat_nom"]);
+                    echo json_encode(array(
+                        'status' => 'success',
+                        'message' => 'Categoría registrada correctamente'
+                    ));
+                } else {
+                    $categoria->update_categoria($_POST["cat_id"], $_POST["cat_nom"]);
+                    echo json_encode(array(
+                        'status' => 'success',
+                        'message' => 'Categoría actualizada correctamente'
+                    ));
+                }
+            } catch (Exception $e) {
+                echo json_encode(array(
+                    'status' => 'error',
+                    'message' => 'Error al procesar la solicitud: ' . $e->getMessage()
+                ));
             }
             break;
 
         /* TODO: Listado de registros formato JSON para Datatable JS */
         case "listar":
-            $datos=$categoria->get_categoria();
-            $data=Array();
+            $datos = $categoria->get_categoria();
+            $data = Array();
             foreach($datos as $row){
                 $sub_array = array();
                 $sub_array[] = $row["CAT_NOM"];
                 $sub_array[] = $row["FECH_CREA"];
-                $sub_array[] = '<button type="button" onClick="editar('.$row["CAT_ID"].')" id="'.$row["CAT_ID"].'" class="btn btn-warning btn-icon waves-effect waves-light"><i class="ri-edit-2-line"></i></button>';
-                $sub_array[] = '<button type="button" onClick="eliminar('.$row["CAT_ID"].')" id="'.$row["CAT_ID"].'" class="btn btn-danger btn-icon waves-effect waves-light"><i class="ri-delete-bin-5-line"></i></button>';
+                $sub_array[] = '<button type="button" onClick="editar('.$row["CAT_ID"].');" id="'.$row["CAT_ID"].'" class="btn btn-warning btn-sm"><i class="bx bx-edit-alt"></i></button>';
+                $sub_array[] = '<button type="button" onClick="eliminar('.$row["CAT_ID"].');" id="'.$row["CAT_ID"].'" class="btn btn-danger btn-sm"><i class="bx bx-trash"></i></button>';
                 $data[] = $sub_array;
             }
 
@@ -52,6 +88,9 @@
         case "eliminar":
             $categoria->delete_categoria($_POST["cat_id"]);
             break;
+
+        /* TODO: Activar categoría (cambiar estado a 1) */
+
 
         /* TODO: Listar Combo */
         case "combo":

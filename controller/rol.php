@@ -8,10 +8,56 @@
     switch($_GET["op"]){
         /* TODO: Guardar y editar, guardar cuando el ID este vacio, y Actualizar cuando se envie el ID */
         case "guardaryeditar":
-            if(empty($_POST["rol_id"])){
-                $rol->insert_rol($_POST["rol_nom"]);
-            }else{
-                $rol->update_rol($_POST["rol_id"],$_POST["rol_nom"]);
+            // Validaciones del servidor
+            $response = array();
+            
+            // Validar que el nombre no esté vacío
+            if(empty(trim($_POST["rol_nom"]))){
+                $response['status'] = 'error';
+                $response['message'] = 'El nombre del rol es obligatorio';
+                echo json_encode($response);
+                exit;
+            }
+            
+            // Validar longitud del nombre
+            if(strlen(trim($_POST["rol_nom"])) < 2){
+                $response['status'] = 'error';
+                $response['message'] = 'El nombre del rol debe tener al menos 2 caracteres';
+                echo json_encode($response);
+                exit;
+            }
+            
+            if(strlen(trim($_POST["rol_nom"])) > 50){
+                $response['status'] = 'error';
+                $response['message'] = 'El nombre del rol no puede exceder 50 caracteres';
+                echo json_encode($response);
+                exit;
+            }
+            
+            // Validar duplicados
+            $rol_id = empty($_POST["rol_id"]) ? null : $_POST["rol_id"];
+            if($rol->verificar_rol_existente($_POST["rol_nom"], $rol_id)){
+                $response['status'] = 'error';
+                $response['message'] = 'Ya existe un rol con este nombre';
+                echo json_encode($response);
+                exit;
+            }
+            
+            try {
+                if(empty($_POST["rol_id"])){
+                    $resultado = $rol->insert_rol($_POST["rol_nom"]);
+                    $response['status'] = 'success';
+                    $response['message'] = 'Rol registrado correctamente';
+                }else{
+                    $resultado = $rol->update_rol($_POST["rol_id"],$_POST["rol_nom"]);
+                    $response['status'] = 'success';
+                    $response['message'] = 'Rol actualizado correctamente';
+                }
+                echo json_encode($response);
+            } catch (Exception $e) {
+                $response['status'] = 'error';
+                $response['message'] = 'Error al procesar la solicitud: ' . $e->getMessage();
+                echo json_encode($response);
             }
             break;
 

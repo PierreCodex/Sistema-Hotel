@@ -52,7 +52,7 @@
                                                 <th>Correo</th>
                                                 <th>Rol</th>
                                                 
-                                                <th>FechaCreacion</th>
+                                                <th>Estado</th>
                                                 <th></th>
                                                 <th></th>
                                             </tr>

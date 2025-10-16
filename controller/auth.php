@@ -88,6 +88,9 @@ class AuthController {
         $_SESSION["Apellido"] = $user["Apellido"];
         $_SESSION["IdRol"] = $user["IdRol"];
         $_SESSION["Correo"] = $user["Correo"];
+        
+        // Renovar sesión al iniciar sesión
+        SessionManager::renewSession();
     }
     
     /**
@@ -111,7 +114,7 @@ class AuthController {
      * Cierra la sesión del usuario
      */
     public function logout() {
-        session_destroy();
+        SessionManager::destroy();
         header("Location: " . Conectar::ruta() . "index.php");
         exit();
     }
@@ -121,7 +124,8 @@ class AuthController {
      * @return bool
      */
     public function isAuthenticated() {
-        return isset($_SESSION["IdUsuario"]) && !empty($_SESSION["IdUsuario"]);
+        $authCheck = SessionMiddleware::checkAuthentication();
+        return $authCheck['authenticated'];
     }
     
     /**
