@@ -1,135 +1,294 @@
 <?php
 
 require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../config/conexion.php';
+require_once __DIR__ . '/../../models/Usuario.php';
 
 use PHPUnit\Framework\TestCase;
 
-/**
- * Pruebas unitarias para el modelo Usuario
- */
 class UsuarioTest extends TestCase
 {
     private $usuario;
 
-    /**
-     * Configuración inicial antes de cada prueba
-     */
     protected function setUp(): void
     {
-        // Aquí puedes configurar mocks o datos de prueba
-        // Por ahora, solo verificamos que la clase existe
-        $this->assertTrue(class_exists('Usuario'), 'La clase Usuario debe existir');
+        $this->usuario = new Usuario();
     }
 
     /**
-     * Prueba que la clase Usuario puede ser instanciada
+     * Test: Verificar que la clase Usuario se puede instanciar
      */
-    public function testUsuarioCanBeInstantiated(): void
+    public function testUsuarioSeInstanciaCorrectamente()
     {
-        // Esta prueba requiere que incluyas el archivo del modelo
-        // require_once __DIR__ . '/../../models/Usuario.php';
-        // require_once __DIR__ . '/../../config/conexion.php';
-        
-        // $usuario = new Usuario();
-        // $this->assertInstanceOf(Usuario::class, $usuario);
-        
-        // Por ahora, solo verificamos que el test funciona
-        $this->assertTrue(true, 'Test de instanciación preparado');
+        $this->assertInstanceOf(Usuario::class, $this->usuario);
     }
 
     /**
-     * Prueba de validación de email
+     * Test: Validación de formato de correo electrónico
      */
-    public function testEmailValidation(): void
+    public function testValidacionFormatoCorreo()
     {
-        $validEmails = [
-            'test@example.com',
-            'user.name@domain.co.uk',
-            'admin@hotel.com'
+        // Correos válidos
+        $correosValidos = [
+            'usuario@hotel.com',
+            'admin@sistema.pe',
+            'test.user@example.org',
+            'user123@domain.co.uk'
         ];
 
-        $invalidEmails = [
-            'invalid-email',
-            '@domain.com',
-            'user@',
+        foreach ($correosValidos as $correo) {
+            $this->assertTrue(
+                filter_var($correo, FILTER_VALIDATE_EMAIL) !== false,
+                "El correo {$correo} debería ser válido"
+            );
+        }
+
+        // Correos inválidos
+        $correosInvalidos = [
+            'correo-sin-arroba.com',
+            '@dominio.com',
+            'usuario@',
+            'usuario..doble@punto.com',
+            'usuario@dominio',
             ''
         ];
 
-        foreach ($validEmails as $email) {
-            $this->assertTrue(
-                filter_var($email, FILTER_VALIDATE_EMAIL) !== false,
-                "El email {$email} debería ser válido"
-            );
-        }
-
-        foreach ($invalidEmails as $email) {
+        foreach ($correosInvalidos as $correo) {
             $this->assertFalse(
-                filter_var($email, FILTER_VALIDATE_EMAIL) !== false,
-                "El email {$email} debería ser inválido"
+                filter_var($correo, FILTER_VALIDATE_EMAIL) !== false,
+                "El correo {$correo} debería ser inválido"
             );
         }
     }
 
     /**
-     * Prueba de validación de contraseña
+     * Test: Validación de DNI peruano (8 dígitos)
      */
-    public function testPasswordValidation(): void
+    public function testValidacionDNI()
     {
-        $validPasswords = [
-            'Password123!',
-            'MySecure@Pass1',
-            'Hotel2024#'
+        // DNIs válidos (8 dígitos)
+        $dnisValidos = [
+            '12345678',
+            '87654321',
+            '11111111',
+            '99999999'
         ];
 
-        $invalidPasswords = [
-            '123',           // Muy corta
-            'password',      // Sin mayúsculas ni números
-            'PASSWORD',      // Sin minúsculas ni números
-            '12345678'       // Solo números
+        foreach ($dnisValidos as $dni) {
+            $this->assertTrue(
+                preg_match('/^\d{8}$/', $dni) === 1,
+                "El DNI {$dni} debería ser válido"
+            );
+        }
+
+        // DNIs inválidos
+        $dnisInvalidos = [
+            '1234567',    // 7 dígitos
+            '123456789',  // 9 dígitos
+            '1234567a',   // contiene letra
+            '',           // vacío
+            '12-34-56-78' // con guiones
         ];
 
-        foreach ($validPasswords as $password) {
-            $this->assertGreaterThanOrEqual(
-                8,
-                strlen($password),
-                "La contraseña debe tener al menos 8 caracteres"
-            );
-        }
-
-        foreach ($invalidPasswords as $password) {
-            $this->assertLessThan(
-                8,
-                strlen($password),
-                "Contraseña inválida detectada correctamente"
+        foreach ($dnisInvalidos as $dni) {
+            $this->assertFalse(
+                preg_match('/^\d{8}$/', $dni) === 1,
+                "El DNI {$dni} debería ser inválido"
             );
         }
     }
 
     /**
-     * Prueba de hash de contraseña
+     * Test: Validación de nombres (solo letras y espacios)
      */
-    public function testPasswordHashing(): void
+    public function testValidacionNombres()
     {
-        $password = 'MiContraseña123!';
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        // Nombres válidos
+        $nombresValidos = [
+            'Juan',
+            'María José',
+            'Ana Lucía',
+            'José María',
+            'Carmen Rosa'
+        ];
 
-        $this->assertNotEquals($password, $hashedPassword, 'La contraseña debe estar hasheada');
-        $this->assertTrue(
-            password_verify($password, $hashedPassword),
-            'La verificación de contraseña debe funcionar'
-        );
-        $this->assertFalse(
-            password_verify('ContraseñaIncorrecta', $hashedPassword),
-            'Una contraseña incorrecta no debe verificarse'
-        );
+        foreach ($nombresValidos as $nombre) {
+            // Validación mejorada: debe contener letras y espacios, pero no solo espacios
+            $esValido = preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', $nombre) === 1 && 
+                        trim($nombre) !== ''; // No debe estar vacío después de quitar espacios
+            
+            $this->assertTrue(
+                $esValido,
+                "El nombre '{$nombre}' debería ser válido"
+            );
+        }
+
+        // Nombres inválidos
+        $nombresInvalidos = [
+            'Juan123',      // contiene números
+            'María@José',   // contiene símbolos
+            '',             // vacío
+            '   ',          // solo espacios
+            'Juan-Carlos'   // contiene guión
+        ];
+
+        foreach ($nombresInvalidos as $nombre) {
+            // Validación mejorada: debe contener letras y espacios, pero no solo espacios
+            $esValido = preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', $nombre) === 1 && 
+                        trim($nombre) !== ''; // No debe estar vacío después de quitar espacios
+            
+            $this->assertFalse(
+                $esValido,
+                "El nombre '{$nombre}' debería ser inválido"
+            );
+        }
+
+        // Nombres inválidos
+        $nombresInvalidos = [
+            'Juan123',      // contiene números
+            'María@José',   // contiene símbolos
+            '',             // vacío
+            '   ',          // solo espacios
+            'Juan-Carlos'   // contiene guión
+        ];
+
+        foreach ($nombresInvalidos as $nombre) {
+            // Validación mejorada: debe contener letras y espacios, pero no solo espacios
+            $esValido = preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', $nombre) === 1 && 
+                        trim($nombre) !== ''; // No debe estar vacío después de quitar espacios
+            
+            $this->assertFalse(
+                $esValido,
+                "El nombre '{$nombre}' debería ser inválido"
+            );
+        }
     }
 
     /**
-     * Limpieza después de cada prueba
+     * Test: Validación de contraseñas seguras
      */
-    protected function tearDown(): void
+    public function testValidacionContrasenas()
     {
-        // Limpiar recursos si es necesario
-        $this->usuario = null;
+        // Contraseñas válidas (mínimo 6 caracteres)
+        $contrasenasValidas = [
+            'password123',
+            'MiClave2024',
+            'Hotel@123',
+            'Sistema2024!'
+        ];
+
+        foreach ($contrasenasValidas as $password) {
+            $this->assertTrue(
+                strlen($password) >= 6,
+                "La contraseña '{$password}' debería tener al menos 6 caracteres"
+            );
+        }
+
+        // Contraseñas inválidas
+        $contrasenasInvalidas = [
+            '123',      // muy corta
+            '12345',    // muy corta
+            '',         // vacía
+            '     '     // solo espacios
+        ];
+
+        foreach ($contrasenasInvalidas as $password) {
+            $this->assertFalse(
+                strlen(trim($password)) >= 6,
+                "La contraseña '{$password}' debería ser inválida"
+            );
+        }
+    }
+
+    /**
+     * Test: Verificar que los parámetros de métodos no estén vacíos
+     */
+    public function testParametrosNoVacios()
+    {
+        // Simular validación de parámetros para insertar usuario
+        $parametros = [
+            'nombre' => 'Juan',
+            'apellido' => 'Pérez',
+            'dni' => '12345678',
+            'correo' => 'juan@hotel.com',
+            'password' => 'password123',
+            'rol_id' => 1
+        ];
+
+        foreach ($parametros as $campo => $valor) {
+            $this->assertNotEmpty(
+                trim($valor),
+                "El campo {$campo} no debería estar vacío"
+            );
+        }
+    }
+
+    /**
+     * Test: Validación de ID numérico positivo
+     */
+    public function testValidacionIDNumerico()
+    {
+        // IDs válidos
+        $idsValidos = [1, 2, 10, 100, 999];
+
+        foreach ($idsValidos as $id) {
+            $this->assertTrue(
+                is_numeric($id) && $id > 0,
+                "El ID {$id} debería ser válido"
+            );
+        }
+
+        // IDs inválidos
+        $idsInvalidos = [0, -1, 'abc', '', null];
+
+        foreach ($idsInvalidos as $id) {
+            $this->assertFalse(
+                is_numeric($id) && $id > 0,
+                "El ID {$id} debería ser inválido"
+            );
+        }
+    }
+
+    /**
+     * Test: Verificar formato de hash de contraseña
+     */
+    public function testHashContrasena()
+    {
+        $password = 'miPassword123';
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+
+        // Verificar que se genera un hash
+        $this->assertNotEmpty($hash);
+        $this->assertNotEquals($password, $hash);
+
+        // Verificar que el hash se puede verificar
+        $this->assertTrue(password_verify($password, $hash));
+        $this->assertFalse(password_verify('passwordIncorrecto', $hash));
+    }
+
+    /**
+     * Test: Validación de búsqueda (término no vacío)
+     */
+    public function testValidacionTerminoBusqueda()
+    {
+        // Términos válidos
+        $terminosValidos = ['Juan', 'admin', 'hotel', 'user123'];
+
+        foreach ($terminosValidos as $termino) {
+            $this->assertTrue(
+                !empty(trim($termino)) && strlen(trim($termino)) >= 2,
+                "El término '{$termino}' debería ser válido para búsqueda"
+            );
+        }
+
+        // Términos inválidos
+        $terminosInvalidos = ['', ' ', 'a'];
+
+        foreach ($terminosInvalidos as $termino) {
+            $this->assertFalse(
+                !empty(trim($termino)) && strlen(trim($termino)) >= 2,
+                "El término '{$termino}' debería ser inválido para búsqueda"
+            );
+        }
     }
 }

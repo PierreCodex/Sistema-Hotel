@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="ExampleTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\ExampleTest.php" tests="4" assertions="15" errors="0" failures="0" skipped="0" time="0.036619">
-    <testcase name="testBasicAssertion" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\ExampleTest.php" line="13" class="ExampleTest" classname="ExampleTest" assertions="3" time="0.028621"/>
-    <testcase name="testMathOperations" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\ExampleTest.php" line="23" class="ExampleTest" classname="ExampleTest" assertions="4" time="0.000392"/>
-    <testcase name="testArrayOperations" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\ExampleTest.php" line="34" class="ExampleTest" classname="ExampleTest" assertions="4" time="0.004913"/>
-    <testcase name="testStringOperations" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\ExampleTest.php" line="47" class="ExampleTest" classname="ExampleTest" assertions="4" time="0.002693"/>
+  <testsuite name="UsuarioTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" tests="9" assertions="64" errors="0" failures="1" skipped="0" time="0.298683">
+    <testcase name="testUsuarioSeInstanciaCorrectamente" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="21" class="UsuarioTest" classname="UsuarioTest" assertions="1" time="0.015223"/>
+    <testcase name="testValidacionFormatoCorreo" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="29" class="UsuarioTest" classname="UsuarioTest" assertions="10" time="0.001645"/>
+    <testcase name="testValidacionDNI" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="67" class="UsuarioTest" classname="UsuarioTest" assertions="9" time="0.000235"/>
+    <testcase name="testValidacionNombres" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="104" class="UsuarioTest" classname="UsuarioTest" assertions="9" time="0.029188">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">UsuarioTest::testValidacionNombres&#13;
+El nombre '   ' debería ser inválido
+Failed asserting that true is false.
+&#13;
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php:132</failure>
+    </testcase>
+    <testcase name="testValidacionContrasenas" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="142" class="UsuarioTest" classname="UsuarioTest" assertions="8" time="0.000436"/>
+    <testcase name="testParametrosNoVacios" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="178" class="UsuarioTest" classname="UsuarioTest" assertions="6" time="0.005509"/>
+    <testcase name="testValidacionIDNumerico" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="201" class="UsuarioTest" classname="UsuarioTest" assertions="10" time="0.000403"/>
+    <testcase name="testHashContrasena" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="227" class="UsuarioTest" classname="UsuarioTest" assertions="4" time="0.245770"/>
+    <testcase name="testValidacionTerminoBusqueda" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="244" class="UsuarioTest" classname="UsuarioTest" assertions="7" time="0.000275"/>
   </testsuite>
 </testsuites>

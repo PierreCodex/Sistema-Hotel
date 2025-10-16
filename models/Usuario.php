@@ -28,7 +28,7 @@ class Usuario extends Conectar
     {
         $conectar = parent::conexion();
         parent::set_names();
-        $sql = "CALL SP_L_USUARIO_01(?)";
+        $sql = "CALL SP_L_USUARIO_03(?)";
         $sql = $conectar->prepare($sql);
         $sql->bindValue(1, $current_user_id);
         $sql->execute();
