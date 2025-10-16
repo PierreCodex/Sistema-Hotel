@@ -1,0 +1,1 @@
+{"version":1,"defects":{"ExampleTest::testStringOperations":8},"times":{"ExampleTest::testBasicAssertion":0.029,"ExampleTest::testMathOperations":0,"ExampleTest::testArrayOperations":0.005,"ExampleTest::testStringOperations":0.003}}

@@ -4,11 +4,7 @@
 -- =============================================
 
 -- Eliminar procedimientos existentes si existen
-DROP PROCEDURE IF EXISTS SP_L_CATEGORIA_01;
-DROP PROCEDURE IF EXISTS SP_L_CATEGORIA_02;
-DROP PROCEDURE IF EXISTS SP_D_CATEGORIA_01;
-DROP PROCEDURE IF EXISTS SP_I_CATEGORIA_01;
-DROP PROCEDURE IF EXISTS SP_U_CATEGORIA_01;
+
 
 -- 1. Listar todas las categorías activas
 DELIMITER $$

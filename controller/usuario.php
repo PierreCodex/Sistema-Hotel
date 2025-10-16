@@ -87,11 +87,11 @@
             $usuario->delete_usuario($_POST["usu_id"]);
             break;
 
-        /* TODO: Activar usuario (cambiar estado a 1) */
+        /* TODO: Activar usuario (cambiar estado a 1) 
         case "activar":
             $usuario->activar_usuario($_POST["usu_id"]);
             break;
-
+        */
         /* TODO: Buscar usuarios */
         case "buscar":
             $datos=$usuario->buscar_usuario($_POST["buscar"]);

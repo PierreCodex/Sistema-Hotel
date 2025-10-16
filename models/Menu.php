@@ -36,7 +36,7 @@ class Menu extends Conectar
                 ),
                 array(
                     "MEN_NOM" => "Pisos",
-                    "MEN_RUTA" => "../MntPisos/",
+                    "MEN_RUTA" => "../MntPiso/",
                     "MEN_GRUPO" => "Mantenimiento",
                     "MEND_PERMI" => "Si",
                     "MEN_IDENTI" => "pisos"

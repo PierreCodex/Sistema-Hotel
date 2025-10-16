@@ -7,7 +7,7 @@
 class SessionManager {
     
     // Tiempo de vida de la sesión en segundos (5 minutos para pruebas)
-    const SESSION_LIFETIME = 300; // 5 minutos
+    const SESSION_LIFETIME = 1200; // 5 minutos
     
     // Tiempo de advertencia antes de expirar (1 minuto antes)
     const WARNING_TIME = 60; // 1 minuto

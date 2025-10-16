@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd"
+         colors="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         cacheDirectory=".phpunit.cache"
+         backupGlobals="false"
+         backupStaticProperties="false"
+         bootstrap="tests/bootstrap.php"
+         testdox="true">
+    
+    <!-- Configuración de directorios de pruebas -->
+    <testsuites>
+        <testsuite name="Unit Tests">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Integration Tests">
+            <directory>tests/Integration</directory>
+        </testsuite>
+        <testsuite name="Feature Tests">
+            <directory>tests/Feature</directory>
+        </testsuite>
+    </testsuites>
+
+    <!-- Configuración de cobertura de código -->
+    <source>
+        <include>
+            <directory>models</directory>
+            <directory>controller</directory>
+            <directory>config</directory>
+        </include>
+        <exclude>
+            <directory>vendor</directory>
+            <directory>tests</directory>
+            <directory>assets</directory>
+            <directory>view</directory>
+        </exclude>
+    </source>
+
+    <!-- Configuración de logging -->
+    <logging>
+        <testdoxHtml outputFile="tests/reports/testdox.html"/>
+        <junit outputFile="tests/reports/junit.xml"/>
+    </logging>
+
+    <!-- Variables de entorno para pruebas -->
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="DB_HOST" value="localhost"/>
+        <env name="DB_NAME" value="hotel_test"/>
+        <env name="DB_USER" value="root"/>
+        <env name="DB_PASS" value=""/>
+    </php>
+</phpunit>

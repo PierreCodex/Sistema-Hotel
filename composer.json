@@ -1,0 +1,8 @@
+{
+    "name": "hotel/sistema-hotel-php",
+    "description": "Sistema de gestión hotelera",
+    "type": "project",
+    "require-dev": {
+        "phpunit/phpunit": "10.0"
+    }
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="ExampleTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\ExampleTest.php" tests="4" assertions="15" errors="0" failures="0" skipped="0" time="0.036619">
+    <testcase name="testBasicAssertion" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\ExampleTest.php" line="13" class="ExampleTest" classname="ExampleTest" assertions="3" time="0.028621"/>
+    <testcase name="testMathOperations" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\ExampleTest.php" line="23" class="ExampleTest" classname="ExampleTest" assertions="4" time="0.000392"/>
+    <testcase name="testArrayOperations" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\ExampleTest.php" line="34" class="ExampleTest" classname="ExampleTest" assertions="4" time="0.004913"/>
+    <testcase name="testStringOperations" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\ExampleTest.php" line="47" class="ExampleTest" classname="ExampleTest" assertions="4" time="0.002693"/>
+  </testsuite>
+</testsuites>
