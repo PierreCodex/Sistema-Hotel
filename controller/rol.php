@@ -8,31 +8,32 @@
     switch($_GET["op"]){
         /* TODO: Guardar y editar, guardar cuando el ID este vacio, y Actualizar cuando se envie el ID */
         case "guardaryeditar":
-            // Validaciones del servidor
+            // Validaciones del servidor usando funciones del modelo
             $response = array();
             
-            // Validar que el nombre no esté vacío
-            if(empty(trim($_POST["rol_nom"]))){
+            // Validar nombre usando función del modelo
+            if(!$rol->validarNombre($_POST["rol_nom"])){
                 $response['status'] = 'error';
-                $response['message'] = 'El nombre del rol es obligatorio';
+                $response['message'] = 'El nombre del rol es inválido. Solo se permiten letras, espacios, guiones y guiones bajos';
                 echo json_encode($response);
                 exit;
             }
             
-            // Validar longitud del nombre
-            if(strlen(trim($_POST["rol_nom"])) < 2){
+            // Validar longitud usando función del modelo
+            if(!$rol->validarLongitud($_POST["rol_nom"])){
                 $response['status'] = 'error';
-                $response['message'] = 'El nombre del rol debe tener al menos 2 caracteres';
+                $response['message'] = 'El nombre del rol debe tener entre 3 y 50 caracteres';
                 echo json_encode($response);
                 exit;
             }
             
-            if(strlen(trim($_POST["rol_nom"])) > 50){
-                $response['status'] = 'error';
-                $response['message'] = 'El nombre del rol no puede exceder 50 caracteres';
-                echo json_encode($response);
-                exit;
-            }
+            // Alternativa: Usar validación completa
+            // if(!$rol->validarRol($_POST["rol_nom"])){
+            //     $response['status'] = 'error';
+            //     $response['message'] = 'El nombre del rol no cumple con los requisitos de validación';
+            //     echo json_encode($response);
+            //     exit;
+            // }
             
             // Validar duplicados
             $rol_id = empty($_POST["rol_id"]) ? null : $_POST["rol_id"];

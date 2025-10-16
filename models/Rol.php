@@ -1,8 +1,10 @@
 <?php
-class Rol extends Conectar{
+class Rol extends Conectar
+{
 
     /* Listar todos los roles activos */
-    public function get_rol(){
+    public function get_rol()
+    {
         $conectar = parent::conexion();
         parent::set_names();
         $sql = "CALL SP_L_ROL_01()";
@@ -12,7 +14,8 @@ class Rol extends Conectar{
     }
 
     /* Obtener rol por ID */
-    public function get_rol_x_rol_id($rol_id){
+    public function get_rol_x_rol_id($rol_id)
+    {
         $conectar = parent::conexion();
         parent::set_names();
         $sql = "CALL SP_L_ROL_02(?)";
@@ -23,7 +26,8 @@ class Rol extends Conectar{
     }
 
     /* Eliminar rol (cambio de estado) */
-    public function delete_rol($rol_id){
+    public function delete_rol($rol_id)
+    {
         $conectar = parent::conexion();
         parent::set_names();
         $sql = "CALL SP_D_ROL_01(?)";
@@ -34,7 +38,8 @@ class Rol extends Conectar{
     }
 
     /* Insertar nuevo rol */
-    public function insert_rol($rol_nom){
+    public function insert_rol($rol_nom)
+    {
         $conectar = parent::conexion();
         parent::set_names();
         $sql = "CALL SP_I_ROL_01(?)";
@@ -45,7 +50,8 @@ class Rol extends Conectar{
     }
 
     /* Actualizar rol */
-    public function update_rol($rol_id, $rol_nom){
+    public function update_rol($rol_id, $rol_nom)
+    {
         $conectar = parent::conexion();
         parent::set_names();
         $sql = "CALL SP_U_ROL_01(?,?)";
@@ -57,7 +63,8 @@ class Rol extends Conectar{
     }
 
     /* Listar todos los roles (activos e inactivos) */
-    public function get_rol_all(){
+    public function get_rol_all()
+    {
         $conectar = parent::conexion();
         parent::set_names();
         $sql = "CALL SP_L_ROL_03()";
@@ -67,7 +74,8 @@ class Rol extends Conectar{
     }
 
     /* Reactivar rol */
-    public function activate_rol($rol_id){
+    public function activate_rol($rol_id)
+    {
         $conectar = parent::conexion();
         parent::set_names();
         $sql = "CALL SP_A_ROL_01(?)";
@@ -78,7 +86,8 @@ class Rol extends Conectar{
     }
 
     /* Buscar roles por descripción */
-    public function search_rol($buscar){
+    public function search_rol($buscar)
+    {
         $conectar = parent::conexion();
         parent::set_names();
         $sql = "CALL SP_S_ROL_01(?)";
@@ -89,11 +98,12 @@ class Rol extends Conectar{
     }
 
     /* Verificar si existe un rol con el mismo nombre */
-    public function verificar_rol_existente($rol_nom, $rol_id = null){
+    public function verificar_rol_existente($rol_nom, $rol_id = null)
+    {
         $conectar = parent::conexion();
         parent::set_names();
-        
-        if($rol_id == null){
+
+        if ($rol_id == null) {
             // Para inserción - verificar si existe el nombre
             $sql = "SELECT COUNT(*) as total FROM rol WHERE UPPER(TRIM(Descripcion)) = UPPER(TRIM(?)) AND Estado = 1";
             $sql = $conectar->prepare($sql);
@@ -105,11 +115,23 @@ class Rol extends Conectar{
             $sql->bindValue(1, $rol_nom);
             $sql->bindValue(2, $rol_id);
         }
-        
+
         $sql->execute();
         $resultado = $sql->fetch(PDO::FETCH_ASSOC);
         return $resultado['total'] > 0;
     }
+// agregue metodo para validar el nombre del rol
+    public function validarNombre($nombre)
+    {
+        // Solo letras, espacios y tildes
+        return preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', trim($nombre)) === 1;
+    }
 
+// agregue metodo para validar la longitud del nombre del rol
+    public function validarLongitud($nombre)
+    {
+        $longitud = strlen(trim($nombre));
+        return $longitud >= 3 && $longitud <=50;
+    }
 }
 ?>

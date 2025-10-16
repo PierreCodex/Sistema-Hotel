@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="UsuarioTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" tests="9" assertions="64" errors="0" failures="1" skipped="0" time="0.298683">
-    <testcase name="testUsuarioSeInstanciaCorrectamente" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="21" class="UsuarioTest" classname="UsuarioTest" assertions="1" time="0.015223"/>
-    <testcase name="testValidacionFormatoCorreo" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="29" class="UsuarioTest" classname="UsuarioTest" assertions="10" time="0.001645"/>
-    <testcase name="testValidacionDNI" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="67" class="UsuarioTest" classname="UsuarioTest" assertions="9" time="0.000235"/>
-    <testcase name="testValidacionNombres" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="104" class="UsuarioTest" classname="UsuarioTest" assertions="9" time="0.029188">
-      <failure type="PHPUnit\Framework\ExpectationFailedException">UsuarioTest::testValidacionNombres&#13;
-El nombre '   ' debería ser inválido
+  <testsuite name="RolTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolTest.php" tests="4" assertions="5" errors="0" failures="3" skipped="0" time="0.107489">
+    <testcase name="testValidarNombreValido" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolTest.php" line="18" class="RolTest" classname="RolTest" assertions="1" time="0.095879">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">RolTest::testValidarNombreValido&#13;
+Failed asserting that false is true.
+&#13;
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolTest.php:20</failure>
+    </testcase>
+    <testcase name="testValidarNombreInvalido" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolTest.php" line="23" class="RolTest" classname="RolTest" assertions="1" time="0.003292"/>
+    <testcase name="testValidarLongitudCorrecta" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolTest.php" line="28" class="RolTest" classname="RolTest" assertions="1" time="0.003609">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">RolTest::testValidarLongitudCorrecta&#13;
+Failed asserting that false is true.
+&#13;
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolTest.php:30</failure>
+    </testcase>
+    <testcase name="testValidarLongitudIncorrecta" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolTest.php" line="33" class="RolTest" classname="RolTest" assertions="2" time="0.004708">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">RolTest::testValidarLongitudIncorrecta&#13;
 Failed asserting that true is false.
 &#13;
-C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php:132</failure>
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolTest.php:36</failure>
     </testcase>
-    <testcase name="testValidacionContrasenas" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="142" class="UsuarioTest" classname="UsuarioTest" assertions="8" time="0.000436"/>
-    <testcase name="testParametrosNoVacios" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="178" class="UsuarioTest" classname="UsuarioTest" assertions="6" time="0.005509"/>
-    <testcase name="testValidacionIDNumerico" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="201" class="UsuarioTest" classname="UsuarioTest" assertions="10" time="0.000403"/>
-    <testcase name="testHashContrasena" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="227" class="UsuarioTest" classname="UsuarioTest" assertions="4" time="0.245770"/>
-    <testcase name="testValidacionTerminoBusqueda" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioTest.php" line="244" class="UsuarioTest" classname="UsuarioTest" assertions="7" time="0.000275"/>
   </testsuite>
 </testsuites>
