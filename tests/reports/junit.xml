@@ -1,31 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="RolControllerTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" tests="11" assertions="45" errors="0" failures="2" skipped="0" time="0.135711">
-    <testcase name="testGuardarYEditarRechazaNombreVacio" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="17" class="RolControllerTest" classname="RolControllerTest" assertions="3" time="0.013342"/>
-    <testcase name="testGuardarYEditarRechazaNombreMuyCorto" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="41" class="RolControllerTest" classname="RolControllerTest" assertions="1" time="0.036988">
-      <failure type="PHPUnit\Framework\ExpectationFailedException">RolControllerTest::testGuardarYEditarRechazaNombreMuyCorto&#13;
-Failed asserting that true is false.
-&#13;
-C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php:49</failure>
-    </testcase>
-    <testcase name="testGuardarYEditarRechazaNombreMuyLargo" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="66" class="RolControllerTest" classname="RolControllerTest" assertions="3" time="0.000487"/>
-    <testcase name="testGuardarYEditarInsercionExitosa" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="91" class="RolControllerTest" classname="RolControllerTest" assertions="6" time="0.000434"/>
-    <testcase name="testGuardarYEditarActualizacionExitosa" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="123" class="RolControllerTest" classname="RolControllerTest" assertions="6" time="0.000436"/>
-    <testcase name="testGuardarYEditarRechazaRolDuplicado" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="155" class="RolControllerTest" classname="RolControllerTest" assertions="3" time="0.000269"/>
-    <testcase name="testListarEstructuraDataTables" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="180" class="RolControllerTest" classname="RolControllerTest" assertions="12" time="0.002745"/>
-    <testcase name="testMostrarEstructuraJSON" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="225" class="RolControllerTest" classname="RolControllerTest" assertions="4" time="0.000387"/>
-    <testcase name="testEliminarValidacionID" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="251" class="RolControllerTest" classname="RolControllerTest" assertions="2" time="0.000243"/>
-    <testcase name="testComboHTMLConDatos" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="268" class="RolControllerTest" classname="RolControllerTest" assertions="4" time="0.000306"/>
-    <testcase name="testComboSinDatos" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="295" class="RolControllerTest" classname="RolControllerTest" assertions="1" time="0.080073">
-      <failure type="PHPUnit\Framework\ExpectationFailedException">RolControllerTest::testComboSinDatos&#13;
-Failed asserting that two strings are equal.
---- Expected
-+++ Actual
-@@ @@
--''
-+'&lt;option selected&gt;Seleccionar&lt;/option&gt;&lt;option value='1'&gt;Editor&lt;/option&gt;&lt;option value='2'&gt;Coobertura&lt;/option&gt;'
-&#13;
-C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php:313</failure>
-    </testcase>
+  <testsuite name="CategoriaModelTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" tests="8" assertions="42" errors="0" failures="0" skipped="0" time="0.223542">
+    <testcase name="testGetCategoria" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" line="88" class="CategoriaModelTest" classname="CategoriaModelTest" assertions="9" time="0.069862"/>
+    <testcase name="testGetCategoriaXCatId" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" line="136" class="CategoriaModelTest" classname="CategoriaModelTest" assertions="6" time="0.012260"/>
+    <testcase name="testInsertCategoria" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" line="187" class="CategoriaModelTest" classname="CategoriaModelTest" assertions="2" time="0.009588"/>
+    <testcase name="testUpdateCategoria" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" line="222" class="CategoriaModelTest" classname="CategoriaModelTest" assertions="4" time="0.017472"/>
+    <testcase name="testDeleteCategoria" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" line="275" class="CategoriaModelTest" classname="CategoriaModelTest" assertions="3" time="0.031333"/>
+    <testcase name="testVerificarCategoriaExistenteParaInsercion" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" line="343" class="CategoriaModelTest" classname="CategoriaModelTest" assertions="2" time="0.016617"/>
+    <testcase name="testVerificarCategoriaExistenteParaActualizacion" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" line="381" class="CategoriaModelTest" classname="CategoriaModelTest" assertions="5" time="0.029114"/>
+    <testcase name="testFlujoCompletoModelo" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" line="447" class="CategoriaModelTest" classname="CategoriaModelTest" assertions="11" time="0.037296"/>
   </testsuite>
 </testsuites>
