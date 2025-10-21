@@ -120,12 +120,7 @@ class Rol extends Conectar
         $resultado = $sql->fetch(PDO::FETCH_ASSOC);
         return $resultado['total'] > 0;
     }
-// agregue metodo para validar el nombre del rol
-    public function validarNombre($nombre)
-    {
-        // Solo letras, espacios y tildes
-        return preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', trim($nombre)) === 1;
-    }
+
 
 // agregue metodo para validar la longitud del nombre del rol
     public function validarLongitud($nombre)

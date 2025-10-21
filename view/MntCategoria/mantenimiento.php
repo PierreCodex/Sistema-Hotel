@@ -17,7 +17,7 @@
                                        class="form-control" 
                                        id="cat_nom" 
                                        name="cat_nom" 
-                                       required
+                                    
                                        minlength="2"
                                        maxlength="50"
                                        placeholder="Ingrese el nombre de la categoría"

@@ -11,10 +11,10 @@
             // Validaciones del servidor usando funciones del modelo
             $response = array();
             
-            // Validar nombre usando función del modelo
-            if(!$rol->validarNombre($_POST["rol_nom"])){
+            // Validar nombre vacío
+            if(empty(trim($_POST["rol_nom"]))){
                 $response['status'] = 'error';
-                $response['message'] = 'El nombre del rol es inválido. Solo se permiten letras, espacios, guiones y guiones bajos';
+                $response['message'] = 'El nombre del rol es obligatorio';
                 echo json_encode($response);
                 exit;
             }
@@ -27,17 +27,12 @@
                 exit;
             }
             
-            // Alternativa: Usar validación completa
-            // if(!$rol->validarRol($_POST["rol_nom"])){
-            //     $response['status'] = 'error';
-            //     $response['message'] = 'El nombre del rol no cumple con los requisitos de validación';
-            //     echo json_encode($response);
-            //     exit;
-            // }
             
-            // Validar duplicados
-            $rol_id = empty($_POST["rol_id"]) ? null : $_POST["rol_id"];
-            if($rol->verificar_rol_existente($_POST["rol_nom"], $rol_id)){
+            // Verificar si ya existe un rol con el mismo nombre
+            $existe = $rol->verificar_rol_existente($_POST["rol_nom"], 
+                empty($_POST["rol_id"]) ? null : $_POST["rol_id"]);
+            
+            if($existe){
                 $response['status'] = 'error';
                 $response['message'] = 'Ya existe un rol con este nombre';
                 echo json_encode($response);

@@ -1,24 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="RolTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolTest.php" tests="4" assertions="5" errors="0" failures="3" skipped="0" time="0.107489">
-    <testcase name="testValidarNombreValido" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolTest.php" line="18" class="RolTest" classname="RolTest" assertions="1" time="0.095879">
-      <failure type="PHPUnit\Framework\ExpectationFailedException">RolTest::testValidarNombreValido&#13;
-Failed asserting that false is true.
-&#13;
-C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolTest.php:20</failure>
-    </testcase>
-    <testcase name="testValidarNombreInvalido" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolTest.php" line="23" class="RolTest" classname="RolTest" assertions="1" time="0.003292"/>
-    <testcase name="testValidarLongitudCorrecta" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolTest.php" line="28" class="RolTest" classname="RolTest" assertions="1" time="0.003609">
-      <failure type="PHPUnit\Framework\ExpectationFailedException">RolTest::testValidarLongitudCorrecta&#13;
-Failed asserting that false is true.
-&#13;
-C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolTest.php:30</failure>
-    </testcase>
-    <testcase name="testValidarLongitudIncorrecta" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolTest.php" line="33" class="RolTest" classname="RolTest" assertions="2" time="0.004708">
-      <failure type="PHPUnit\Framework\ExpectationFailedException">RolTest::testValidarLongitudIncorrecta&#13;
+  <testsuite name="RolControllerTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" tests="11" assertions="45" errors="0" failures="2" skipped="0" time="0.135711">
+    <testcase name="testGuardarYEditarRechazaNombreVacio" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="17" class="RolControllerTest" classname="RolControllerTest" assertions="3" time="0.013342"/>
+    <testcase name="testGuardarYEditarRechazaNombreMuyCorto" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="41" class="RolControllerTest" classname="RolControllerTest" assertions="1" time="0.036988">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">RolControllerTest::testGuardarYEditarRechazaNombreMuyCorto&#13;
 Failed asserting that true is false.
 &#13;
-C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolTest.php:36</failure>
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php:49</failure>
+    </testcase>
+    <testcase name="testGuardarYEditarRechazaNombreMuyLargo" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="66" class="RolControllerTest" classname="RolControllerTest" assertions="3" time="0.000487"/>
+    <testcase name="testGuardarYEditarInsercionExitosa" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="91" class="RolControllerTest" classname="RolControllerTest" assertions="6" time="0.000434"/>
+    <testcase name="testGuardarYEditarActualizacionExitosa" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="123" class="RolControllerTest" classname="RolControllerTest" assertions="6" time="0.000436"/>
+    <testcase name="testGuardarYEditarRechazaRolDuplicado" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="155" class="RolControllerTest" classname="RolControllerTest" assertions="3" time="0.000269"/>
+    <testcase name="testListarEstructuraDataTables" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="180" class="RolControllerTest" classname="RolControllerTest" assertions="12" time="0.002745"/>
+    <testcase name="testMostrarEstructuraJSON" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="225" class="RolControllerTest" classname="RolControllerTest" assertions="4" time="0.000387"/>
+    <testcase name="testEliminarValidacionID" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="251" class="RolControllerTest" classname="RolControllerTest" assertions="2" time="0.000243"/>
+    <testcase name="testComboHTMLConDatos" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="268" class="RolControllerTest" classname="RolControllerTest" assertions="4" time="0.000306"/>
+    <testcase name="testComboSinDatos" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="295" class="RolControllerTest" classname="RolControllerTest" assertions="1" time="0.080073">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">RolControllerTest::testComboSinDatos&#13;
+Failed asserting that two strings are equal.
+--- Expected
++++ Actual
+@@ @@
+-''
++'&lt;option selected&gt;Seleccionar&lt;/option&gt;&lt;option value='1'&gt;Editor&lt;/option&gt;&lt;option value='2'&gt;Coobertura&lt;/option&gt;'
+&#13;
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php:313</failure>
     </testcase>
   </testsuite>
 </testsuites>
