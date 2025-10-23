@@ -46,6 +46,19 @@
                             <div>
                                 <label for="valueInput" class="form-label">Correo</label>
                                 <input type="email" class="form-control" id="usu_correo" name="usu_correo" />
+<<<<<<< HEAD
+=======
+                                <div class="valid-feedback">
+                                    Email disponible
+                                </div>
+                                <div class="invalid-feedback" id="email-feedback">
+                                    Por favor, ingrese un email válido
+                                </div>
+                                <!-- Mensaje específico para email duplicado -->
+                                <div class="text-danger mt-1" id="email-duplicate-message" style="display: none;">
+                                    <i class="ri-error-warning-line"></i> Email ya existente
+                                </div>
+>>>>>>> desarrollo
                             </div>
                         </div>
                     </div>

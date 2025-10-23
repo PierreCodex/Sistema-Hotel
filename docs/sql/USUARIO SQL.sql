@@ -2,8 +2,37 @@
 -- STORED PROCEDURES PARA TABLA USUARIO
 -- Estructura: IdUsuario, Nombre, Apellido, DNI, Correo, Pass, Estado, FechaCreacion, IdRol
 -- =============================================
+<<<<<<< HEAD
 
 -- 1. Listar todos los usuarios activos excluyendo al usuario logueado
+=======
+-- 1. Listar todos los usuarios (activos e inactivos) excluyendo al usuario logueado
+DELIMITER $$
+CREATE PROCEDURE SP_L_USUARIO_03(IN CURRENT_USER_ID INT)
+BEGIN
+    SELECT 
+        u.IdUsuario AS USU_ID,
+        u.Nombre AS USU_NOM,
+        u.Apellido AS USU_APE,
+        u.DNI AS USU_DNI,
+        u.Correo AS USU_CORREO,
+        u.Estado AS EST,
+        DATE_FORMAT(u.FechaCreacion, '%d/%m/%Y %H:%i:%s') AS FECH_CREA,
+        u.IdRol AS ROL_ID,
+        COALESCE(r.Descripcion, 'Sin Rol') AS ROL_NOM,
+        CASE 
+            WHEN u.Estado = 1 THEN 'Activo'
+            ELSE 'Inactivo'
+        END AS EST_TEXTO
+    FROM usuario u
+    LEFT JOIN rol r ON u.IdRol = r.IdRol
+    WHERE u.IdUsuario != CURRENT_USER_ID
+    ORDER BY u.FechaCreacion DESC;
+END$$
+DELIMITER ;
+
+-- SIN USAR. Listar todos los usuarios activos excluyendo al usuario logueado
+>>>>>>> desarrollo
 DELIMITER $$
 CREATE PROCEDURE SP_L_USUARIO_01(IN CURRENT_USER_ID INT)
 BEGIN
@@ -71,7 +100,11 @@ BEGIN
 END$$
 DELIMITER ;
 
+<<<<<<< HEAD
 -- 5. Actualizar usuario existente
+=======
+-- 5.  Actualizar usuario existente
+>>>>>>> desarrollo
 DELIMITER $$
 CREATE PROCEDURE SP_U_USUARIO_01(
     IN USU_ID INT,
@@ -97,6 +130,7 @@ BEGIN
 END$$
 DELIMITER ;
 
+<<<<<<< HEAD
 -- 6. Listar todos los usuarios (activos e inactivos) excluyendo al usuario logueado
 DELIMITER $$
 CREATE PROCEDURE SP_L_USUARIO_03(IN CURRENT_USER_ID INT)
@@ -123,6 +157,11 @@ END$$
 DELIMITER ;
 
 -- 7. Reactivar usuario
+=======
+
+
+-- 7. SIN USAR: Reactivar usuario
+>>>>>>> desarrollo
 DELIMITER $$
 CREATE PROCEDURE SP_A_USUARIO_01(IN USU_ID INT)
 BEGIN
@@ -132,7 +171,11 @@ BEGIN
 END$$
 DELIMITER ;
 
+<<<<<<< HEAD
 -- 8. Buscar usuarios por nombre, apellido o correo
+=======
+-- 8. SIN USAR : Buscar usuarios por nombre, apellido o correo
+>>>>>>> desarrollo
 DELIMITER $$
 CREATE PROCEDURE SP_S_USUARIO_01(IN BUSCAR VARCHAR(100))
 BEGIN
@@ -156,7 +199,11 @@ BEGIN
 END$$
 DELIMITER ;
 
+<<<<<<< HEAD
 -- 9. Procedimiento de inserción modificado con reactivación
+=======
+-- 9. SIN USAR:  Procedimiento de inserción modificado con reactivación
+>>>>>>> desarrollo
 DELIMITER $$
 CREATE PROCEDURE SP_I_USUARIO_02(
     IN USU_NOM VARCHAR(50),
@@ -232,7 +279,11 @@ BEGIN
 END$$
 DELIMITER ;
 
+<<<<<<< HEAD
 -- 12. Combo box de usuarios activos
+=======
+-- 12. SIN USAR Combo box de usuarios activos
+>>>>>>> desarrollo
 DELIMITER $$
 CREATE PROCEDURE SP_L_USUARIO_COMBO_01()
 BEGIN

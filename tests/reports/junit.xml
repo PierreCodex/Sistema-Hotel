@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
+<<<<<<< HEAD
   <testsuite name="RolModelTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php" tests="3" assertions="3" errors="0" failures="1" skipped="0" time="0.017183">
     <testcase name="validar_longitud_acepta_nombre_valido" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php" line="16" class="RolModelTest" classname="RolModelTest" assertions="1" time="0.005613"/>
     <testcase name="validar_longitud_rechaza_nombre_muy_corto" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php" line="22" class="RolModelTest" classname="RolModelTest" assertions="1" time="0.011141">
@@ -9,5 +10,26 @@ Failed asserting that false is true.
 C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php:24</failure>
     </testcase>
     <testcase name="validar_longitud_rechaza_nombre_demasiado_largo" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php" line="28" class="RolModelTest" classname="RolModelTest" assertions="1" time="0.000430"/>
+=======
+  <testsuite name="TestAuth" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" tests="6" assertions="7" errors="0" failures="2" skipped="0" time="0.121272">
+    <testcase name="testFindUserByCredentials" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="53" class="TestAuth" classname="TestAuth" assertions="1" time="0.083735">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">TestAuth::testFindUserByCredentials&#13;
+El método debe retornar datos del usuario, no false
+Failed asserting that false is not false.
+&#13;
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php:61</failure>
+    </testcase>
+    <testcase name="testFindUserWithInvalidCredentials" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="77" class="TestAuth" classname="TestAuth" assertions="1" time="0.008265"/>
+    <testcase name="testFindNonExistentUser" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="93" class="TestAuth" classname="TestAuth" assertions="1" time="0.006419"/>
+    <testcase name="testFindInactiveUser" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="109" class="TestAuth" classname="TestAuth" assertions="1" time="0.008301"/>
+    <testcase name="testEmailExists" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="128" class="TestAuth" classname="TestAuth" assertions="1" time="0.009278">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">TestAuth::testEmailExists&#13;
+Debe encontrar el email existente
+Failed asserting that an array is not empty.
+&#13;
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php:136</failure>
+    </testcase>
+    <testcase name="testDatabaseConnection" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="146" class="TestAuth" classname="TestAuth" assertions="2" time="0.005273"/>
+>>>>>>> desarrollo
   </testsuite>
 </testsuites>
