@@ -40,7 +40,7 @@ final class RolControllerTest extends TestCase
      */
     public function testGuardarYEditarRechazaNombreMuyCorto(): void
     {
-        $rol_nom = 'ABC'; // Solo 2 caracteres
+        $rol_nom = 'AB'; // Solo 2 caracteres
         
         // Simular validación de longitud (3-50 caracteres)
         $longitud = strlen(trim($rol_nom));

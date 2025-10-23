@@ -5,30 +5,30 @@
     require_once("../models/Rol.php");
     /* TODO: Inicializando clase */
     $usuario = new Usuario();
-    $rol = new Rol();
+
 
     switch($_GET["op"]){
-        /* TODO: Guardar y editar, guardar cuando el ID este vacio, y Actualizar cuando se envie el ID */
-        case "guardaryeditar":
+         case "guardaryeditar": 
             if(empty($_POST["usu_id"])){
-                // Insertar nuevo usuario
-                $usuario->insert_usuario($_POST["usu_nom"], $_POST["usu_ape"], $_POST["usu_dni"], $_POST["usu_correo"], $_POST["usu_pass"], $_POST["rol_id"]);
+                $usuario->insert_usuario(
+                    $_POST["usu_nom"],
+                    $_POST["usu_ape"],
+                    $_POST["usu_dni"],
+                    $_POST["usu_correo"],
+                    $_POST["usu_pass"],
+
+                    $_POST["rol_id"]
+                );
             }else{
-                // Actualizar usuario existente
-                
-                /*
-                 * FUNCIONALIDAD: PRESERVACIÓN DE CONTRASEÑA EN MODO EDICIÓN
-                 * 
-               */
-                if(isset($_POST["usu_pass"]) && !empty($_POST["usu_pass"])){
-                    // CASO 1: Se envió contraseña → Actualizar incluyendo la nueva contraseña
-                    // Usado para: usuarios nuevos o cuando se quiere cambiar la contraseña
-                    $usuario->update_usuario($_POST["usu_id"], $_POST["usu_nom"], $_POST["usu_ape"], $_POST["usu_dni"], $_POST["usu_correo"], $_POST["usu_pass"], $_POST["rol_id"]);
-                } else {
-                    // CASO 2: NO se envió contraseña → Actualizar SIN tocar la contraseña
-                    // Usado para: edición de usuario donde se preserva la contraseña original
-                    $usuario->update_usuario_sin_password($_POST["usu_id"], $_POST["usu_nom"], $_POST["usu_ape"], $_POST["usu_dni"], $_POST["usu_correo"], $_POST["rol_id"]);
-                }
+                $usuario->update_usuario(
+                    $_POST["usu_id"],
+                    $_POST["usu_nom"],
+                    $_POST["usu_ape"],
+                    $_POST["usu_dni"],
+                    $_POST["usu_correo"],
+                    $_POST["usu_pass"],
+                    $_POST["rol_id"]
+                );
             }
             break;
 
@@ -86,65 +86,36 @@
         case "eliminar":
             $usuario->delete_usuario($_POST["usu_id"]);
             break;
-
-        /* TODO: Activar usuario (cambiar estado a 1) 
-        case "activar":
-            $usuario->activar_usuario($_POST["usu_id"]);
-            break;
-        */
-        /* TODO: Buscar usuarios */
-        case "buscar":
-            $datos=$usuario->buscar_usuario($_POST["buscar"]);
-            $data=Array();
-            foreach($datos as $row){
-                $sub_array = array();
-                $sub_array[] = $row["USU_NOM"];
-                $sub_array[] = $row["USU_APE"];
-                $sub_array[] = $row["USU_DNI"];
-                $sub_array[] = $row["USU_CORREO"];
-                $sub_array[] = $row["ROL_NOM"];
-                $sub_array[] = ($row["EST"] == 1) ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>';
-                $sub_array[] = '<button type="button" onClick="editar('.$row["USU_ID"].')" id="'.$row["USU_ID"].'" class="btn btn-warning btn-icon waves-effect waves-light"><i class="ri-edit-2-line"></i></button>';
-                $sub_array[] = '<button type="button" onClick="eliminar('.$row["USU_ID"].')" id="'.$row["USU_ID"].'" class="btn btn-danger btn-icon waves-effect waves-light"><i class="ri-delete-bin-5-line"></i></button>';
-                $data[] = $sub_array;
-            }
-
-            $results = array(
-                "sEcho"=>1,
-                "iTotalRecords"=>count($data),
-                "iTotalDisplayRecords"=>count($data),
-                "aaData"=>$data);
-            echo json_encode($results);
-            break;
-
+ 
         /* TODO: Actualizar contraseña */
         case "actualizar_password":
-            $usuario->update_password($_POST["usu_id"], $_POST["usu_pass"]);
+            $usuario->update_usuario_pass($_POST["usu_id"], $_POST["usu_pass"]);
             break;
 
-        /* TODO: Listar Combo de Usuarios */
-        case "combo":
-            $datos=$usuario->get_usuario_combo();
-            if(is_array($datos)==true and count($datos)>0){
-                $html="";
-                $html.="<option selected>Seleccionar</option>";
-                foreach($datos as $row){
-                    $html.= "<option value='".$row["IDUSUARIO"]."'>".$row["NOMBRE"]." ".$row["APELLIDO"]."</option>";
+        /* TODO: Validar si existe email duplicado */
+        case "validar_email":
+            $datos = $usuario->existe_usuario_correo($_POST["usu_correo"]);
+            $existe_duplicado = false;
+            
+            if(is_array($datos) && count($datos) > 0){
+                // Si estamos en modo edición, verificar si el email pertenece al mismo usuario
+                if(isset($_POST["usu_id"]) && !empty($_POST["usu_id"])){
+                    foreach($datos as $row){
+                        if($row["IdUsuario"] != $_POST["usu_id"]){
+                            $existe_duplicado = true;
+                            break;
+                        }
+                    }
+                } else {
+                    // Modo nuevo registro, cualquier email existente es duplicado
+                    $existe_duplicado = true;
                 }
-                echo $html;
             }
-            break;
-
-        /* TODO: Listar Combo de Roles */
-        case "combo_rol":
-            $datos=$rol->get_rol();
-            if(is_array($datos)==true and count($datos)>0){
-                $html="";
-                $html.="<option selected>Seleccionar</option>";
-                foreach($datos as $row){
-                    $html.= "<option value='".$row["ROL_ID"]."'>".$row["ROL_NOM"]."</option>";
-                }
-                echo $html;
+            
+            if($existe_duplicado){
+                echo json_encode(array("existe" => true, "mensaje" => "Email ya existente"));
+            } else {
+                echo json_encode(array("existe" => false, "mensaje" => "Email disponible"));
             }
             break;
 

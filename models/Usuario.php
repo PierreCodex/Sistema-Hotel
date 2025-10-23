@@ -94,55 +94,8 @@ class Usuario extends Conectar
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /*
-      MÉTODO ESPECIALIZADO: Actualizar usuario SIN modificar contraseña
-    
-    */
-   
-    public function update_usuario_sin_password($usu_id, $usu_nom, $usu_ape, $usu_dni, $usu_correo, $rol_id)
-    {
-        $conectar = parent::conexion();
-        parent::set_names();
-        $sql = "CALL SP_U_USUARIO_SIN_PASS_01(?,?,?,?,?,?)";        
-        $sql = $conectar->prepare($sql);
-        $sql->bindValue(1, $usu_id);       
-        $sql->bindValue(2, $usu_nom);     
-        $sql->bindValue(3, $usu_ape);     
-        $sql->bindValue(4, $usu_dni);     
-        $sql->bindValue(5, $usu_correo);  
-        $sql->bindValue(6, $rol_id);       
-      
-        
-        $sql->execute();
-        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /* Reactivar usuario */
-    public function activar_usuario($usu_id)
-    {
-        $conectar = parent::conexion();
-        parent::set_names();
-        $sql = "CALL SP_A_USUARIO_01(?)";
-        $sql = $conectar->prepare($sql);
-        $sql->bindValue(1, $usu_id);
-        $sql->execute();
-        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /* Buscar usuarios */
-    public function buscar_usuario($buscar)
-    {
-        $conectar = parent::conexion();
-        parent::set_names();
-        $sql = "CALL SP_S_USUARIO_01(?)";
-        $sql = $conectar->prepare($sql);
-        $sql->bindValue(1, $buscar);
-        $sql->execute();
-        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
-    }
-
     /* Actualizar contraseña */
-    public function update_password($usu_id, $usu_pass)
+    public function update_usuario_pass($usu_id, $usu_pass)
     {
         $conectar = parent::conexion();
         parent::set_names();
@@ -154,14 +107,13 @@ class Usuario extends Conectar
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /* Combo box de usuarios */
-    public function get_usuario_combo()
-    {
-        $conectar = parent::conexion();
-        parent::set_names();
-        $sql = "CALL SP_L_USUARIO_COMBO_01()";
-        $sql = $conectar->prepare($sql);
-        $sql->execute();
-        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
+    // Validaciones de duplicados
+    public function existe_usuario_correo($usu_correo){
+        $conectar=parent::Conexion();
+        $sql="SELECT IdUsuario FROM usuario WHERE Correo = ? AND Estado=1";
+        $query=$conectar->prepare($sql);
+        $query->bindValue(1,$usu_correo);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 }

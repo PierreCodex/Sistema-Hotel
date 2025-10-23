@@ -85,17 +85,62 @@ function validateDNI(field) {
 function validateEmail(field) {
     const value = field.value.trim();
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const isValid = emailPattern.test(value);
+    const duplicateMessage = document.getElementById('email-duplicate-message');
+    const emailFeedback = document.getElementById('email-feedback');
     
-    if (isValid) {
-        field.classList.remove('is-invalid');
-        field.classList.add('is-valid');
-    } else {
-        field.classList.remove('is-valid');
+    // Limpiar estados previos
+    field.classList.remove('is-valid', 'is-invalid');
+    duplicateMessage.style.display = 'none';
+    
+    // Validar formato de email
+    if (!emailPattern.test(value)) {
         field.classList.add('is-invalid');
+        emailFeedback.textContent = 'Por favor, ingrese un email válido';
+        return false;
     }
     
-    return isValid;
+    // Si el formato es válido, verificar duplicados
+     if (value !== '') {
+         // Verificar si estamos en modo edición
+         const usuId = $('#usu_id').val();
+         const isEditing = usuId !== '';
+         
+         // Preparar datos para enviar
+         const postData = { usu_correo: value };
+         if (isEditing) {
+             postData.usu_id = usuId;
+         }
+         
+         $.ajax({
+             url: "../../controller/usuario.php?op=validar_email",
+             type: "POST",
+             data: postData,
+             dataType: "json",
+            success: function(response) {
+                if (response.existe) {
+                    // Email ya existe
+                    field.classList.remove('is-valid');
+                    field.classList.add('is-invalid');
+                    duplicateMessage.style.display = 'block';
+                    emailFeedback.textContent = 'Email ya existente';
+                } else {
+                    // Email disponible
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                    duplicateMessage.style.display = 'none';
+                    emailFeedback.textContent = 'Por favor, ingrese un email válido';
+                }
+            },
+            error: function() {
+                // En caso de error, solo validar formato
+                field.classList.remove('is-invalid');
+                field.classList.add('is-valid');
+                duplicateMessage.style.display = 'none';
+            }
+        });
+    }
+    
+    return true; // Retorna true para el formato, la validación de duplicados es asíncrona
 }
 
 // Validar contraseña
@@ -151,6 +196,19 @@ function guardaryeditar(e){
     // Validar todos los campos antes de enviar
     const form = document.getElementById('mantenimiento_form');
     const isFormValid = validateForm();
+    
+    // Verificar si hay email duplicado
+    const duplicateMessage = document.getElementById('email-duplicate-message');
+    const emailField = document.getElementById('usu_correo');
+    
+    if (duplicateMessage.style.display === 'block' || emailField.classList.contains('is-invalid')) {
+        swal.fire({
+            title: 'Email Duplicado',
+            text: 'El email ingresado ya existe en el sistema. Por favor, use otro email.',
+            icon: 'error'
+        });
+        return;
+    }
     
     if (!isFormValid) {
         // Mostrar mensaje de error si el formulario no es válido
@@ -208,6 +266,18 @@ function guardaryeditar(e){
         contentType:false,
         processData:false,
         success:function(data){
+
+             var resp = null;
+            try { resp = JSON.parse(data); } catch (e) { resp = null; }
+            if (resp && resp.status === 'error') {
+                swal.fire({
+                    title:'Usuario',
+                    text: resp.message || 'Error de validación',
+                    icon: 'error'
+                });
+                return;
+            }
+            
             $('#table_data').DataTable().ajax.reload();
             $('#modalmantenimiento').modal('hide');
             
@@ -255,7 +325,7 @@ function clearValidationClasses() {
 }
 
 function combo_rol(){
-    $.post("../../controller/usuario.php?op=combo_rol",function(data){
+    $.post("../../controller/rol.php?op=combo",function(data){
         $('#rol_id').html(data);
     });
 }

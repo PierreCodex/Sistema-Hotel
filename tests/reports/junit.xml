@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="CategoriaModelTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" tests="8" assertions="42" errors="0" failures="0" skipped="0" time="0.223542">
-    <testcase name="testGetCategoria" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" line="88" class="CategoriaModelTest" classname="CategoriaModelTest" assertions="9" time="0.069862"/>
-    <testcase name="testGetCategoriaXCatId" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" line="136" class="CategoriaModelTest" classname="CategoriaModelTest" assertions="6" time="0.012260"/>
-    <testcase name="testInsertCategoria" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" line="187" class="CategoriaModelTest" classname="CategoriaModelTest" assertions="2" time="0.009588"/>
-    <testcase name="testUpdateCategoria" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" line="222" class="CategoriaModelTest" classname="CategoriaModelTest" assertions="4" time="0.017472"/>
-    <testcase name="testDeleteCategoria" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" line="275" class="CategoriaModelTest" classname="CategoriaModelTest" assertions="3" time="0.031333"/>
-    <testcase name="testVerificarCategoriaExistenteParaInsercion" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" line="343" class="CategoriaModelTest" classname="CategoriaModelTest" assertions="2" time="0.016617"/>
-    <testcase name="testVerificarCategoriaExistenteParaActualizacion" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" line="381" class="CategoriaModelTest" classname="CategoriaModelTest" assertions="5" time="0.029114"/>
-    <testcase name="testFlujoCompletoModelo" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" line="447" class="CategoriaModelTest" classname="CategoriaModelTest" assertions="11" time="0.037296"/>
+  <testsuite name="TestAuth" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" tests="6" assertions="7" errors="0" failures="2" skipped="0" time="0.121272">
+    <testcase name="testFindUserByCredentials" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="53" class="TestAuth" classname="TestAuth" assertions="1" time="0.083735">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">TestAuth::testFindUserByCredentials&#13;
+El método debe retornar datos del usuario, no false
+Failed asserting that false is not false.
+&#13;
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php:61</failure>
+    </testcase>
+    <testcase name="testFindUserWithInvalidCredentials" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="77" class="TestAuth" classname="TestAuth" assertions="1" time="0.008265"/>
+    <testcase name="testFindNonExistentUser" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="93" class="TestAuth" classname="TestAuth" assertions="1" time="0.006419"/>
+    <testcase name="testFindInactiveUser" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="109" class="TestAuth" classname="TestAuth" assertions="1" time="0.008301"/>
+    <testcase name="testEmailExists" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="128" class="TestAuth" classname="TestAuth" assertions="1" time="0.009278">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">TestAuth::testEmailExists&#13;
+Debe encontrar el email existente
+Failed asserting that an array is not empty.
+&#13;
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php:136</failure>
+    </testcase>
+    <testcase name="testDatabaseConnection" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="146" class="TestAuth" classname="TestAuth" assertions="2" time="0.005273"/>
   </testsuite>
 </testsuites>
