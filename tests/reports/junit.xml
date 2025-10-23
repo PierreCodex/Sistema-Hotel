@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="RolModelTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php" tests="3" assertions="3" errors="0" failures="1" skipped="0" time="0.017183">
+    <testcase name="validar_longitud_acepta_nombre_valido" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php" line="16" class="RolModelTest" classname="RolModelTest" assertions="1" time="0.005613"/>
+    <testcase name="validar_longitud_rechaza_nombre_muy_corto" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php" line="22" class="RolModelTest" classname="RolModelTest" assertions="1" time="0.011141">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">RolModelTest::validar_longitud_rechaza_nombre_muy_corto&#13;
+Failed asserting that false is true.
+&#13;
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php:24</failure>
+    </testcase>
+    <testcase name="validar_longitud_rechaza_nombre_demasiado_largo" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php" line="28" class="RolModelTest" classname="RolModelTest" assertions="1" time="0.000430"/>
+  </testsuite>
+</testsuites>
