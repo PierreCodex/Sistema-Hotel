@@ -1,35 +1,147 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-<<<<<<< HEAD
-  <testsuite name="RolModelTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php" tests="3" assertions="3" errors="0" failures="1" skipped="0" time="0.017183">
-    <testcase name="validar_longitud_acepta_nombre_valido" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php" line="16" class="RolModelTest" classname="RolModelTest" assertions="1" time="0.005613"/>
-    <testcase name="validar_longitud_rechaza_nombre_muy_corto" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php" line="22" class="RolModelTest" classname="RolModelTest" assertions="1" time="0.011141">
-      <failure type="PHPUnit\Framework\ExpectationFailedException">RolModelTest::validar_longitud_rechaza_nombre_muy_corto&#13;
-Failed asserting that false is true.
+  <testsuite name="C:\xampp\htdocs\SistemaHotel-PHP\phpunit.xml" tests="70" assertions="203" errors="7" failures="2" skipped="0" time="2.938006">
+    <testsuite name="Unit Tests" tests="39" assertions="144" errors="0" failures="1" skipped="0" time="0.051655">
+      <testsuite name="CategoriaControllerTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaControllerTest.php" tests="9" assertions="33" errors="0" failures="0" skipped="0" time="0.009757">
+        <testcase name="testGuardarYEditarRechazaNombreVacio" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaControllerTest.php" line="9" class="CategoriaControllerTest" classname="CategoriaControllerTest" assertions="3" time="0.007309"/>
+        <testcase name="testGuardarYEditarInsercionExitosa" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaControllerTest.php" line="33" class="CategoriaControllerTest" classname="CategoriaControllerTest" assertions="4" time="0.000478"/>
+        <testcase name="testGuardarYEditarActualizacionExitosa" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaControllerTest.php" line="58" class="CategoriaControllerTest" classname="CategoriaControllerTest" assertions="4" time="0.000210"/>
+        <testcase name="testGuardarYEditarErrorCategoriaDuplicada" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaControllerTest.php" line="83" class="CategoriaControllerTest" classname="CategoriaControllerTest" assertions="2" time="0.000127"/>
+        <testcase name="testListarEstructuraDataTables" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaControllerTest.php" line="102" class="CategoriaControllerTest" classname="CategoriaControllerTest" assertions="7" time="0.000598"/>
+        <testcase name="testMostrarEstructuraJSON" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaControllerTest.php" line="143" class="CategoriaControllerTest" classname="CategoriaControllerTest" assertions="4" time="0.000440"/>
+        <testcase name="testEliminarValidacionID" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaControllerTest.php" line="168" class="CategoriaControllerTest" classname="CategoriaControllerTest" assertions="2" time="0.000115"/>
+        <testcase name="testComboHTMLConDatos" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaControllerTest.php" line="182" class="CategoriaControllerTest" classname="CategoriaControllerTest" assertions="6" time="0.000156"/>
+        <testcase name="testComboSinDatos" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaControllerTest.php" line="211" class="CategoriaControllerTest" classname="CategoriaControllerTest" assertions="1" time="0.000324"/>
+      </testsuite>
+      <testsuite name="CategoriaModelTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.022170">
+        <testcase name="testVerificarCategoriaExistenteConResultadoFalse" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\CategoriaModelTest.php" line="8" class="CategoriaModelTest" classname="CategoriaModelTest" assertions="1" time="0.022170"/>
+      </testsuite>
+      <testsuite name="RolControllerTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" tests="11" assertions="46" errors="0" failures="1" skipped="0" time="0.013374">
+        <testcase name="testGuardarYEditarRechazaNombreVacio" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="17" class="RolControllerTest" classname="RolControllerTest" assertions="3" time="0.000291"/>
+        <testcase name="testGuardarYEditarRechazaNombreMuyCorto" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="41" class="RolControllerTest" classname="RolControllerTest" assertions="1" time="0.010665">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">RolControllerTest::testGuardarYEditarRechazaNombreMuyCorto&#13;
+Failed asserting that true is false.
 &#13;
-C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php:24</failure>
-    </testcase>
-    <testcase name="validar_longitud_rechaza_nombre_demasiado_largo" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php" line="28" class="RolModelTest" classname="RolModelTest" assertions="1" time="0.000430"/>
-=======
-  <testsuite name="TestAuth" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" tests="6" assertions="7" errors="0" failures="2" skipped="0" time="0.121272">
-    <testcase name="testFindUserByCredentials" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="53" class="TestAuth" classname="TestAuth" assertions="1" time="0.083735">
-      <failure type="PHPUnit\Framework\ExpectationFailedException">TestAuth::testFindUserByCredentials&#13;
-El método debe retornar datos del usuario, no false
-Failed asserting that false is not false.
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php:49</failure>
+        </testcase>
+        <testcase name="testGuardarYEditarRechazaNombreMuyLargo" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="66" class="RolControllerTest" classname="RolControllerTest" assertions="3" time="0.000200"/>
+        <testcase name="testGuardarYEditarInsercionExitosa" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="91" class="RolControllerTest" classname="RolControllerTest" assertions="6" time="0.000325"/>
+        <testcase name="testGuardarYEditarActualizacionExitosa" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="123" class="RolControllerTest" classname="RolControllerTest" assertions="6" time="0.000429"/>
+        <testcase name="testGuardarYEditarRechazaRolDuplicado" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="155" class="RolControllerTest" classname="RolControllerTest" assertions="3" time="0.000237"/>
+        <testcase name="testListarEstructuraDataTables" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="180" class="RolControllerTest" classname="RolControllerTest" assertions="12" time="0.000662"/>
+        <testcase name="testMostrarEstructuraJSON" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="225" class="RolControllerTest" classname="RolControllerTest" assertions="4" time="0.000163"/>
+        <testcase name="testEliminarValidacionID" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="251" class="RolControllerTest" classname="RolControllerTest" assertions="2" time="0.000111"/>
+        <testcase name="testComboHTMLConDatos" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="268" class="RolControllerTest" classname="RolControllerTest" assertions="4" time="0.000176"/>
+        <testcase name="testComboSinDatos" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolControllerTest.php" line="295" class="RolControllerTest" classname="RolControllerTest" assertions="2" time="0.000113"/>
+      </testsuite>
+      <testsuite name="RolModelTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php" tests="3" assertions="3" errors="0" failures="0" skipped="0" time="0.001215">
+        <testcase name="validar_longitud_acepta_nombre_valido" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php" line="16" class="RolModelTest" classname="RolModelTest" assertions="1" time="0.000817"/>
+        <testcase name="validar_longitud_rechaza_nombre_muy_corto" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php" line="22" class="RolModelTest" classname="RolModelTest" assertions="1" time="0.000198"/>
+        <testcase name="validar_longitud_rechaza_nombre_demasiado_largo" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\RolModelTest.php" line="28" class="RolModelTest" classname="RolModelTest" assertions="1" time="0.000199"/>
+      </testsuite>
+      <testsuite name="UsuarioControllerTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioControllerTest.php" tests="15" assertions="61" errors="0" failures="0" skipped="0" time="0.005139">
+        <testcase name="testGuardarYEditarInsercionConIdVacio" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioControllerTest.php" line="26" class="UsuarioControllerTest" classname="UsuarioControllerTest" assertions="5" time="0.001410"/>
+        <testcase name="testGuardarYEditarActualizacionConId" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioControllerTest.php" line="51" class="UsuarioControllerTest" classname="UsuarioControllerTest" assertions="2" time="0.000236"/>
+        <testcase name="testPreservacionContrasenaEnEdicion" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioControllerTest.php" line="71" class="UsuarioControllerTest" classname="UsuarioControllerTest" assertions="1" time="0.000115"/>
+        <testcase name="testActualizacionContrasenaEnEdicion" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioControllerTest.php" line="92" class="UsuarioControllerTest" classname="UsuarioControllerTest" assertions="2" time="0.000117"/>
+        <testcase name="testValidacionParametrosInsercion" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioControllerTest.php" line="118" class="UsuarioControllerTest" classname="UsuarioControllerTest" assertions="12" time="0.000339"/>
+        <testcase name="testValidacionParametrosMostrar" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioControllerTest.php" line="146" class="UsuarioControllerTest" classname="UsuarioControllerTest" assertions="3" time="0.000575"/>
+        <testcase name="testValidacionParametrosEliminar" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioControllerTest.php" line="158" class="UsuarioControllerTest" classname="UsuarioControllerTest" assertions="3" time="0.000153"/>
+        <testcase name="testValidacionParametrosBusqueda" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioControllerTest.php" line="170" class="UsuarioControllerTest" classname="UsuarioControllerTest" assertions="3" time="0.000150"/>
+        <testcase name="testValidacionParametrosActualizarPassword" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioControllerTest.php" line="182" class="UsuarioControllerTest" classname="UsuarioControllerTest" assertions="5" time="0.000185"/>
+        <testcase name="testOperacionListarEstructuraRespuesta" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioControllerTest.php" line="203" class="UsuarioControllerTest" classname="UsuarioControllerTest" assertions="6" time="0.000310"/>
+        <testcase name="testOperacionMostrarEstructuraRespuesta" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioControllerTest.php" line="250" class="UsuarioControllerTest" classname="UsuarioControllerTest" assertions="9" time="0.000304"/>
+        <testcase name="testGeneracionHtmlComboUsuarios" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioControllerTest.php" line="292" class="UsuarioControllerTest" classname="UsuarioControllerTest" assertions="3" time="0.000138"/>
+        <testcase name="testGeneracionHtmlComboRoles" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioControllerTest.php" line="316" class="UsuarioControllerTest" classname="UsuarioControllerTest" assertions="3" time="0.000129"/>
+        <testcase name="testManejoParametrosFaltantes" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioControllerTest.php" line="344" class="UsuarioControllerTest" classname="UsuarioControllerTest" assertions="3" time="0.000833"/>
+        <testcase name="testValidacionOperacionInvalida" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Unit\UsuarioControllerTest.php" line="370" class="UsuarioControllerTest" classname="UsuarioControllerTest" assertions="1" time="0.000145"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Integration Tests" tests="31" assertions="59" errors="7" failures="1" skipped="0" time="2.886350">
+      <testsuite name="AuthControllerTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\AuthControllerTest.php" tests="14" assertions="28" errors="0" failures="0" skipped="0" time="0.003358">
+        <testcase name="testValidateLoginInputConDatosValidos" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\AuthControllerTest.php" line="24" class="AuthControllerTest" classname="AuthControllerTest" assertions="1" time="0.000751"/>
+        <testcase name="testValidateLoginInputConCorreoVacio" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\AuthControllerTest.php" line="42" class="AuthControllerTest" classname="AuthControllerTest" assertions="2" time="0.000141"/>
+        <testcase name="testValidateLoginInputConPasswordVacio" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\AuthControllerTest.php" line="60" class="AuthControllerTest" classname="AuthControllerTest" assertions="2" time="0.000134"/>
+        <testcase name="testValidateLoginInputConAmbosVacios" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\AuthControllerTest.php" line="78" class="AuthControllerTest" classname="AuthControllerTest" assertions="2" time="0.000130"/>
+        <testcase name="testValidateLoginInputConCorreoInvalido" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\AuthControllerTest.php" line="96" class="AuthControllerTest" classname="AuthControllerTest" assertions="2" time="0.000161"/>
+        <testcase name="testIsAuthenticatedSinSesion" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\AuthControllerTest.php" line="114" class="AuthControllerTest" classname="AuthControllerTest" assertions="1" time="0.000346"/>
+        <testcase name="testGetCurrentUserSinSesion" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\AuthControllerTest.php" line="129" class="AuthControllerTest" classname="AuthControllerTest" assertions="1" time="0.000386"/>
+        <testcase name="testConstructorInicializaCorrectamente" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\AuthControllerTest.php" line="144" class="AuthControllerTest" classname="AuthControllerTest" assertions="1" time="0.000367"/>
+        <testcase name="testMetodoLoginExiste" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\AuthControllerTest.php" line="154" class="AuthControllerTest" classname="AuthControllerTest" assertions="2" time="0.000127"/>
+        <testcase name="testMetodoLogoutExiste" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\AuthControllerTest.php" line="163" class="AuthControllerTest" classname="AuthControllerTest" assertions="2" time="0.000122"/>
+        <testcase name="testValidateLoginInputConValoresNull" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\AuthControllerTest.php" line="172" class="AuthControllerTest" classname="AuthControllerTest" assertions="2" time="0.000135"/>
+        <testcase name="testValidateLoginInputConEspaciosEnBlanco" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\AuthControllerTest.php" line="187" class="AuthControllerTest" classname="AuthControllerTest" assertions="1" time="0.000148"/>
+        <testcase name="testValidateLoginInputConCorreosValidosComplejos" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\AuthControllerTest.php" line="201" class="AuthControllerTest" classname="AuthControllerTest" assertions="3" time="0.000194"/>
+        <testcase name="testValidateLoginInputConCorreosInvalidos" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\AuthControllerTest.php" line="222" class="AuthControllerTest" classname="AuthControllerTest" assertions="6" time="0.000214"/>
+      </testsuite>
+      <testsuite name="CategoriaIntegrationTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\CategoriaIntegrationTest.php" tests="3" assertions="3" errors="1" failures="0" skipped="0" time="0.007671">
+        <testcase name="testInsertCategoria" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\CategoriaIntegrationTest.php" line="16" class="CategoriaIntegrationTest" classname="CategoriaIntegrationTest" assertions="0" time="0.004841">
+          <error type="PDOException">CategoriaIntegrationTest::testInsertCategoria&#13;
+PDOException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'Servicios de Spa' for key 'uq_categoria_descripcion'
 &#13;
-C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php:61</failure>
-    </testcase>
-    <testcase name="testFindUserWithInvalidCredentials" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="77" class="TestAuth" classname="TestAuth" assertions="1" time="0.008265"/>
-    <testcase name="testFindNonExistentUser" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="93" class="TestAuth" classname="TestAuth" assertions="1" time="0.006419"/>
-    <testcase name="testFindInactiveUser" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="109" class="TestAuth" classname="TestAuth" assertions="1" time="0.008301"/>
-    <testcase name="testEmailExists" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="128" class="TestAuth" classname="TestAuth" assertions="1" time="0.009278">
-      <failure type="PHPUnit\Framework\ExpectationFailedException">TestAuth::testEmailExists&#13;
-Debe encontrar el email existente
-Failed asserting that an array is not empty.
+C:\xampp\htdocs\SistemaHotel-PHP\models\Categoria.php:43
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\CategoriaIntegrationTest.php:18</error>
+        </testcase>
+        <testcase name="testListarCategorias" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\CategoriaIntegrationTest.php" line="22" class="CategoriaIntegrationTest" classname="CategoriaIntegrationTest" assertions="2" time="0.001489"/>
+        <testcase name="testActualizarCategoria" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\CategoriaIntegrationTest.php" line="29" class="CategoriaIntegrationTest" classname="CategoriaIntegrationTest" assertions="1" time="0.001341"/>
+      </testsuite>
+      <testsuite name="ControllerModelIntegrationTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\ControllerModelIntegrationTest.php" tests="7" assertions="11" errors="5" failures="0" skipped="0" time="0.057118">
+        <testcase name="testCompleteUserCreationFlow" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\ControllerModelIntegrationTest.php" line="59" class="ControllerModelIntegrationTest" classname="ControllerModelIntegrationTest" assertions="0" time="0.026580">
+          <error type="Error">ControllerModelIntegrationTest::testCompleteUserCreationFlow&#13;
+Error: Call to undefined method Usuario::existe_usuario_correo()
 &#13;
-C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php:136</failure>
-    </testcase>
-    <testcase name="testDatabaseConnection" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="146" class="TestAuth" classname="TestAuth" assertions="2" time="0.005273"/>
->>>>>>> desarrollo
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\ControllerModelIntegrationTest.php:88</error>
+        </testcase>
+        <testcase name="testCompleteUserEditFlow" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\ControllerModelIntegrationTest.php" line="125" class="ControllerModelIntegrationTest" classname="ControllerModelIntegrationTest" assertions="0" time="0.007531">
+          <error type="PDOException">ControllerModelIntegrationTest::testCompleteUserEditFlow&#13;
+PDOException: SQLSTATE[42000]: Syntax error or access violation: 1305 PROCEDURE db-hotel.SP_U_USUARIO_01 does not exist
+&#13;
+C:\xampp\htdocs\SistemaHotel-PHP\models\Usuario.php:93
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\ControllerModelIntegrationTest.php:156</error>
+        </testcase>
+        <testcase name="testCompleteUserListingFlow" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\ControllerModelIntegrationTest.php" line="185" class="ControllerModelIntegrationTest" classname="ControllerModelIntegrationTest" assertions="0" time="0.005703">
+          <error type="PDOException">ControllerModelIntegrationTest::testCompleteUserListingFlow&#13;
+PDOException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '12345678' for key 'uq_usuario_dni'
+&#13;
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\ControllerModelIntegrationTest.php:416
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\ControllerModelIntegrationTest.php:189</error>
+        </testcase>
+        <testcase name="testCompleteUserDeletionFlow" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\ControllerModelIntegrationTest.php" line="222" class="ControllerModelIntegrationTest" classname="ControllerModelIntegrationTest" assertions="0" time="0.005829">
+          <error type="PDOException">ControllerModelIntegrationTest::testCompleteUserDeletionFlow&#13;
+PDOException: SQLSTATE[42000]: Syntax error or access violation: 1305 PROCEDURE db-hotel.SP_D_USUARIO_01 does not exist
+&#13;
+C:\xampp\htdocs\SistemaHotel-PHP\models\Usuario.php:58
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\ControllerModelIntegrationTest.php:237</error>
+        </testcase>
+        <testcase name="testDuplicateEmailValidationInCreationFlow" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\ControllerModelIntegrationTest.php" line="260" class="ControllerModelIntegrationTest" classname="ControllerModelIntegrationTest" assertions="0" time="0.004245">
+          <error type="Error">ControllerModelIntegrationTest::testDuplicateEmailValidationInCreationFlow&#13;
+Error: Call to undefined method Usuario::existe_usuario_correo()
+&#13;
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\ControllerModelIntegrationTest.php:282</error>
+        </testcase>
+        <testcase name="testCompleteAuthenticationWithSessionFlow" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\ControllerModelIntegrationTest.php" line="315" class="ControllerModelIntegrationTest" classname="ControllerModelIntegrationTest" assertions="7" time="0.005192"/>
+        <testcase name="testCompleteLogoutFlow" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\ControllerModelIntegrationTest.php" line="378" class="ControllerModelIntegrationTest" classname="ControllerModelIntegrationTest" assertions="4" time="0.002037"/>
+      </testsuite>
+      <testsuite name="DatabaseTransactionIntegrationTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\DatabaseTransactionIntegrationTest.php" tests="7" assertions="17" errors="1" failures="1" skipped="0" time="2.818203">
+        <testcase name="testSuccessfulTransactionWithMultipleOperations" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\DatabaseTransactionIntegrationTest.php" line="47" class="DatabaseTransactionIntegrationTest" classname="DatabaseTransactionIntegrationTest" assertions="6" time="0.004633"/>
+        <testcase name="testTransactionRollbackOnError" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\DatabaseTransactionIntegrationTest.php" line="118" class="DatabaseTransactionIntegrationTest" classname="DatabaseTransactionIntegrationTest" assertions="2" time="0.002707"/>
+        <testcase name="testStoredProcedureTransactionHandling" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\DatabaseTransactionIntegrationTest.php" line="172" class="DatabaseTransactionIntegrationTest" classname="DatabaseTransactionIntegrationTest" assertions="0" time="0.006649">
+          <error type="PDOException">DatabaseTransactionIntegrationTest::testStoredProcedureTransactionHandling&#13;
+PDOException: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`db-hotel`.`usuario`, CONSTRAINT `fk_usuario_rol` FOREIGN KEY (`IdRol`) REFERENCES `rol` (`IdRol`) ON UPDATE CASCADE)
+&#13;
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\DatabaseTransactionIntegrationTest.php:221</error>
+        </testcase>
+        <testcase name="testDataConsistencyWithConcurrentOperations" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\DatabaseTransactionIntegrationTest.php" line="241" class="DatabaseTransactionIntegrationTest" classname="DatabaseTransactionIntegrationTest" assertions="5" time="0.108801"/>
+        <testcase name="testDatabaseConnectionErrorHandling" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\DatabaseTransactionIntegrationTest.php" line="298" class="DatabaseTransactionIntegrationTest" classname="DatabaseTransactionIntegrationTest" assertions="2" time="2.687351"/>
+        <testcase name="testReferentialIntegrityConstraints" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\DatabaseTransactionIntegrationTest.php" line="332" class="DatabaseTransactionIntegrationTest" classname="DatabaseTransactionIntegrationTest" assertions="1" time="0.005403"/>
+        <testcase name="testDataTypeValidationIntegration" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\DatabaseTransactionIntegrationTest.php" line="380" class="DatabaseTransactionIntegrationTest" classname="DatabaseTransactionIntegrationTest" assertions="1" time="0.002658">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">DatabaseTransactionIntegrationTest::testDataTypeValidationIntegration&#13;
+Debe ser un error relacionado con tipos de datos
+Failed asserting that 'sqlstate[23000]: integrity constraint violation: 1452 cannot add or update a child row: a foreign key constraint fails (`db-hotel`.`usuario`, constraint `fk_usuario_rol` foreign key (`idrol`) references `rol` (`idrol`) on update cascade)' [ASCII](length: 237) contains "type" [ASCII](length: 4).
+&#13;
+C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\DatabaseTransactionIntegrationTest.php:418</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
   </testsuite>
 </testsuites>

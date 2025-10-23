@@ -3,10 +3,6 @@
     "description": "Sistema de gestión hotelera",
     "type": "project",
     "require-dev": {
-<<<<<<< HEAD
         "phpunit/phpunit": "^10.5"
-=======
-        "phpunit/phpunit": "10.0"
->>>>>>> desarrollo
     }
 }

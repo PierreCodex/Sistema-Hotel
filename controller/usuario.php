@@ -5,7 +5,6 @@
     require_once("../models/Rol.php");
     /* TODO: Inicializando clase */
     $usuario = new Usuario();
-<<<<<<< HEAD
     $rol = new Rol();
 
     switch($_GET["op"]){
@@ -30,32 +29,6 @@
                     // Usado para: edición de usuario donde se preserva la contraseña original
                     $usuario->update_usuario_sin_password($_POST["usu_id"], $_POST["usu_nom"], $_POST["usu_ape"], $_POST["usu_dni"], $_POST["usu_correo"], $_POST["rol_id"]);
                 }
-=======
-
-
-    switch($_GET["op"]){
-         case "guardaryeditar": 
-            if(empty($_POST["usu_id"])){
-                $usuario->insert_usuario(
-                    $_POST["usu_nom"],
-                    $_POST["usu_ape"],
-                    $_POST["usu_dni"],
-                    $_POST["usu_correo"],
-                    $_POST["usu_pass"],
-
-                    $_POST["rol_id"]
-                );
-            }else{
-                $usuario->update_usuario(
-                    $_POST["usu_id"],
-                    $_POST["usu_nom"],
-                    $_POST["usu_ape"],
-                    $_POST["usu_dni"],
-                    $_POST["usu_correo"],
-                    $_POST["usu_pass"],
-                    $_POST["rol_id"]
-                );
->>>>>>> desarrollo
             }
             break;
 
@@ -113,7 +86,6 @@
         case "eliminar":
             $usuario->delete_usuario($_POST["usu_id"]);
             break;
-<<<<<<< HEAD
 
         /* TODO: Activar usuario (cambiar estado a 1) 
         case "activar":
@@ -173,38 +145,6 @@
                     $html.= "<option value='".$row["ROL_ID"]."'>".$row["ROL_NOM"]."</option>";
                 }
                 echo $html;
-=======
- 
-        /* TODO: Actualizar contraseña */
-        case "actualizar_password":
-            $usuario->update_usuario_pass($_POST["usu_id"], $_POST["usu_pass"]);
-            break;
-
-        /* TODO: Validar si existe email duplicado */
-        case "validar_email":
-            $datos = $usuario->existe_usuario_correo($_POST["usu_correo"]);
-            $existe_duplicado = false;
-            
-            if(is_array($datos) && count($datos) > 0){
-                // Si estamos en modo edición, verificar si el email pertenece al mismo usuario
-                if(isset($_POST["usu_id"]) && !empty($_POST["usu_id"])){
-                    foreach($datos as $row){
-                        if($row["IdUsuario"] != $_POST["usu_id"]){
-                            $existe_duplicado = true;
-                            break;
-                        }
-                    }
-                } else {
-                    // Modo nuevo registro, cualquier email existente es duplicado
-                    $existe_duplicado = true;
-                }
-            }
-            
-            if($existe_duplicado){
-                echo json_encode(array("existe" => true, "mensaje" => "Email ya existente"));
-            } else {
-                echo json_encode(array("existe" => false, "mensaje" => "Email disponible"));
->>>>>>> desarrollo
             }
             break;
 

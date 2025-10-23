@@ -94,7 +94,6 @@ class Usuario extends Conectar
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
-<<<<<<< HEAD
     /*
       MÉTODO ESPECIALIZADO: Actualizar usuario SIN modificar contraseña
     
@@ -144,10 +143,6 @@ class Usuario extends Conectar
 
     /* Actualizar contraseña */
     public function update_password($usu_id, $usu_pass)
-=======
-    /* Actualizar contraseña */
-    public function update_usuario_pass($usu_id, $usu_pass)
->>>>>>> desarrollo
     {
         $conectar = parent::conexion();
         parent::set_names();
@@ -159,7 +154,6 @@ class Usuario extends Conectar
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
-<<<<<<< HEAD
     /* Combo box de usuarios */
     public function get_usuario_combo()
     {
@@ -169,15 +163,5 @@ class Usuario extends Conectar
         $sql = $conectar->prepare($sql);
         $sql->execute();
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
-=======
-    // Validaciones de duplicados
-    public function existe_usuario_correo($usu_correo){
-        $conectar=parent::Conexion();
-        $sql="SELECT IdUsuario FROM usuario WHERE Correo = ? AND Estado=1";
-        $query=$conectar->prepare($sql);
-        $query->bindValue(1,$usu_correo);
-        $query->execute();
-        return $query->fetchAll(PDO::FETCH_ASSOC);
->>>>>>> desarrollo
     }
 }

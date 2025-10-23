@@ -6,10 +6,7 @@
         <style>
             body {
                 text-rendering: optimizeLegibility;
-<<<<<<< HEAD
                 font-family: Source SansSerif Pro, Arial, sans-serif;
-=======
->>>>>>> desarrollo
                 font-variant-ligatures: common-ligatures;
                 font-kerning: normal;
                 margin-left: 2rem;
@@ -18,37 +15,21 @@
             }
 
             body > ul > li {
-<<<<<<< HEAD
-=======
-                font-family: Source Serif Pro, PT Sans, Trebuchet MS, Helvetica, Arial;
->>>>>>> desarrollo
                 font-size: larger;
             }
 
             h2 {
-<<<<<<< HEAD
                 font-size: larger;
                 text-decoration-line: underline;
                 text-decoration-thickness: 2px;
-=======
-                font-family: Tahoma, Helvetica, Arial;
-                font-size: larger;
->>>>>>> desarrollo
                 margin: 0;
                 padding: 0.5rem 0;
             }
 
             ul {
                 list-style: none;
-<<<<<<< HEAD
                 margin: 0 0 2rem;
                 padding: 0 0 0 1rem;
-=======
-                margin: 0;
-                padding: 0;
-                margin-bottom: 2rem;
-                padding-left: 1rem;
->>>>>>> desarrollo
                 text-indent: -1rem;
             }
 
@@ -70,22 +51,102 @@
         </style>
     </head>
     <body>
-<<<<<<< HEAD
+        <h2>Auth Controller</h2>
+        <ul>
+            <li class="success">Validate login input con datos validos</li>
+            <li class="success">Validate login input con correo vacio</li>
+            <li class="success">Validate login input con password vacio</li>
+            <li class="success">Validate login input con ambos vacios</li>
+            <li class="success">Validate login input con correo invalido</li>
+            <li class="success">Is authenticated sin sesion</li>
+            <li class="success">Get current user sin sesion</li>
+            <li class="success">Constructor inicializa correctamente</li>
+            <li class="success">Metodo login existe</li>
+            <li class="success">Metodo logout existe</li>
+            <li class="success">Validate login input con valores null</li>
+            <li class="success">Validate login input con espacios en blanco</li>
+            <li class="success">Validate login input con correos validos complejos</li>
+            <li class="success">Validate login input con correos invalidos</li>
+        </ul>
+        <h2>Categoria Controller</h2>
+        <ul>
+            <li class="success">Guardar y editar rechaza nombre vacio</li>
+            <li class="success">Guardar y editar insercion exitosa</li>
+            <li class="success">Guardar y editar actualizacion exitosa</li>
+            <li class="success">Guardar y editar error categoria duplicada</li>
+            <li class="success">Listar estructura data tables</li>
+            <li class="success">Mostrar estructura j s o n</li>
+            <li class="success">Eliminar validacion i d</li>
+            <li class="success">Combo h t m l con datos</li>
+            <li class="success">Combo sin datos</li>
+        </ul>
+        <h2>Categoria Integration</h2>
+        <ul>
+            <li class="defect">Insert categoria</li>
+            <li class="success">Listar categorias</li>
+            <li class="success">Actualizar categoria</li>
+        </ul>
+        <h2>Categoria Model</h2>
+        <ul>
+            <li class="success">Verificar categoria existente con resultado false</li>
+        </ul>
+        <h2>Controller Model Integration</h2>
+        <ul>
+            <li class="defect">Complete user creation flow</li>
+            <li class="defect">Complete user edit flow</li>
+            <li class="defect">Complete user listing flow</li>
+            <li class="defect">Complete user deletion flow</li>
+            <li class="defect">Duplicate email validation in creation flow</li>
+            <li class="success">Complete authentication with session flow</li>
+            <li class="success">Complete logout flow</li>
+        </ul>
+        <h2>Database Transaction Integration</h2>
+        <ul>
+            <li class="success">Successful transaction with multiple operations</li>
+            <li class="success">Transaction rollback on error</li>
+            <li class="defect">Stored procedure transaction handling</li>
+            <li class="success">Data consistency with concurrent operations</li>
+            <li class="success">Database connection error handling</li>
+            <li class="success">Referential integrity constraints</li>
+            <li class="defect">Data type validation integration</li>
+        </ul>
+        <h2>Rol Controller</h2>
+        <ul>
+            <li class="success">Guardar y editar rechaza nombre vacio</li>
+            <li class="defect">Guardar y editar rechaza nombre muy corto</li>
+            <li class="success">Guardar y editar rechaza nombre muy largo</li>
+            <li class="success">Guardar y editar insercion exitosa</li>
+            <li class="success">Guardar y editar actualizacion exitosa</li>
+            <li class="success">Guardar y editar rechaza rol duplicado</li>
+            <li class="success">Listar estructura data tables</li>
+            <li class="success">Mostrar estructura j s o n</li>
+            <li class="success">Eliminar validacion i d</li>
+            <li class="success">Combo h t m l con datos</li>
+            <li class="success">Combo sin datos</li>
+        </ul>
         <h2>Rol Model</h2>
         <ul>
             <li class="success">Validar longitud acepta nombre valido</li>
-            <li class="defect">Validar longitud rechaza nombre muy corto</li>
+            <li class="success">Validar longitud rechaza nombre muy corto</li>
             <li class="success">Validar longitud rechaza nombre demasiado largo</li>
-=======
-        <h2>Auth</h2>
+        </ul>
+        <h2>Usuario Controller</h2>
         <ul>
-            <li class="defect">Find user by credentials</li>
-            <li class="success">Find user with invalid credentials</li>
-            <li class="success">Find non existent user</li>
-            <li class="success">Find inactive user</li>
-            <li class="defect">Email exists</li>
-            <li class="success">Database connection</li>
->>>>>>> desarrollo
+            <li class="success">Guardar y editar insercion con id vacio</li>
+            <li class="success">Guardar y editar actualizacion con id</li>
+            <li class="success">Preservacion contrasena en edicion</li>
+            <li class="success">Actualizacion contrasena en edicion</li>
+            <li class="success">Validacion parametros insercion</li>
+            <li class="success">Validacion parametros mostrar</li>
+            <li class="success">Validacion parametros eliminar</li>
+            <li class="success">Validacion parametros busqueda</li>
+            <li class="success">Validacion parametros actualizar password</li>
+            <li class="success">Operacion listar estructura respuesta</li>
+            <li class="success">Operacion mostrar estructura respuesta</li>
+            <li class="success">Generacion html combo usuarios</li>
+            <li class="success">Generacion html combo roles</li>
+            <li class="success">Manejo parametros faltantes</li>
+            <li class="success">Validacion operacion invalida</li>
         </ul>
     </body>
 </html>

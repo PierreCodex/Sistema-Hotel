@@ -3,17 +3,9 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
-/**
- * Pruebas Unitarias Esenciales para el Controller de Categoría
- * 
- * Este archivo contiene solo las pruebas esenciales para validar
- * la lógica básica de las 5 operaciones principales del controller.
- */
+
 final class CategoriaControllerTest extends TestCase
 {
-    /**
-     * ✅ VERIFICA: Operación GUARDAR Y EDITAR - Validación de nombre vacío
-     */
     public function testGuardarYEditarRechazaNombreVacio(): void
     {
         $cat_nom = '';  // Nombre vacío

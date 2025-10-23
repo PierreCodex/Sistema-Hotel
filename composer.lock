@@ -4,16 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
     "content-hash": "555de214a1f5269c4fbf7a6fdcc47999",
-=======
-    "content-hash": "c7dcb617aa20165fdb23793357df4e25",
->>>>>>> desarrollo
     "packages": [],
     "packages-dev": [
         {
             "name": "myclabs/deep-copy",
-<<<<<<< HEAD
             "version": "1.13.4",
             "source": {
                 "type": "git",
@@ -24,18 +19,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/07d290f0c47959fd5eed98c95ee5602db07e0b6a",
                 "reference": "07d290f0c47959fd5eed98c95ee5602db07e0b6a",
-=======
-            "version": "1.13.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/myclabs/DeepCopy.git",
-                "reference": "d25e62e636b0a9b01e3bdebb7823b474876dd829"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/d25e62e636b0a9b01e3bdebb7823b474876dd829",
-                "reference": "d25e62e636b0a9b01e3bdebb7823b474876dd829",
->>>>>>> desarrollo
                 "shasum": ""
             },
             "require": {
@@ -74,11 +57,7 @@
             ],
             "support": {
                 "issues": "https://github.com/myclabs/DeepCopy/issues",
-<<<<<<< HEAD
                 "source": "https://github.com/myclabs/DeepCopy/tree/1.13.4"
-=======
-                "source": "https://github.com/myclabs/DeepCopy/tree/1.13.2"
->>>>>>> desarrollo
             },
             "funding": [
                 {
@@ -86,7 +65,6 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
             "time": "2025-08-01T08:46:24+00:00"
         },
         {
@@ -101,22 +79,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/3a454ca033b9e06b63282ce19562e892747449bb",
                 "reference": "3a454ca033b9e06b63282ce19562e892747449bb",
-=======
-            "time": "2025-07-04T14:07:32+00:00"
-        },
-        {
-            "name": "nikic/php-parser",
-            "version": "v5.5.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "ae59794362fe85e051a58ad36b289443f57be7a9"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/ae59794362fe85e051a58ad36b289443f57be7a9",
-                "reference": "ae59794362fe85e051a58ad36b289443f57be7a9",
->>>>>>> desarrollo
                 "shasum": ""
             },
             "require": {
@@ -135,11 +97,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-<<<<<<< HEAD
                     "dev-master": "5.x-dev"
-=======
-                    "dev-master": "5.0-dev"
->>>>>>> desarrollo
                 }
             },
             "autoload": {
@@ -163,15 +121,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
-<<<<<<< HEAD
                 "source": "https://github.com/nikic/PHP-Parser/tree/v5.6.2"
             },
             "time": "2025-10-21T19:32:17+00:00"
-=======
-                "source": "https://github.com/nikic/PHP-Parser/tree/v5.5.0"
-            },
-            "time": "2025-05-31T08:24:38+00:00"
->>>>>>> desarrollo
         },
         {
             "name": "phar-io/manifest",
@@ -614,7 +566,6 @@
         },
         {
             "name": "phpunit/phpunit",
-<<<<<<< HEAD
             "version": "10.5.58",
             "source": {
                 "type": "git",
@@ -625,18 +576,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/e24fb46da450d8e6a5788670513c1af1424f16ca",
                 "reference": "e24fb46da450d8e6a5788670513c1af1424f16ca",
-=======
-            "version": "10.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "c4c60c34c0e92045afce938510f8878d7cd84f8a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c4c60c34c0e92045afce938510f8878d7cd84f8a",
-                "reference": "c4c60c34c0e92045afce938510f8878d7cd84f8a",
->>>>>>> desarrollo
                 "shasum": ""
             },
             "require": {
@@ -646,7 +585,6 @@
                 "ext-mbstring": "*",
                 "ext-xml": "*",
                 "ext-xmlwriter": "*",
-<<<<<<< HEAD
                 "myclabs/deep-copy": "^1.13.4",
                 "phar-io/manifest": "^2.0.4",
                 "phar-io/version": "^3.2.1",
@@ -670,31 +608,6 @@
             },
             "suggest": {
                 "ext-soap": "To be able to generate mocks based on WSDL files"
-=======
-                "myclabs/deep-copy": "^1.10.1",
-                "phar-io/manifest": "^2.0.3",
-                "phar-io/version": "^3.0.2",
-                "php": ">=8.1",
-                "phpunit/php-code-coverage": "^10.0",
-                "phpunit/php-file-iterator": "^4.0",
-                "phpunit/php-invoker": "^4.0",
-                "phpunit/php-text-template": "^3.0",
-                "phpunit/php-timer": "^6.0",
-                "sebastian/cli-parser": "^2.0",
-                "sebastian/code-unit": "^2.0",
-                "sebastian/comparator": "^5.0",
-                "sebastian/diff": "^5.0",
-                "sebastian/environment": "^6.0",
-                "sebastian/exporter": "^5.0",
-                "sebastian/global-state": "^6.0",
-                "sebastian/object-enumerator": "^5.0",
-                "sebastian/recursion-context": "^5.0",
-                "sebastian/type": "^4.0",
-                "sebastian/version": "^4.0"
-            },
-            "suggest": {
-                "ext-soap": "*"
->>>>>>> desarrollo
             },
             "bin": [
                 "phpunit"
@@ -702,11 +615,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-<<<<<<< HEAD
                     "dev-main": "10.5-dev"
-=======
-                    "dev-main": "10.0-dev"
->>>>>>> desarrollo
                 }
             },
             "autoload": {
@@ -737,12 +646,8 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
-<<<<<<< HEAD
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
                 "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.58"
-=======
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.0.0"
->>>>>>> desarrollo
             },
             "funding": [
                 {
@@ -754,7 +659,6 @@
                     "type": "github"
                 },
                 {
-<<<<<<< HEAD
                     "url": "https://liberapay.com/sebastianbergmann",
                     "type": "liberapay"
                 },
@@ -763,17 +667,11 @@
                     "type": "thanks_dev"
                 },
                 {
-=======
->>>>>>> desarrollo
                     "url": "https://tidelift.com/funding/github/packagist/phpunit/phpunit",
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
             "time": "2025-09-28T12:04:46+00:00"
-=======
-            "time": "2023-02-03T07:16:15+00:00"
->>>>>>> desarrollo
         },
         {
             "name": "sebastian/cli-parser",
@@ -945,7 +843,6 @@
         },
         {
             "name": "sebastian/comparator",
-<<<<<<< HEAD
             "version": "5.0.4",
             "source": {
                 "type": "git",
@@ -956,18 +853,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/e8e53097718d2b53cfb2aa859b06a41abf58c62e",
                 "reference": "e8e53097718d2b53cfb2aa859b06a41abf58c62e",
-=======
-            "version": "5.0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sebastianbergmann/comparator.git",
-                "reference": "a18251eb0b7a2dcd2f7aa3d6078b18545ef0558e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/a18251eb0b7a2dcd2f7aa3d6078b18545ef0558e",
-                "reference": "a18251eb0b7a2dcd2f7aa3d6078b18545ef0558e",
->>>>>>> desarrollo
                 "shasum": ""
             },
             "require": {
@@ -1023,17 +908,12 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/comparator/issues",
                 "security": "https://github.com/sebastianbergmann/comparator/security/policy",
-<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/comparator/tree/5.0.4"
-=======
-                "source": "https://github.com/sebastianbergmann/comparator/tree/5.0.3"
->>>>>>> desarrollo
             },
             "funding": [
                 {
                     "url": "https://github.com/sebastianbergmann",
                     "type": "github"
-<<<<<<< HEAD
                 },
                 {
                     "url": "https://liberapay.com/sebastianbergmann",
@@ -1049,11 +929,6 @@
                 }
             ],
             "time": "2025-09-07T05:25:07+00:00"
-=======
-                }
-            ],
-            "time": "2024-10-18T14:56:07+00:00"
->>>>>>> desarrollo
         },
         {
             "name": "sebastian/complexity",
@@ -1246,7 +1121,6 @@
         },
         {
             "name": "sebastian/exporter",
-<<<<<<< HEAD
             "version": "5.1.4",
             "source": {
                 "type": "git",
@@ -1257,18 +1131,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/0735b90f4da94969541dac1da743446e276defa6",
                 "reference": "0735b90f4da94969541dac1da743446e276defa6",
-=======
-            "version": "5.1.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sebastianbergmann/exporter.git",
-                "reference": "955288482d97c19a372d3f31006ab3f37da47adf"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/955288482d97c19a372d3f31006ab3f37da47adf",
-                "reference": "955288482d97c19a372d3f31006ab3f37da47adf",
->>>>>>> desarrollo
                 "shasum": ""
             },
             "require": {
@@ -1277,11 +1139,7 @@
                 "sebastian/recursion-context": "^5.0"
             },
             "require-dev": {
-<<<<<<< HEAD
                 "phpunit/phpunit": "^10.5"
-=======
-                "phpunit/phpunit": "^10.0"
->>>>>>> desarrollo
             },
             "type": "library",
             "extra": {
@@ -1329,17 +1187,12 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/exporter/issues",
                 "security": "https://github.com/sebastianbergmann/exporter/security/policy",
-<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/exporter/tree/5.1.4"
-=======
-                "source": "https://github.com/sebastianbergmann/exporter/tree/5.1.2"
->>>>>>> desarrollo
             },
             "funding": [
                 {
                     "url": "https://github.com/sebastianbergmann",
                     "type": "github"
-<<<<<<< HEAD
                 },
                 {
                     "url": "https://liberapay.com/sebastianbergmann",
@@ -1355,11 +1208,6 @@
                 }
             ],
             "time": "2025-09-24T06:09:11+00:00"
-=======
-                }
-            ],
-            "time": "2024-03-02T07:17:12+00:00"
->>>>>>> desarrollo
         },
         {
             "name": "sebastian/global-state",
@@ -1595,7 +1443,6 @@
         },
         {
             "name": "sebastian/recursion-context",
-<<<<<<< HEAD
             "version": "5.0.1",
             "source": {
                 "type": "git",
@@ -1606,29 +1453,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/recursion-context/zipball/47e34210757a2f37a97dcd207d032e1b01e64c7a",
                 "reference": "47e34210757a2f37a97dcd207d032e1b01e64c7a",
-=======
-            "version": "5.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sebastianbergmann/recursion-context.git",
-                "reference": "05909fb5bc7df4c52992396d0116aed689f93712"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/recursion-context/zipball/05909fb5bc7df4c52992396d0116aed689f93712",
-                "reference": "05909fb5bc7df4c52992396d0116aed689f93712",
->>>>>>> desarrollo
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.1"
             },
             "require-dev": {
-<<<<<<< HEAD
                 "phpunit/phpunit": "^10.5"
-=======
-                "phpunit/phpunit": "^10.0"
->>>>>>> desarrollo
             },
             "type": "library",
             "extra": {
@@ -1663,18 +1494,13 @@
             "homepage": "https://github.com/sebastianbergmann/recursion-context",
             "support": {
                 "issues": "https://github.com/sebastianbergmann/recursion-context/issues",
-<<<<<<< HEAD
                 "security": "https://github.com/sebastianbergmann/recursion-context/security/policy",
                 "source": "https://github.com/sebastianbergmann/recursion-context/tree/5.0.1"
-=======
-                "source": "https://github.com/sebastianbergmann/recursion-context/tree/5.0.0"
->>>>>>> desarrollo
             },
             "funding": [
                 {
                     "url": "https://github.com/sebastianbergmann",
                     "type": "github"
-<<<<<<< HEAD
                 },
                 {
                     "url": "https://liberapay.com/sebastianbergmann",
@@ -1690,11 +1516,6 @@
                 }
             ],
             "time": "2025-08-10T07:50:56+00:00"
-=======
-                }
-            ],
-            "time": "2023-02-03T07:05:40+00:00"
->>>>>>> desarrollo
         },
         {
             "name": "sebastian/type",
