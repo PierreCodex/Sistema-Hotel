@@ -13,13 +13,51 @@ class Usuario extends Conectar
         $conectar = parent::conexion();
         parent::set_names();
 
-        $sql = "SELECT * FROM usuario WHERE Correo=? AND Pass=? AND Estado=1";
+        // Primero obtenemos el usuario por correo
+        $sql = "SELECT * FROM usuario WHERE Correo=? AND Estado=1";
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $correo);
-        $stmt->bindValue(2, $password);
         $stmt->execute();
-
-        return $stmt->fetch();
+        
+        $user = $stmt->fetch();
+        
+        if ($user) {
+            // Verificar si la contraseña está hasheada (comienza con $2y$)
+            if (strpos($user['Pass'], '$2y$') === 0) {
+                // Contraseña hasheada - usar password_verify
+                if (password_verify($password, $user['Pass'])) {
+                    return $user;
+                }
+            } else {
+                // Contraseña en texto plano - comparación directa
+                if ($password === $user['Pass']) {
+                    // Actualizar la contraseña a formato hasheado
+                    $this->updatePasswordToHashed($user['IdUsuario'], $password);
+                    return $user;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Actualiza una contraseña de texto plano a formato hasheado
+     * @param int $userId
+     * @param string $plainPassword
+     */
+    private function updatePasswordToHashed($userId, $plainPassword)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        
+        $hashedPassword = password_hash($plainPassword, PASSWORD_DEFAULT);
+        
+        $sql = "UPDATE usuario SET Pass = ? WHERE IdUsuario = ?";
+        $stmt = $conectar->prepare($sql);
+        $stmt->bindValue(1, $hashedPassword);
+        $stmt->bindValue(2, $userId);
+        $stmt->execute();
     }
 
     /* Listar todos los usuarios activos excluyendo al usuario logueado */
@@ -64,13 +102,17 @@ class Usuario extends Conectar
     {
         $conectar = parent::conexion();
         parent::set_names();
+        
+        // Hashear la contraseña antes de guardarla
+        $hashed_password = password_hash($usu_pass, PASSWORD_DEFAULT);
+        
         $sql = "CALL SP_I_USUARIO_01(?,?,?,?,?,?)";
         $sql = $conectar->prepare($sql);
         $sql->bindValue(1, $usu_nom);
         $sql->bindValue(2, $usu_ape);
         $sql->bindValue(3, $usu_dni);
         $sql->bindValue(4, $usu_correo);
-        $sql->bindValue(5, $usu_pass);
+        $sql->bindValue(5, $hashed_password);
         $sql->bindValue(6, $rol_id);
         $sql->execute();
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
@@ -81,6 +123,10 @@ class Usuario extends Conectar
     {
         $conectar = parent::conexion();
         parent::set_names();
+        
+        // Hashear la contraseña antes de guardarla
+        $hashed_password = password_hash($usu_pass, PASSWORD_DEFAULT);
+        
         $sql = "CALL SP_U_USUARIO_01(?,?,?,?,?,?,?)";
         $sql = $conectar->prepare($sql);
         $sql->bindValue(1, $usu_id);
@@ -88,7 +134,7 @@ class Usuario extends Conectar
         $sql->bindValue(3, $usu_ape);
         $sql->bindValue(4, $usu_dni);
         $sql->bindValue(5, $usu_correo);
-        $sql->bindValue(6, $usu_pass);
+        $sql->bindValue(6, $hashed_password);
         $sql->bindValue(7, $rol_id);
         $sql->execute();
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
@@ -99,10 +145,14 @@ class Usuario extends Conectar
     {
         $conectar = parent::conexion();
         parent::set_names();
+        
+        // Hashear la contraseña antes de guardarla
+        $hashed_password = password_hash($usu_pass, PASSWORD_DEFAULT);
+        
         $sql = "CALL SP_U_USUARIO_PASS_01(?,?)";
         $sql = $conectar->prepare($sql);
         $sql->bindValue(1, $usu_id);
-        $sql->bindValue(2, $usu_pass);
+        $sql->bindValue(2, $hashed_password);
         $sql->execute();
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
     }

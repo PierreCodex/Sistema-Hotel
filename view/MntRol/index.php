@@ -1,7 +1,10 @@
 <?php
     require_once("../../config/conexion.php");
+        require_once("../../models/Rol.php");
+    $rol = new Rol();
     if(isset($_SESSION["IdUsuario"])){
 ?>
+
 
 <!doctype html>
 <html lang="es" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none">
@@ -49,6 +52,7 @@
                                                 <th>FechaCreacion</th>
                                                 <th></th>
                                                 <th></th>
+                                                <th></th>
                                                
                                             </tr>
                                         </thead>
@@ -70,6 +74,7 @@
     </div>
 
     <?php require_once("mantenimiento.php"); ?>
+        <?php require_once("modalpermiso.php"); ?>
 
     <?php require_once("../html/js.php"); ?>
     <script type="text/javascript" src="mntrol.js"></script>

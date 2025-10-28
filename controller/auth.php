@@ -97,7 +97,7 @@ class AuthController {
      * Redirige al usuario a la página de inicio
      */
     private function redirectToHome() {
-        header("Location: " . Conectar::ruta() . "view/Home/");
+        header("Location: " . Conectar::ruta() . "view/home/");
         exit();
     }
     

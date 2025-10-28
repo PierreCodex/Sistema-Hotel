@@ -65,6 +65,7 @@
                 $sub_array = array();
                 $sub_array[] = $row["ROL_NOM"];
                 $sub_array[] = $row["FECH_CREA"];
+                $sub_array[] = '<button type="button" onClick="permiso('.$row["ROL_ID"].')" id="'.$row["ROL_ID"].'" class="btn btn-primary btn-icon waves-effect waves-light"><i class="ri-settings-2-line"></i></button>';
                 $sub_array[] = '<button type="button" onClick="editar('.$row["ROL_ID"].')" id="'.$row["ROL_ID"].'" class="btn btn-warning btn-icon waves-effect waves-light"><i class="ri-edit-2-line"></i></button>';
                 $sub_array[] = '<button type="button" onClick="eliminar('.$row["ROL_ID"].')" id="'.$row["ROL_ID"].'" class="btn btn-danger btn-icon waves-effect waves-light"><i class="ri-delete-bin-5-line"></i></button>';
                 $data[] = $sub_array;

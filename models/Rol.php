@@ -128,5 +128,18 @@ class Rol extends Conectar
         $longitud = strlen(trim($nombre));
         return $longitud >= 3 && $longitud <=50;
     }
+
+    /* Validar acceso de rol para un usuario */
+    public function validar_acceso_rol($usu_id, $modulo)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_L_MENU_03(?,?)";
+        $sql = $conectar->prepare($sql);
+        $sql->bindValue(1, $usu_id);
+        $sql->bindValue(2, $modulo);
+        $sql->execute();
+        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 ?>

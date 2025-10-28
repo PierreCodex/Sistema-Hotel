@@ -1,7 +1,6 @@
 <?php
 require_once("../../models/Menu.php");
 $menu = new Menu();
-/* TODO: Obtener listado de acceso por ROL ID del Usuario */
 $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
 ?>
 
@@ -41,12 +40,11 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
             </div>
             <ul class="navbar-nav" id="navbar-nav">
 
-
                 <li class="menu-title"><span data-key="t-menu">Menu</span></li>
 
                 <?php
                 foreach ($datos as $row) {
-                    if ($row["MEN_GRUPO"] == "Principal" && $row["MEND_PERMI"] == "Si") {
+                    if ($row["MEN_GRUPO"] == "Dashboard" && $row["MEND_PERMI"] == "Si") {
                 ?>
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="<?php echo $row["MEN_RUTA"]; ?>">
@@ -57,8 +55,6 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
                     }
                 }
                 ?>
-
-                <li class="menu-title"><span data-key="t-menu">Modulo de Gestion</span></li>
 
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarGestion" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarGestion">
@@ -83,8 +79,6 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
                     </div>
                 </li> <!-- end Gestion Menu -->
 
-                <!--  Gestion Tienda -->
-          
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarTienda" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarTienda">
                         <i class="ri-settings-3-line"></i> <span data-key="t-mantenimiento">Tienda</span>
@@ -106,8 +100,7 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
                             ?>
                         </ul>
                     </div>
-                </li> <!-- end Gestion Tienda -->
-
+                </li> <!-- end Gestion Menu -->
 
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarMantenimiento" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarMantenimiento">
@@ -132,9 +125,6 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
                     </div>
                 </li> <!-- end Mantenimiento Menu -->
 
-                <!-- Modulo de Reportes -->
-
-               
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarReportes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarReportes">
                         <i class="ri-settings-3-line"></i> <span data-key="t-mantenimiento">Reportes </span>
@@ -156,37 +146,17 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
                             ?>
                         </ul>
                     </div>
-                </li> <!-- end Mantenimiento Clientes -->
+                </li> <!-- end Mantenimiento Reportes -->
 
 
-                <!-- Mantenimiento Usuarios -->
-                <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarUsuarios" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarUsuarios">
-                        <i class="ri-settings-3-line"></i> <span data-key="t-mantenimiento">Usuarios </span>
-                    </a>
-                    <div class="collapse menu-dropdown" id="sidebarUsuarios">
-                        <ul class="nav nav-sm flex-column">
-                            <?php
-                            foreach ($datos as $row) {
-                                if ($row["MEN_GRUPO"] == "Usuarios" && $row["MEND_PERMI"] == "Si") {
-                            ?>
-                                    <li class="nav-item">
-                                        <a href="<?php echo $row["MEN_RUTA"]; ?>" class="nav-link" data-key="t-<?php echo strtolower($row["MEN_NOM"]); ?>">
-                                            <?php echo $row["MEN_NOM"]; ?>
-                                        </a>
-                                    </li>
-                            <?php
-                                }
-                            }
-                            ?>
-                        </ul>
-                    </div>
-                </li> <!-- end Mantenimiento Clientes -->
 
-                <!-- Mantenimiento CLientes -->
+
+
+                <li class="menu-title"><span data-key="t-menu">Mantenimiento Usuarios</span></li>
+
                 <?php
                 foreach ($datos as $row) {
-                    if ($row["MEN_GRUPO"] == "Clientes" && $row["MEND_PERMI"] == "Si") {
+                    if ($row["MEN_GRUPO"] == "Usuarios" && $row["MEND_PERMI"] == "Si") {
                 ?>
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="<?php echo $row["MEN_RUTA"]; ?>">
@@ -200,8 +170,15 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
 
 
 
+                <!-- Mantenimiento Clientes -->
 
 
+            </ul>
+            <ul class="navbar-nav" id="navbar-nav">
+
+                <li class="menu-title"><span data-key="t-menu">Menu</span></li>     
+
+            </ul>
         </div>
 
     </div>
