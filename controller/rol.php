@@ -22,7 +22,7 @@
             // Validar longitud usando función del modelo
             if(!$rol->validarLongitud($_POST["rol_nom"])){
                 $response['status'] = 'error';
-                $response['message'] = 'El nombre del rol debe tener entre 3 y 50 caracteres';
+                $response['message'] = 'El nombre del rol debe tener máximo 50 caracteres';
                 echo json_encode($response);
                 exit;
             }
@@ -64,10 +64,24 @@
             foreach($datos as $row){
                 $sub_array = array();
                 $sub_array[] = $row["ROL_NOM"];
-                $sub_array[] = $row["FECH_CREA"];
+                $sub_array[] = $row["EST"] == 1 ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>';
+                // Botón de permisos - siempre habilitado para consulta
                 $sub_array[] = '<button type="button" onClick="permiso('.$row["ROL_ID"].')" id="'.$row["ROL_ID"].'" class="btn btn-primary btn-icon waves-effect waves-light"><i class="ri-settings-2-line"></i></button>';
-                $sub_array[] = '<button type="button" onClick="editar('.$row["ROL_ID"].')" id="'.$row["ROL_ID"].'" class="btn btn-warning btn-icon waves-effect waves-light"><i class="ri-edit-2-line"></i></button>';
-                $sub_array[] = '<button type="button" onClick="eliminar('.$row["ROL_ID"].')" id="'.$row["ROL_ID"].'" class="btn btn-danger btn-icon waves-effect waves-light"><i class="ri-delete-bin-5-line"></i></button>';
+                
+                // Botón de editar - solo habilitado si el rol está activo
+                if($row["EST"] == 1) {
+                    $sub_array[] = '<button type="button" onClick="editar('.$row["ROL_ID"].')" id="'.$row["ROL_ID"].'" class="btn btn-warning btn-icon waves-effect waves-light" title="Editar rol"><i class="ri-edit-2-line"></i></button>';
+                } else {
+                    $sub_array[] = '<button type="button" class="btn btn-warning btn-icon waves-effect waves-light" disabled title="Para editar, primero active el rol"><i class="ri-edit-2-line"></i></button>';
+                }
+                    $sub_array[] = '<button type="button" onClick="eliminar(' . $row["ROL_ID"] . ');"  id="' . $row["ROL_ID"] . '" class="btn btn-outline-danger btn-icon waves-effect waves-light"><i class="ri-delete-bin-5-line"></i></button>';
+                   // Checkbox para cambiar estado
+                $checked = $row["EST"] == 1 ? 'checked' : '';
+                $sub_array[] = '<div class="form-check form-switch form-switch-custom form-switch-success">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="switch'.$row["ROL_ID"].'" '.$checked.' onchange="cambiarEstado('.$row["ROL_ID"].', this.checked)">
+                                    <label class="form-check-label" for="switch'.$row["ROL_ID"].'">Yes/No</label>
+                                </div>';
+                
                 $data[] = $sub_array;
             }
 
@@ -91,14 +105,20 @@
             }
             break;
 
-        /* TODO: Cambiar Estado a 0 del Registro */
+        /* TODO: Cambiar Estado del Registro */
+        case "cambiar_estado":
+            $nuevo_estado = $_POST["estado"] == 'true' ? 1 : 0;
+            $rol->cambiar_estado_rol($_POST["rol_id"], $nuevo_estado);
+            echo json_encode(array("status" => "success", "message" => "Estado actualizado correctamente"));
+            break;
+        /* TODO: Eliminar Registro */
         case "eliminar":
             $rol->delete_rol($_POST["rol_id"]);
             break;
 
         /* TODO: Listar Combo */
         case "combo":
-            $datos=$rol->get_rol();
+            $datos=$rol->get_rol_activo();
             if(is_array($datos)==true and count($datos)>0){
                 $html="";
                 $html.="<option selected>Seleccionar</option>";

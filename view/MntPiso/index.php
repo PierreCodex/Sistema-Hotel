@@ -6,7 +6,7 @@
 <!doctype html>
 <html lang="es" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none">
 <head>
-    <title>Hotel Las Palmeras  | Piso</title>
+    <title>Hotel Las Palmeras | Piso</title>
     <?php require_once("../html/head.php"); ?>
 </head>
 
@@ -46,7 +46,8 @@
                                         <thead>
                                             <tr>
                                                 <th>Nombre</th>
-                                                <th>FechaCreacion</th>
+                                                <th>Estado</th>
+                                                <th></th>
                                                 <th></th>
                                                 <th></th>
                                             </tr>
@@ -71,7 +72,7 @@
     <?php require_once("mantenimiento.php"); ?>
 
     <?php require_once("../html/js.php"); ?>
-    <script type="text/javascript" src="mntcategoria.js"></script>
+    <script type="text/javascript" src="mntpiso.js"></script>
 </body>
 
 </html>

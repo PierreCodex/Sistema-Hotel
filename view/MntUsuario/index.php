@@ -6,7 +6,7 @@
 <!doctype html>
 <html lang="es" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none">
 <head>
-    <title>AnderCode | Usuario</title>
+    <title>Hotel Las Palmeras | Usuario</title>
     <?php require_once("../html/head.php"); ?>
     <link rel="stylesheet" href="password-strength.css">
 </head>
@@ -53,6 +53,7 @@
                                                 <th>Rol</th>
                                                 
                                                 <th>Estado</th>
+                                                <th></th>
                                                 <th></th>
                                                 <th></th>
                                             </tr>

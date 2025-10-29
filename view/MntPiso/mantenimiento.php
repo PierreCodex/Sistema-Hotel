@@ -7,22 +7,26 @@
             </div>
             <form method="post" id="mantenimiento_form">
                 <div class="modal-body">
-                    <input type="hidden" name="rol_id" id="rol_id"/>
+                    <input type="hidden" name="piso_id" id="piso_id"/>
 
                     <div class="row gy-2">
                         <div class="col-md-12">
                             <div>
-                                <label for="rol_nom" class="form-label">Nombre del Rol</label>
+                                <label for="piso_nom" class="form-label">Nombre <span class="text-danger">*</span></label>
                                 <input type="text" 
                                        class="form-control" 
-                                       id="rol_nom" 
-                                       name="rol_nom" 
+                                       id="piso_nom" 
+                                       name="piso_nom" 
+                                    
                                        maxlength="50"
-                                       placeholder="Ingrese el nombre del rol"
+                                       placeholder="Ingrese el nombre del piso"
                                        autocomplete="off"/>
-                                <small class="text-muted">Máximo 50 caracteres</small>
+                                <div class="form-text">
+                                    <small class="text-muted">Máximo 50 caracteres</small>
+                                </div>
                             </div>
                         </div>
+
                     </div>
 
                 </div>

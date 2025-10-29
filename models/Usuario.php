@@ -166,4 +166,27 @@ class Usuario extends Conectar
         $query->execute();
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /* Validar si el DNI ya existe en la base de datos */
+    public function existe_usuario_dni($usu_dni){
+        $conectar=parent::Conexion();
+        $sql="CALL SP_L_USUARIO_BY_DNI_01(?)";
+        $query=$conectar->prepare($sql);
+        $query->bindValue(1,$usu_dni);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+    /* Cambiar estado del usuario (activar/desactivar) */
+    public function cambiar_estado_usuario($usu_id, $nuevo_estado)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_CAMBIAR_ESTADO_USUARIO_01(?, ?)";
+        $sql = $conectar->prepare($sql);
+        $sql->bindValue(1, $usu_id);    
+        $sql->bindValue(2, $nuevo_estado);
+        $sql->execute();
+        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
 }

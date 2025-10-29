@@ -4,9 +4,23 @@
 --  - Solo maneja IdRol
 -- =============================================
 
--- 1. Listar todos los roles activos
+-- 1. Listar todos los roles (activos e inactivos)
 DELIMITER $$
 CREATE PROCEDURE SP_L_ROL_01()
+BEGIN
+    SELECT 
+        IdRol AS ROL_ID,
+        Descripcion AS ROL_NOM,
+        Estado AS EST,
+        DATE_FORMAT(FechaCreacion, '%d/%m/%Y %H:%i:%s') AS FECH_CREA
+    FROM rol 
+    ORDER BY FechaCreacion DESC;
+END$$
+DELIMITER ;
+
+-- 2. Listar todos los roles (SOLO ACTIVOS)
+DELIMITER $$
+CREATE PROCEDURE SP_L_ROL_03()
 BEGIN
     SELECT 
         IdRol AS ROL_ID,
@@ -18,6 +32,7 @@ BEGIN
     ORDER BY FechaCreacion DESC;
 END$$
 DELIMITER ;
+
 
 -- 2. Obtener rol por ID específico
 DELIMITER $$
@@ -33,12 +48,11 @@ BEGIN
 END$$
 DELIMITER ;
 
--- 3. Eliminar rol (cambio de estado)
+-- 3. Eliminar rol definitivamente
 DELIMITER $$
 CREATE PROCEDURE SP_D_ROL_01(IN ROL_ID INT)
 BEGIN
-    UPDATE rol 
-    SET Estado = 0 
+    DELETE FROM rol 
     WHERE IdRol = ROL_ID;
 END$$
 DELIMITER ;
@@ -104,28 +118,13 @@ BEGIN
 END$$
 DELIMITER ;
 
--- 7. Reactivar rol
+
+-- 10. Cambiar estado del rol
 DELIMITER $$
-CREATE PROCEDURE SP_A_ROL_01(IN ROL_ID INT)
+CREATE PROCEDURE SP_CAMBIAR_ESTADO_ROL_01(IN ROL_ID INT, IN NUEVO_ESTADO INT)
 BEGIN
     UPDATE rol 
-    SET Estado = 1 
+    SET Estado = NUEVO_ESTADO 
     WHERE IdRol = ROL_ID;
-END$$
-DELIMITER ;
-
--- 8. Buscar roles por descripción
-DELIMITER $$
-CREATE PROCEDURE SP_S_ROL_01(IN BUSCAR VARCHAR(50))
-BEGIN
-    SELECT 
-        IdRol AS ROL_ID,
-        Descripcion AS ROL_NOM,
-        Estado AS EST,
-        DATE_FORMAT(FechaCreacion, '%d/%m/%Y %H:%i:%s') AS FECH_CREA
-    FROM rol 
-    WHERE Descripcion LIKE CONCAT('%', BUSCAR, '%')
-    AND Estado = 1
-    ORDER BY Descripcion ASC;
 END$$
 DELIMITER ;

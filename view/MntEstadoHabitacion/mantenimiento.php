@@ -7,22 +7,26 @@
             </div>
             <form method="post" id="mantenimiento_form">
                 <div class="modal-body">
-                    <input type="hidden" name="rol_id" id="rol_id"/>
+                    <input type="hidden" name="est_hab_id" id="est_hab_id"/>
 
                     <div class="row gy-2">
                         <div class="col-md-12">
                             <div>
-                                <label for="rol_nom" class="form-label">Nombre del Rol</label>
+                                <label for="est_hab_nom" class="form-label">Descripción <span class="text-danger">*</span></label>
                                 <input type="text" 
                                        class="form-control" 
-                                       id="rol_nom" 
-                                       name="rol_nom" 
+                                       id="est_hab_nom" 
+                                       name="est_hab_nom" 
+                                   
                                        maxlength="50"
-                                       placeholder="Ingrese el nombre del rol"
+                                       placeholder="Ingrese la descripción del estado de habitación"
                                        autocomplete="off"/>
-                                <small class="text-muted">Máximo 50 caracteres</small>
+                                <div class="form-text">
+                                    <small class="text-muted">Máximo 50 caracteres</small>
+                                </div>
                             </div>
                         </div>
+
                     </div>
 
                 </div>

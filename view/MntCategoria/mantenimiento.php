@@ -18,12 +18,11 @@
                                        id="cat_nom" 
                                        name="cat_nom" 
                                     
-                                       minlength="2"
                                        maxlength="50"
                                        placeholder="Ingrese el nombre de la categoría"
                                        autocomplete="off"/>
                                 <div class="form-text">
-                                    <small class="text-muted">Mínimo 2 caracteres, máximo 50 caracteres</small>
+                                    <small class="text-muted">Máximo 50 caracteres</small>
                                 </div>
                             </div>
                         </div>

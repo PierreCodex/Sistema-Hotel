@@ -9,21 +9,21 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
 
     <div class="navbar-brand-box">
 
-        <a href="index.html" class="logo logo-dark">
+        <a href="index.html" class="logo Logo-dark">
             <span class="logo-sm">
-                <img src="../../assets/images/logo-sm.png" alt="" height="22">
+                <img src="../../assets/images/logo-sm.png" alt="" height="42">
             </span>
             <span class="logo-lg">
-                <img src="../../assets/images/logo-dark.png" alt="" height="17">
+                <img src="../../assets/images/Logo-dark.png" alt="" height="80">
             </span>
         </a>
 
-        <a href="index.html" class="logo logo-light">
+    <a href="index.html" class="logo Logo-light">
             <span class="logo-sm">
-                <img src="../../assets/images/logo-sm.png" alt="" height="22">
+                <img src="../../assets/images/ogo-sm.png" alt="" height="22">
             </span>
             <span class="logo-lg">
-                <img src="../../assets/images/logo-light.png" alt="" height="17">
+                <img src="../../assets/images/ogo-light.png" alt="" height="77">
             </span>
         </a>
 
@@ -87,7 +87,7 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
           
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarTienda" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarTienda">
-                        <i class="ri-settings-3-line"></i> <span data-key="t-mantenimiento">Tienda</span>
+                        <i class="ri-store-2-line"></i> <span data-key="t-mantenimiento">Tienda</span>
                     </a>
                     <div class="collapse menu-dropdown" id="sidebarTienda">
                         <ul class="nav nav-sm flex-column">
@@ -108,7 +108,7 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
                     </div>
                 </li> <!-- end Gestion Tienda -->
 
-
+                <!-- Getiona  -->
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarMantenimiento" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarMantenimiento">
                         <i class="ri-settings-3-line"></i> <span data-key="t-mantenimiento">Mantenimiento</span>
@@ -137,7 +137,7 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
                
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarReportes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarReportes">
-                        <i class="ri-settings-3-line"></i> <span data-key="t-mantenimiento">Reportes </span>
+                        <i class="bx bxs-report"></i> <span data-key="t-mantenimiento">Reportes </span>
                     </a>
                     <div class="collapse menu-dropdown" id="sidebarReportes">
                         <ul class="nav nav-sm flex-column">
@@ -162,7 +162,7 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
                 <!-- Mantenimiento Usuarios -->
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarUsuarios" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarUsuarios">
-                        <i class="ri-settings-3-line"></i> <span data-key="t-mantenimiento">Usuarios </span>
+                        <i class="bx bx-user-circle"></i> <span data-key="t-mantenimiento">Usuarios </span>
                     </a>
                     <div class="collapse menu-dropdown" id="sidebarUsuarios">
                         <ul class="nav nav-sm flex-column">

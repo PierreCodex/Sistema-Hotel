@@ -27,19 +27,17 @@ BEGIN
         TD_MENU.IdRol = IdRol;
 END$$
 
--- Procedimiento para activar permiso de menú
-DROP PROCEDURE IF EXISTS SP_U_MENU_01$$
-CREATE PROCEDURE SP_U_MENU_01(
-    IN MEND_ID INT
-)
-BEGIN
+-- 3 Procedimiento para activar permiso de menú
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_U_MENU_01` (IN `MEND_ID` INT)   BEGIN
     UPDATE TD_MENU
     SET MEND_PERMI = 'Si'
     WHERE TD_MENU.MEND_ID = MEND_ID;
 END$$
 
--- Procedimiento para desactivar permiso de menú
-DROP PROCEDURE IF EXISTS SP_U_MENU_02$$
+-- 4 Procedimiento para desactivar permiso de menú
+DELIMITER $$
+
 CREATE PROCEDURE SP_U_MENU_02(
     IN MEND_ID INT
 )
@@ -86,7 +84,7 @@ END$$
 
 DELIMITER ;
 
--- registrar automáticamente los permisos de menú para un rol específico
+-- 2: registrar automáticamente los permisos de menú para un rol específico
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_I_MENU_02`(
     p_IdRol INT

@@ -26,19 +26,6 @@ function guardaryeditar(e){
         return false;
     }
     
-    // Validar longitud mínima
-    if(rol_nom.length < 2){
-        $('#rol_nom').addClass('is-invalid');
-        swal.fire({
-            title: 'Error de Validación',
-            text: 'El nombre del rol debe tener al menos 2 caracteres',
-            icon: 'warning',
-            confirmButtonText: 'Entendido'
-        });
-        $('#rol_nom').focus();
-        return false;
-    }
-    
     // Validar longitud máxima
     if(rol_nom.length > 50){
         $('#rol_nom').addClass('is-invalid');
@@ -185,6 +172,55 @@ function editar(rol_id){
     });
 }
 
+// Función para cambiar el estado del rol via checkbox
+function cambiarEstado(rol_id, estado) {
+    var accion = estado ? 'activar' : 'desactivar';
+    var titulo = estado ? 'Activar Rol' : 'Desactivar Rol';
+    var texto = '¿Está seguro que desea ' + accion + ' este rol?';
+    
+    swal.fire({
+        title: titulo,
+        text: texto,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, ' + accion,
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post("../../controller/rol.php?op=cambiar_estado", {
+                rol_id: rol_id,
+                estado: estado
+            }, function(data) {
+                var response = JSON.parse(data);
+                if(response.status === 'success') {
+                    $('#table_data').DataTable().ajax.reload();
+                    swal.fire({
+                        title: 'Rol',
+                        text: response.message,
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            }).fail(function() {
+                swal.fire({
+                    title: 'Error',
+                    text: 'No se pudo actualizar el estado',
+                    icon: 'error'
+                });
+                // Revertir el checkbox en caso de error
+                $('#switch' + rol_id).prop('checked', !estado);
+            });
+        } else {
+            // Si el usuario cancela, revertir el checkbox
+            $('#switch' + rol_id).prop('checked', !estado);
+        }
+    });
+}
+
+
 function eliminar(rol_id){
     swal.fire({
         title:"Eliminar!",
@@ -210,30 +246,6 @@ function eliminar(rol_id){
     });
 }
 
-function activar(rol_id){
-    swal.fire({
-        title:"Activar!",
-        text:"Desea Activar el Registro?",
-        icon: "question",
-        confirmButtonText : "Si",
-        showCancelButton : true,
-        cancelButtonText: "No",
-    }).then((result)=>{
-        if (result.value){
-            $.post("../../controller/rol.php?op=activar",{rol_id:rol_id},function(data){
-                console.log(data);
-            });
-
-            $('#table_data').DataTable().ajax.reload();
-
-            swal.fire({
-                title:'Rol',
-                text: 'Registro Activado',
-                icon: 'success'
-            });
-        }
-    });
-}
 
 // Función para validar el nombre del rol en tiempo real
 function validarRolNombre(){
@@ -243,9 +255,6 @@ function validarRolNombre(){
     $('#rol_nom').removeClass('is-invalid is-valid');
     
     if(rol_nom === ''){
-        $('#rol_nom').addClass('is-invalid');
-        return false;
-    } else if(rol_nom.length < 2){
         $('#rol_nom').addClass('is-invalid');
         return false;
     } else if(rol_nom.length > 50){

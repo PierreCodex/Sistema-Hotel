@@ -8,25 +8,25 @@ function guardaryeditar(e){
     e.preventDefault();
     
     // Validaciones del lado del cliente
-    var cat_nom = $("#cat_nom").val().trim();
+    var piso_nom = $("#piso_nom").val().trim();
     
-    if(cat_nom === ""){
+    if(piso_nom === ""){
         swal.fire({
             title:'Error de Validación',
-            text: 'El nombre de la categoría es obligatorio',
+            text: 'El nombre del piso es obligatorio',
             icon: 'warning'
         });
-        $("#cat_nom").focus();
+        $("#piso_nom").focus();
         return false;
     }
     
-    if(cat_nom.length > 50){
+    if(piso_nom.length > 50){
         swal.fire({
             title:'Error de Validación',
-            text: 'El nombre de la categoría no puede exceder 50 caracteres',
+            text: 'El nombre del piso no puede exceder 50 caracteres',
             icon: 'warning'
         });
-        $("#cat_nom").focus();
+        $("#piso_nom").focus();
         return false;
     }
     
@@ -43,7 +43,7 @@ function guardaryeditar(e){
     
     var formData = new FormData($("#mantenimiento_form")[0]);
     $.ajax({
-        url:"../../controller/categoria.php?op=guardaryeditar",
+        url:"../../controller/piso.php?op=guardaryeditar",
         type:"POST",
         data:formData,
         contentType:false,
@@ -104,7 +104,7 @@ $(document).ready(function(){
             'csvHtml5',
         ],
         "ajax":{
-            url:"../../controller/categoria.php?op=listar",
+            url:"../../controller/piso.php?op=listar",
             type:"post"
         },
         "bDestroy": true,
@@ -140,18 +140,18 @@ $(document).ready(function(){
 
 });
 
-function editar(cat_id){
-    $.post("../../controller/categoria.php?op=mostrar", {cat_id : cat_id}, function (data) {
+function editar(piso_id){
+    $.post("../../controller/piso.php?op=mostrar", {piso_id : piso_id}, function (data) {
         data = JSON.parse(data);
-        $('#cat_id').val(data.CAT_ID);
-        $('#cat_nom').val(data.CAT_NOM);
+        $('#piso_id').val(data.PISO_ID);
+        $('#piso_nom').val(data.PISO_NOM);
         
         // Remover clases de validación
-        $('#cat_nom').removeClass('is-invalid is-valid');
+        $('#piso_nom').removeClass('is-invalid is-valid');
         
         // Validar el campo cargado
-        if(data.CAT_NOM && data.CAT_NOM.trim().length > 0 && data.CAT_NOM.trim().length <= 50){
-            $('#cat_nom').addClass('is-valid');
+        if(data.PISO_NOM && data.PISO_NOM.trim().length > 0 && data.PISO_NOM.trim().length <= 50){
+            $('#piso_nom').addClass('is-valid');
         }
     });
     $('#lbltitulo').html('Editar Registro');
@@ -159,13 +159,13 @@ function editar(cat_id){
     
     // Enfocar el campo nombre después de que se muestre el modal
     $('#modalmantenimiento').on('shown.bs.modal', function () {
-        $('#cat_nom').focus().select();
+        $('#piso_nom').focus().select();
     });
 }
 
 
 
-function eliminar(cat_id){
+function eliminar(piso_id){
     swal.fire({
         title:"Eliminar!",
         text:"Desea Eliminar el Registro?",
@@ -175,14 +175,14 @@ function eliminar(cat_id){
         cancelButtonText: "No",
     }).then((result)=>{
         if (result.value){
-            $.post("../../controller/categoria.php?op=eliminar",{cat_id:cat_id},function(data){
+            $.post("../../controller/piso.php?op=eliminar",{piso_id:piso_id},function(data){
                 console.log(data);
             });
 
             $('#table_data').DataTable().ajax.reload();
 
             swal.fire({
-                title:'Categoria',
+                title:'Piso',
                 text: 'Registro Eliminado',
                 icon: 'success'
             });
@@ -190,11 +190,11 @@ function eliminar(cat_id){
     });
 }
 
-// Función para cambiar el estado del Categoria via checkbox
-function cambiarEstado(cat_id, estado) {
+// Función para cambiar el estado del Piso via checkbox
+function cambiarEstado(piso_id, estado) {
     var accion = estado ? 'activar' : 'desactivar';
-    var titulo = estado ? 'Activar Categoria' : 'Desactivar Categoria';
-    var texto = '¿Está seguro que desea ' + accion + ' este Categoria?';
+    var titulo = estado ? 'Activar Piso' : 'Desactivar Piso';
+    var texto = '¿Está seguro que desea ' + accion + ' este Piso?';
     
     swal.fire({
         title: titulo,
@@ -207,15 +207,15 @@ function cambiarEstado(cat_id, estado) {
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if (result.isConfirmed) {
-            $.post("../../controller/categoria.php?op=cambiar_estado", {
-                cat_id: cat_id,
+            $.post("../../controller/piso.php?op=cambiar_estado", {
+                piso_id: piso_id,
                 estado: estado
             }, function(data) {
                 var response = JSON.parse(data);
                 if(response.status === 'success') {
                     $('#table_data').DataTable().ajax.reload();
                     swal.fire({
-                        title: 'Categoria',         
+                        title: 'Piso',         
                         text: response.message,
                         icon: 'success',
                         timer: 1500,
@@ -229,34 +229,34 @@ function cambiarEstado(cat_id, estado) {
                     icon: 'error'
                 });
                 // Revertir el checkbox en caso de error
-                $('#switch' + cat_id).prop('checked', !estado);
+                $('#switch' + piso_id).prop('checked', !estado);
             });
         } else {
             // Si el usuario cancela, revertir el checkbox
-            $('#switch' + cat_id).prop('checked', !estado);
+            $('#switch' + piso_id).prop('checked', !estado);
         }
     });
 }
 
 $(document).on("click","#btnnuevo",function(){
-    $('#cat_id').val('');
-    $('#cat_nom').val('');
+    $('#piso_id').val('');
+    $('#piso_nom').val('');
     $('#lbltitulo').html('Nuevo Registro');
     $("#mantenimiento_form")[0].reset();
     
     // Remover clases de validación
-    $('#cat_nom').removeClass('is-invalid is-valid');
+    $('#piso_nom').removeClass('is-invalid is-valid');
     
     $('#modalmantenimiento').modal('show');
     
     // Enfocar el campo nombre después de que se muestre el modal
     $('#modalmantenimiento').on('shown.bs.modal', function () {
-        $('#cat_nom').focus();
+        $('#piso_nom').focus();
     });
 });
 
 // Validación en tiempo real del campo nombre
-$(document).on('input', '#cat_nom', function(){
+$(document).on('input', '#piso_nom', function(){
     var valor = $(this).val().trim();
     var campo = $(this);
     

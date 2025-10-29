@@ -34,8 +34,12 @@
                                 <label for="valueInput" class="form-label">DNI</label>
                                 <input type="text" class="form-control" id="usu_dni" name="usu_dni"  maxlength="8" pattern="[0-9]{8}"/>
                              
-                                <div class="invalid-feedback">
+                                <div class="invalid-feedback" id="dni-feedback">
                                     DEBE SER EXACTAMENTE 8 CARACTERES
+                                </div>
+                                <!-- Mensaje específico para DNI duplicado -->
+                                <div class="text-danger mt-1" id="dni-duplicate-message" style="display: none;">
+                                    <i class="ri-error-warning-line"></i> DNI ya existente
                                 </div>
                             </div>
                         </div>

@@ -1,123 +1,229 @@
 <?php
-    /* TODO: Llamando Clases */
-    require_once("../config/conexion.php");
-    require_once("../models/Usuario.php");
-    require_once("../models/Rol.php");
-    /* TODO: Inicializando clase */
-    $usuario = new Usuario();
+/* TODO: Llamando Clases */
+require_once("../config/conexion.php");
+require_once("../models/Usuario.php");
+require_once("../models/Rol.php");
+/* TODO: Inicializando clase */
+$usuario = new Usuario();
 
 
-    switch($_GET["op"]){
-         case "guardaryeditar": 
-            if(empty($_POST["usu_id"])){
+switch ($_GET["op"]) {
+    case "guardaryeditar":
+        
+        // Validar email duplicado antes de guardar
+        $datos = $usuario->existe_usuario_correo($_POST["usu_correo"]);
+        $existe_duplicado_email = false;
+
+        if (is_array($datos) && count($datos) > 0) {
+            // Si estamos en modo edición, verificar si el email pertenece al mismo usuario
+            if (!empty($_POST["usu_id"])) {
+                foreach ($datos as $row) {
+                    if ($row["IdUsuario"] != $_POST["usu_id"]) {
+                        $existe_duplicado_email = true;
+                        break;
+                    }
+                }
+            } else {
+                // Modo nuevo registro, cualquier email existente es duplicado
+                $existe_duplicado_email = true;
+            }
+        }
+
+        // Validar DNI duplicado
+        $datos_dni = $usuario->existe_usuario_dni($_POST["usu_dni"]);
+        $existe_duplicado_dni = false;
+
+        if (is_array($datos_dni) && count($datos_dni) > 0) {
+            // Si estamos en modo edición, verificar si el DNI pertenece al mismo usuario
+            if (!empty($_POST["usu_id"])) {
+                foreach ($datos_dni as $row) {
+                    if ($row["IdUsuario"] != $_POST["usu_id"]) {
+                        $existe_duplicado_dni = true;
+                        break;
+                    }
+                }
+            } else {
+                // Modo nuevo registro, cualquier DNI existente es duplicado
+                $existe_duplicado_dni = true;
+            }
+        }
+
+        if ($existe_duplicado_email) {
+            // Retornar error si el email ya existe
+            echo json_encode(array(
+                "status" => "error", 
+                "message" => "El email ya existe en el sistema. Por favor, use otro email."
+            ));
+        } elseif ($existe_duplicado_dni) {
+            // Retornar error si el DNI ya existe
+            echo json_encode(array(
+                "status" => "error", 
+                "message" => "El DNI ya existe en el sistema. Por favor, use otro DNI."
+            ));
+        } else {
+            // Proceder con el guardado si no hay duplicados
+            if (empty($_POST["usu_id"])) {
                 $usuario->insert_usuario(
                     $_POST["usu_nom"],
                     $_POST["usu_ape"],
                     $_POST["usu_dni"],
                     $_POST["usu_correo"],
                     $_POST["usu_pass"],
-
                     $_POST["rol_id"]
                 );
-            }else{
+                echo json_encode(array("status" => "success", "message" => "Usuario creado correctamente"));
+            } else {
+                // Modo edición - verificar si mantener contraseña actual
+                $password_a_usar = $_POST["usu_pass"];
+                
+                // Si viene el flag mantener_password, no hashear la contraseña (ya está hasheada)
+                if (isset($_POST["mantener_password"]) && $_POST["mantener_password"] === 'true') {
+                    // Usar la contraseña tal como viene (ya encriptada)
+                    $password_a_usar = $_POST["usu_pass"];
+                } else {
+                    // Nueva contraseña ingresada - se hasheará en el modelo
+                    $password_a_usar = $_POST["usu_pass"];
+                }
+                
                 $usuario->update_usuario(
                     $_POST["usu_id"],
                     $_POST["usu_nom"],
                     $_POST["usu_ape"],
                     $_POST["usu_dni"],
                     $_POST["usu_correo"],
-                    $_POST["usu_pass"],
-                    $_POST["rol_id"]
+                    $password_a_usar,
+                    $_POST["rol_id"],
+                    isset($_POST["mantener_password"]) ? $_POST["mantener_password"] : 'false'
                 );
+                echo json_encode(array("status" => "success", "message" => "Usuario actualizado correctamente"));
             }
-            break;
+        }
+        break;
 
-        /* TODO: Listado de registros formato JSON para Datatable JS */
-        case "listar":
-            try {
-                $current_user_id = $_SESSION["IdUsuario"];
-                $datos = $usuario->get_usuario($current_user_id);
-                $data = Array();
-                
-                if (is_array($datos) && count($datos) > 0) {
-                    foreach($datos as $row){
-                        $sub_array = array();
-                        $sub_array[] = $row["USU_NOM"];
-                        $sub_array[] = $row["USU_APE"];
-                        $sub_array[] = $row["USU_DNI"];
-                        $sub_array[] = $row["USU_CORREO"];
-                        $sub_array[] = $row["ROL_NOM"];
-                        $sub_array[] = ($row["EST"] == 1) ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>';
-                        $sub_array[] = '<button type="button" onClick="editar('.$row["USU_ID"].');"  id="'.$row["USU_ID"].'" class="btn btn-outline-warning btn-icon waves-effect waves-light"><i class="ri-edit-line"></i></button>';
-                        $sub_array[] = '<button type="button" onClick="eliminar('.$row["USU_ID"].');"  id="'.$row["USU_ID"].'" class="btn btn-outline-danger btn-icon waves-effect waves-light"><i class="ri-delete-bin-5-line"></i></button>';
-                        $data[] = $sub_array;
+    /* TODO: Listado de registros formato JSON para Datatable JS */
+    case "listar":
+        try {
+            $current_user_id = $_SESSION["IdUsuario"];
+            $datos = $usuario->get_usuario($current_user_id);
+            $data = array();
+
+            if (is_array($datos) && count($datos) > 0) {
+                foreach ($datos as $row) {
+                    $sub_array = array();
+                    $sub_array[] = $row["USU_NOM"];
+                    $sub_array[] = $row["USU_APE"];
+                    $sub_array[] = $row["USU_DNI"];
+                    $sub_array[] = $row["USU_CORREO"];
+                    $sub_array[] = $row["ROL_NOM"];
+                    $sub_array[] = ($row["EST"] == 1) ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>';
+                    $sub_array[] = '<button type="button" onClick="editar(' . $row["USU_ID"] . ');"  id="' . $row["USU_ID"] . '" class="btn btn-outline-warning btn-icon waves-effect waves-light"><i class="ri-edit-line"></i></button>';
+                    $sub_array[] = '<button type="button" onClick="eliminar(' . $row["USU_ID"] . ');"  id="' . $row["USU_ID"] . '" class="btn btn-outline-danger btn-icon waves-effect waves-light"><i class="ri-delete-bin-5-line"></i></button>';
+                    // Checkbox para cambiar estado
+                    $checked = $row["EST"] == 1 ? 'checked' : '';
+                    $sub_array[] = '<div class="form-check form-switch form-switch-custom form-switch-success">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="switch' . $row["USU_ID"] . '" ' . $checked . ' onchange="cambiarEstado(' . $row["USU_ID"] . ', this.checked)">
+                                    <label class="form-check-label" for="switch' . $row["ROL_ID"] . '">Yes/No</label>
+                                </div>';
+                    $data[] = $sub_array;
+                }
+            }
+
+            $results = array(
+                "sEcho" => 1,
+                "iTotalRecords" => count($data),
+                "iTotalDisplayRecords" => count($data),
+                "aaData" => $data
+            );
+            echo json_encode($results);
+        } catch (Exception $e) {
+            echo json_encode(array("error" => $e->getMessage()));
+        }
+        break;
+
+    /* TODO:Mostrar informacion de registro segun su ID */
+    case "mostrar":
+        $datos = $usuario->get_usuario_x_usu_id($_POST["usu_id"]);
+        if (is_array($datos) == true and count($datos) > 0) {
+            foreach ($datos as $row) {
+                $output["USU_ID"] = $row["USU_ID"];
+                $output["USU_NOM"] = $row["USU_NOM"];
+                $output["USU_APE"] = $row["USU_APE"];
+                $output["USU_DNI"] = $row["USU_DNI"];
+                $output["USU_CORREO"] = $row["USU_CORREO"];
+                $output["USU_PASS"] = $row["USU_PASS"];
+                $output["ROL_ID"] = $row["ROL_ID"];
+            }
+            echo json_encode($output);
+        }
+        break;
+
+    /* TODO: Cambiar Estado del Registro */
+        case "cambiar_estado":
+            $nuevo_estado = $_POST["estado"] == 'true' ? 1 : 0;
+            $usuario->cambiar_estado_usuario($_POST["usu_id"], $nuevo_estado);          
+            echo json_encode(array("status" => "success", "message" => "Estado actualizado correctamente"));
+            break;
+    /* TODO: Eliminar Usuario */
+    case "eliminar":
+        $usuario->delete_usuario($_POST["usu_id"]);
+        break;
+
+    /* TODO: Actualizar contraseña */
+    case "actualizar_password":
+        $usuario->update_usuario_pass($_POST["usu_id"], $_POST["usu_pass"]);
+        break;
+
+    /* TODO: Validar si existe email duplicado */
+    case "validar_email":
+        $datos = $usuario->existe_usuario_correo($_POST["usu_correo"]);
+        $existe_duplicado = false;
+
+        if (is_array($datos) && count($datos) > 0) {
+            // Si estamos en modo edición, verificar si el email pertenece al mismo usuario
+            if (isset($_POST["usu_id"]) && !empty($_POST["usu_id"])) {
+                foreach ($datos as $row) {
+                    if ($row["IdUsuario"] != $_POST["usu_id"]) {
+                        $existe_duplicado = true;
+                        break;
                     }
                 }
-
-                $results = array(
-                    "sEcho"=>1,
-                    "iTotalRecords"=>count($data),
-                    "iTotalDisplayRecords"=>count($data),
-                    "aaData"=>$data);
-                echo json_encode($results);
-            } catch (Exception $e) {
-                echo json_encode(array("error" => $e->getMessage()));
-            }
-            break;
-
-        /* TODO:Mostrar informacion de registro segun su ID */
-        case "mostrar":
-            $datos=$usuario->get_usuario_x_usu_id($_POST["usu_id"]);
-            if (is_array($datos)==true and count($datos)>0){
-                foreach($datos as $row){
-                    $output["USU_ID"] = $row["USU_ID"];
-                    $output["USU_NOM"] = $row["USU_NOM"];
-                    $output["USU_APE"] = $row["USU_APE"];
-                    $output["USU_DNI"] = $row["USU_DNI"];
-                    $output["USU_CORREO"] = $row["USU_CORREO"];
-                    $output["USU_PASS"] = $row["USU_PASS"];
-                    $output["ROL_ID"] = $row["ROL_ID"];
-                }
-                echo json_encode($output);
-            }
-            break;
-
-        /* TODO: Cambiar Estado a 0 del Registro */
-        case "eliminar":
-            $usuario->delete_usuario($_POST["usu_id"]);
-            break;
- 
-        /* TODO: Actualizar contraseña */
-        case "actualizar_password":
-            $usuario->update_usuario_pass($_POST["usu_id"], $_POST["usu_pass"]);
-            break;
-
-        /* TODO: Validar si existe email duplicado */
-        case "validar_email":
-            $datos = $usuario->existe_usuario_correo($_POST["usu_correo"]);
-            $existe_duplicado = false;
-            
-            if(is_array($datos) && count($datos) > 0){
-                // Si estamos en modo edición, verificar si el email pertenece al mismo usuario
-                if(isset($_POST["usu_id"]) && !empty($_POST["usu_id"])){
-                    foreach($datos as $row){
-                        if($row["IdUsuario"] != $_POST["usu_id"]){
-                            $existe_duplicado = true;
-                            break;
-                        }
-                    }
-                } else {
-                    // Modo nuevo registro, cualquier email existente es duplicado
-                    $existe_duplicado = true;
-                }
-            }
-            
-            if($existe_duplicado){
-                echo json_encode(array("existe" => true, "mensaje" => "Email ya existente"));
             } else {
-                echo json_encode(array("existe" => false, "mensaje" => "Email disponible"));
+                // Modo nuevo registro, cualquier email existente es duplicado
+                $existe_duplicado = true;
             }
-            break;
+        }
 
-    }
-?>
+        if ($existe_duplicado) {
+            echo json_encode(array("existe" => true, "mensaje" => "Email ya existente"));
+        } else {
+            echo json_encode(array("existe" => false, "mensaje" => "Email disponible"));
+        }
+        break;
+
+    /* TODO: Validar si existe DNI duplicado */
+    case "validar_dni":
+        $datos = $usuario->existe_usuario_dni($_POST["usu_dni"]);
+        $existe_duplicado = false;
+
+        if (is_array($datos) && count($datos) > 0) {
+            // Si estamos en modo edición, verificar si el DNI pertenece al mismo usuario
+            if (isset($_POST["usu_id"]) && !empty($_POST["usu_id"])) {
+                foreach ($datos as $row) {
+                    if ($row["IdUsuario"] != $_POST["usu_id"]) {
+                        $existe_duplicado = true;
+                        break;
+                    }
+                }
+            } else {
+                // Modo nuevo registro, cualquier DNI existente es duplicado
+                $existe_duplicado = true;
+            }
+        }
+
+        if ($existe_duplicado) {
+            echo json_encode(array("existe" => true, "mensaje" => "DNI ya existente"));
+        } else {
+            echo json_encode(array("existe" => false, "mensaje" => "DNI disponible"));
+        }
+        break;
+}
