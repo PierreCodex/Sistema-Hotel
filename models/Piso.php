@@ -33,7 +33,7 @@ class Piso extends Conectar{
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /* Eliminar piso (cambio de estado) */
+    /* Eliminar piso () */
     public function delete_piso($piso_id){
         $conectar = parent::conexion();
         parent::set_names();
