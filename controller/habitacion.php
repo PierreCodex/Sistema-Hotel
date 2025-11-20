@@ -8,18 +8,21 @@ if (file_exists("../config/conexion.php")) {
     require_once("../models/Habitacion.php");
     require_once("../models/Categoria.php");
     require_once("../models/Piso.php");
+    require_once("../models/Tarifa.php");
 } else {
     // Llamado directamente
     require_once("config/conexion.php");
     require_once("models/Habitacion.php");
     require_once("models/Categoria.php");
     require_once("models/Piso.php");
+    require_once("models/Tarifa.php");
 }
 
 /* TODO: Inicializando clases */
 $habitacion = new Habitacion();
 $categoria = new Categoria();
 $piso = new Piso();
+$tarifa = new Tarifa();
 
 switch ($_GET["op"]) {
     /* TODO: Guardar y editar, guardar cuando el ID este vacio, y Actualizar cuando se envie el ID */
@@ -41,13 +44,7 @@ switch ($_GET["op"]) {
             break;
         }
 
-        if (empty($_POST["hab_pre"]) || !is_numeric($_POST["hab_pre"]) || $_POST["hab_pre"] <= 0) {
-            echo json_encode(array(
-                'status' => 'error',
-                'message' => 'El precio debe ser un número mayor a 0'
-            ));
-            break;
-        }
+        // El precio por noche ya no se registra aquí; se asigna por tarifas
 
         if (empty($_POST["hab_piso_id"])) {
             echo json_encode(array(
@@ -87,7 +84,6 @@ switch ($_GET["op"]) {
                 $resultado = $habitacion->insert_habitacion(
                     $_POST["hab_num"],
                     $_POST["hab_det"],
-                    $_POST["hab_pre"],
                     $hab_est_id,
                     $_POST["hab_piso_id"],
                     $_POST["hab_cat_id"]
@@ -99,7 +95,6 @@ switch ($_GET["op"]) {
                     $_POST["hab_id"],
                     $_POST["hab_num"],
                     $_POST["hab_det"],
-                    $_POST["hab_pre"],
                     $hab_est_id,
                     $_POST["hab_piso_id"],
                     $_POST["hab_cat_id"]
@@ -123,20 +118,20 @@ switch ($_GET["op"]) {
             $sub_array = array();
             $sub_array[] = $row["HAB_NUM"];
             $sub_array[] = $row["HAB_DET"];
-            $sub_array[] = 'S/. ' . number_format($row["HAB_PRE"], 2);
+              // Botón para abrir asignación de tarifas
+            $sub_array[] = '<div class="text-center"><button type="button" onClick="abrirModalTarifa(' . $row["HAB_ID"] . ')" class="btn btn-info btn-icon waves-effect waves-light" title="Tarifas"><i class="bx bx-money"></i></button></div>';
             $sub_array[] = $row["PISO_NOM"];
             $sub_array[] = $row["CAT_NOM"];
             
         
             $sub_array[] = $row["EST"] == 1 ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>';
-            
             if ($row["EST"] == 1) {
                 $sub_array[] = '<button type="button" onClick="editar(' . $row["HAB_ID"] . ')" id="' . $row["HAB_ID"] . '" class="btn btn-warning btn-icon waves-effect waves-light" title="Editar habitación"><i class="ri-edit-2-line"></i></button>';
             } else {
                 $sub_array[] = '<button type="button" class="btn btn-warning btn-icon waves-effect waves-light" disabled title="Para editar, primero active la habitación"><i class="ri-edit-2-line"></i></button>';
             }
             
-            $sub_array[] = '<button type="button" onClick="eliminar(' . $row["HAB_ID"] . ');" id="' . $row["HAB_ID"] . '" class="btn btn-danger btn-sm"><i class="bx bx-trash"></i></button>';
+            $sub_array[] = '<button type="button" onClick="eliminar(' . $row["HAB_ID"] . ');" id="' . $row["HAB_ID"] . '" class="btn btn-danger"><i class="bx bx-trash"></i></button>';
             
             // Checkbox para cambiar estado
             $checked = $row["EST"] == 1 ? 'checked' : '';
@@ -165,10 +160,12 @@ switch ($_GET["op"]) {
                 $output["HAB_ID"] = $row["HAB_ID"];
                 $output["HAB_NUM"] = $row["HAB_NUM"];
                 $output["HAB_DET"] = $row["HAB_DET"];
-                $output["HAB_PRE"] = $row["HAB_PRE"];
                 $output["HAB_EST_ID"] = $row["HAB_EST_ID"];
                 $output["HAB_PISO_ID"] = $row["HAB_PISO_ID"];
                 $output["HAB_CAT_ID"] = $row["HAB_CAT_ID"];
+                $output["CAT_NOM"] = $row["CAT_NOM"];
+                $output["ESTADO_NOM"] = $row["ESTADO_NOM"];
+                $output["PISO_NOM"] = $row["PISO_NOM"];
             }
             echo json_encode($output);
         }
@@ -194,7 +191,13 @@ switch ($_GET["op"]) {
             $html = "";
             $html .= "<option value=''>Seleccionar Categoría</option>";
             foreach ($datos as $row) {
-                $html .= "<option value='" . $row["CAT_ID"] . "'>" . $row["CAT_NOM"] . "</option>";
+                // Incluir tarifa como data attribute para auto-rellenar precio de habitación
+                $tarifa = isset($row["CAT_TAR"]) ? $row["CAT_TAR"] : '';
+                $label = $row["CAT_NOM"];
+                if ($tarifa !== '' && is_numeric($tarifa)) {
+                    $label .= " (S/. " . number_format($tarifa, 2) . ")";
+                }
+                $html .= "<option value='" . $row["CAT_ID"] . "' data-tarifa='" . htmlspecialchars($tarifa, ENT_QUOTES, 'UTF-8') . "'>" . $label . "</option>";
             }
             echo $html;
         }
@@ -235,25 +238,6 @@ switch ($_GET["op"]) {
         $datos = $habitacion->get_habitacion_x_piso($_POST["piso_id"]);
         echo json_encode($datos);
         break;
-
-    /* TODO: Filtrar habitaciones por categoría */
-    case "filtrar_por_categoria":
-        $datos = $habitacion->get_habitacion_x_categoria($_POST["cat_id"]);
-        echo json_encode($datos);
-        break;
-
-    /* TODO: Filtrar habitaciones por estado */
-    case "filtrar_por_estado":
-        $datos = $habitacion->get_habitacion_x_estado($_POST["est_id"]);
-        echo json_encode($datos);
-        break;
-
-    /* TODO: Verificar disponibilidad de habitación */
-    case "verificar_disponibilidad":
-        $datos = $habitacion->verificar_disponibilidad_habitacion($_POST["hab_id"]);
-        echo json_encode($datos);
-        break;
-
     /* TODO: Listar habitaciones activas para combo */
     case "combo_habitacion":
         $datos = $habitacion->get_habitacion_activa();
@@ -264,6 +248,120 @@ switch ($_GET["op"]) {
                 $html .= "<option value='" . $row["HAB_ID"] . "'>Hab. " . $row["HAB_NUM"] . " - " . $row["HAB_DET"] . " (S/. " . $row["HAB_PRE"] . ")</option>";
             }
             echo $html;
+        }
+        break;
+
+    /* TODO: Listar habitaciones activas para vista de recepción */
+    case "listar_activos":
+        $datos = $habitacion->get_habitacion_activa();
+        echo json_encode($datos);
+        break;
+    /* TODO: Listar habitaciones activas para vista de tienda */
+    case "listar_ocupados":
+        $datos = $habitacion->get_habitacion_ocupada();
+        echo json_encode($datos);
+        break;
+    /* Obtener habitación por Id */
+    case "obtener_por_id":
+        $hab_id = isset($_POST["hab_id"]) ? intval($_POST["hab_id"]) : 0;
+        if ($hab_id <= 0) {
+            echo json_encode(array("error" => "hab_id requerido"));
+            break;
+        }
+        $datos = $habitacion->get_habitacion_x_hab_id($hab_id);
+        if (is_array($datos) && count($datos) > 0) {
+            echo json_encode($datos[0]);
+        } else {
+            echo json_encode(array("error" => "Habitación no encontrada"));
+        }
+        break;
+    /* TODO: Obtener habitación por número */
+    case "obtener_por_numero":
+        if (!empty($_POST["hab_num"])) {
+            // Buscamos la habitación por su número
+            $habitaciones = $habitacion->get_habitacion_activa();
+            $habitacion_encontrada = null;
+            
+            foreach ($habitaciones as $hab) {
+                if ($hab["HAB_NUM"] == $_POST["hab_num"]) {
+                    $habitacion_encontrada = $hab;
+                    break;
+                }
+            }
+            
+            if ($habitacion_encontrada) {
+                echo json_encode($habitacion_encontrada);
+            } else {
+                echo json_encode(array("error" => "Habitación no encontrada"));
+            }
+        } else {
+            echo json_encode(array("error" => "Número de habitación requerido"));
+        }
+        break;
+
+    /* Tarifas: listar todas las tarifas activas */
+    case "listar_tarifas":
+        $datos = $tarifa->get_tarifas_activas();
+        echo json_encode($datos);
+        break;
+
+    /* Tarifas: listar tarifas asignadas a una habitación */
+    case "listar_tarifas_asignadas":
+        if (empty($_POST["hab_id"])) {
+            echo json_encode(array('status' => 'error', 'message' => 'hab_id requerido'));
+            break;
+        }
+        $datos = $tarifa->get_tarifas_asignadas_por_habitacion($_POST["hab_id"]);
+        echo json_encode($datos);
+        break;
+
+    /* Tarifas: asignar una tarifa a habitación */
+    case "asignar_tarifa":
+        $hab_id = $_POST["hab_id"] ?? null;
+        $tarifa_id = $_POST["tarifa_id"] ?? null;
+        $fecha_inicio = $_POST["fecha_inicio"] ?? null;
+        $fecha_fin = isset($_POST["fecha_fin"]) && $_POST["fecha_fin"] !== '' ? $_POST["fecha_fin"] : null;
+        if (!$hab_id || !$tarifa_id || !$fecha_inicio) {
+            echo json_encode(array('status' => 'error', 'message' => 'hab_id, tarifa_id y fecha_inicio son obligatorios'));
+            break;
+        }
+        try {
+            $tarifa->asignar_tarifa_habitacion($hab_id, $tarifa_id, $fecha_inicio, $fecha_fin);
+            echo json_encode(array('status' => 'success'));
+        } catch (Exception $e) {
+            echo json_encode(array('status' => 'error', 'message' => $e->getMessage()));
+        }
+        break;
+
+    /* Tarifas: actualizar vigencia de una asignación */
+    case "actualizar_vigencia_tarifa":
+        $habitacion_tarifa_id = $_POST["habitacion_tarifa_id"] ?? null;
+        $fecha_inicio = $_POST["fecha_inicio"] ?? null;
+        $fecha_fin = isset($_POST["fecha_fin"]) && $_POST["fecha_fin"] !== '' ? $_POST["fecha_fin"] : null;
+        if (!$habitacion_tarifa_id || !$fecha_inicio) {
+            echo json_encode(array('status' => 'error', 'message' => 'habitacion_tarifa_id y fecha_inicio son obligatorios'));
+            break;
+        }
+        try {
+            $tarifa->actualizar_vigencia_tarifa_habitacion($habitacion_tarifa_id, $fecha_inicio, $fecha_fin);
+            echo json_encode(array('status' => 'success'));
+        } catch (Exception $e) {
+            echo json_encode(array('status' => 'error', 'message' => $e->getMessage()));
+        }
+        break;
+
+    /* Tarifas: eliminar asignación de tarifa */
+    case "eliminar_tarifa_asignada":
+        $habitacion_tarifa_id = $_POST["habitacion_tarifa_id"] ?? null;
+        if (!$habitacion_tarifa_id) {
+            echo json_encode(array('status' => 'error', 'message' => 'habitacion_tarifa_id requerido'));
+            break;
+        }
+        try {
+            $tarifa->eliminar_tarifa_habitacion($habitacion_tarifa_id);
+            echo json_encode(array('status' => 'success'));
+        } catch (Exception $e) {
+            echo json_encode(array('status' => 'error', 'message' => $e->getMessage()));
         }
         break;
 }

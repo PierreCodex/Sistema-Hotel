@@ -20,6 +20,16 @@ class Habitacion extends Conectar{
         $sql->execute();
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
     }
+    
+    /* Listar todas las habitaciones ocupadas */
+    public function get_habitacion_ocupada(){
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_L_HABITACION_OCUPADO()";
+        $sql = $conectar->prepare($sql);
+        $sql->execute();
+        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
 
     /* Obtener habitación por ID */
     public function get_habitacion_x_hab_id($hab_id){
@@ -44,34 +54,32 @@ class Habitacion extends Conectar{
     }
 
     /* Insertar nueva habitación */
-    public function insert_habitacion($hab_num, $hab_det, $hab_pre, $hab_est_id, $hab_piso_id, $hab_cat_id){
+    public function insert_habitacion($hab_num, $hab_det,$hab_est_id, $hab_piso_id, $hab_cat_id){
         $conectar = parent::conexion();
         parent::set_names();
-        $sql = "CALL SP_I_HABITACION_01(?,?,?,?,?,?)";
+        $sql = "CALL SP_I_HABITACION_01(?,?,?,?,?)";
         $sql = $conectar->prepare($sql);
         $sql->bindValue(1, $hab_num);
         $sql->bindValue(2, $hab_det);
-        $sql->bindValue(3, $hab_pre);
-        $sql->bindValue(4, $hab_est_id);
-        $sql->bindValue(5, $hab_piso_id);
-        $sql->bindValue(6, $hab_cat_id);
+        $sql->bindValue(3, $hab_est_id);
+        $sql->bindValue(4, $hab_piso_id);
+        $sql->bindValue(5, $hab_cat_id);
         $sql->execute();
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /* Actualizar habitación */
-    public function update_habitacion($hab_id, $hab_num, $hab_det, $hab_pre, $hab_est_id, $hab_piso_id, $hab_cat_id){
+    public function update_habitacion($hab_id, $hab_num, $hab_det, $hab_est_id, $hab_piso_id, $hab_cat_id){
         $conectar = parent::conexion();
         parent::set_names();
-        $sql = "CALL SP_U_HABITACION_01(?,?,?,?,?,?,?)";
+        $sql = "CALL SP_U_HABITACION_01(?,?,?,?,?,?)";
         $sql = $conectar->prepare($sql);
         $sql->bindValue(1, $hab_id);
         $sql->bindValue(2, $hab_num);
         $sql->bindValue(3, $hab_det);
-        $sql->bindValue(4, $hab_pre);
-        $sql->bindValue(5, $hab_est_id);
-        $sql->bindValue(6, $hab_piso_id);
-        $sql->bindValue(7, $hab_cat_id);
+        $sql->bindValue(4, $hab_est_id);
+        $sql->bindValue(5, $hab_piso_id);
+        $sql->bindValue(6, $hab_cat_id);
         $sql->execute();
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -127,54 +135,5 @@ class Habitacion extends Conectar{
         $sql->execute();
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    /* Obtener habitaciones por categoría */
-    public function get_habitacion_x_categoria($cat_id){
-        $conectar = parent::conexion();
-        parent::set_names();
-        $sql = "SELECT h.*, p.Descripcion as PisoNombre, c.Descripcion as CategoriaNombre, eh.Descripcion as EstadoNombre 
-                FROM habitacion h 
-                INNER JOIN piso p ON h.IdPiso = p.IdPiso 
-                INNER JOIN categoria c ON h.IdCategoria = c.IdCategoria 
-                INNER JOIN estado_habitacion eh ON h.IdEstadoHabitacion = eh.IdEstadoHabitacion 
-                WHERE h.IdCategoria = ? AND h.Estado = 1 
-                ORDER BY h.Numero";
-        $sql = $conectar->prepare($sql);
-        $sql->bindValue(1, $cat_id);
-        $sql->execute();
-        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /* Obtener habitaciones por estado */
-    public function get_habitacion_x_estado($est_id){
-        $conectar = parent::conexion();
-        parent::set_names();
-        $sql = "SELECT h.*, p.Descripcion as PisoNombre, c.Descripcion as CategoriaNombre, eh.Descripcion as EstadoNombre 
-                FROM habitacion h 
-                INNER JOIN piso p ON h.IdPiso = p.IdPiso 
-                INNER JOIN categoria c ON h.IdCategoria = c.IdCategoria 
-                INNER JOIN estado_habitacion eh ON h.IdEstadoHabitacion = eh.IdEstadoHabitacion 
-                WHERE h.IdEstadoHabitacion = ? AND h.Estado = 1 
-                ORDER BY h.Numero";
-        $sql = $conectar->prepare($sql);
-        $sql->bindValue(1, $est_id);
-        $sql->execute();
-        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /* Verificar disponibilidad de habitación */
-    public function verificar_disponibilidad_habitacion($hab_id){
-        $conectar = parent::conexion();
-        parent::set_names();
-        $sql = "SELECT h.*, eh.Descripcion as EstadoNombre 
-                FROM habitacion h 
-                INNER JOIN estado_habitacion eh ON h.IdEstadoHabitacion = eh.IdEstadoHabitacion 
-                WHERE h.IdHabitacion = ? AND h.Estado = 1";
-        $sql = $conectar->prepare($sql);
-        $sql->bindValue(1, $hab_id);
-        $sql->execute();
-        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
-    }
-
 }
 ?>

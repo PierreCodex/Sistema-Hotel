@@ -121,5 +121,11 @@ switch ($_GET["op"]) {
             echo $html;
         }
         break;
+
+    /* TODO: Listar pisos activos para vista de recepción */
+    case "listar_activos":
+        $datos = $piso->get_piso_activo();
+        echo json_encode($datos);
+        break;
 }
 ?>

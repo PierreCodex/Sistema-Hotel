@@ -28,27 +28,7 @@
                             </div>
                         </div>
 
-                        <!-- Precio -->
-                        <div class="col-md-6">
-                            <div>
-                                <label for="hab_pre" class="form-label">Precio por Noche <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <span class="input-group-text">S/</span>
-                                    <input type="number" 
-                                           class="form-control" 
-                                           id="hab_pre" 
-                                           name="hab_pre" 
-                                           step="0.01"
-                                           min="0.01"
-                                           placeholder="0.00"
-                                           autocomplete="off"
-                                           required/>
-                                </div>
-                                <div class="form-text">
-                                    <small class="text-muted">Precio en soles (S/). Debe ser mayor a 0.</small>
-                                </div>
-                            </div>
-                        </div>
+                        
 
                         <!-- Descripción -->
                         <div class="col-md-12">

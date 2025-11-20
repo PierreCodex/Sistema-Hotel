@@ -48,7 +48,7 @@
                                             <tr>
                                                 <th>Numero</th>
                                                 <th>Descripcion</th>
-                                                <th>Precio</th>
+                                                <th>Tarifas</th>
                                                 <th>Piso</th>
                                                 <th>Tipo de Habitacion</th>
                                                 <th>Estado</th>
@@ -75,6 +75,7 @@
     </div>
 
     <?php require_once("mantenimiento.php"); ?>
+    <?php require_once("modaltarifa.php"); ?>
 
     <?php require_once("../html/js.php"); ?>
    

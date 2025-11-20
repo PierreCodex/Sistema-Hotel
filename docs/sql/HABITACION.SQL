@@ -13,7 +13,6 @@ BEGIN
         h.IdHabitacion AS HAB_ID,
         h.Numero AS HAB_NUM,
         h.Detalle AS HAB_DET,
-        h.Precio AS HAB_PRE,
         h.IdEstadoHabitacion AS HAB_EST_ID,
         h.IdPiso AS HAB_PISO_ID,
         h.IdCategoria AS HAB_CAT_ID,
@@ -39,7 +38,6 @@ BEGIN
         h.IdHabitacion AS HAB_ID,
         h.Numero AS HAB_NUM,
         h.Detalle AS HAB_DET,
-        h.Precio AS HAB_PRE,
         h.IdEstadoHabitacion AS HAB_EST_ID,
         h.IdPiso AS HAB_PISO_ID,
         h.IdCategoria AS HAB_CAT_ID,
@@ -58,6 +56,32 @@ BEGIN
 END$$
 DELIMITER ;
 
+-- Listar solo las habitaciones con estado OCUPADO
+DELIMITER $$
+CREATE PROCEDURE SP_L_HABITACION_OCUPADO()
+BEGIN
+    SELECT 
+        h.IdHabitacion AS HAB_ID,
+        h.Numero AS HAB_NUM,
+        h.Detalle AS HAB_DET,
+        h.IdEstadoHabitacion AS HAB_EST_ID,
+        h.IdPiso AS HAB_PISO_ID,
+        h.IdCategoria AS HAB_CAT_ID,
+        h.Estado AS EST,
+        DATE_FORMAT(h.FechaCreacion, '%d/%m/%Y %H:%i:%s') AS FECH_CREA,
+        COALESCE(p.Descripcion, 'Sin Piso') AS PISO_NOM,
+        COALESCE(c.Descripcion, 'Sin Categoría') AS CAT_NOM,
+        COALESCE(eh.Descripcion, 'Sin Estado') AS ESTADO_NOM
+    FROM habitacion h
+    LEFT JOIN piso p ON h.IdPiso = p.IdPiso AND p.Estado = 1
+    LEFT JOIN categoria c ON h.IdCategoria = c.IdCategoria AND c.Estado = 1
+    LEFT JOIN estado_habitacion eh ON h.IdEstadoHabitacion = eh.IdEstadoHabitacion AND eh.Estado = 1
+    WHERE h.Estado = 1
+      AND UPPER(eh.Descripcion) LIKE '%OCUPADO%'
+    ORDER BY h.FechaCreacion DESC;
+END$$
+DELIMITER ;
+
 -- 3. Obtener habitación por ID con información completa (MEJORADO)
 DELIMITER $$
 CREATE PROCEDURE SP_L_HABITACION_02(IN HAB_ID INT)
@@ -66,7 +90,6 @@ BEGIN
         h.IdHabitacion AS HAB_ID,
         h.Numero AS HAB_NUM,
         h.Detalle AS HAB_DET,
-        h.Precio AS HAB_PRE,
         h.IdEstadoHabitacion AS HAB_EST_ID,
         h.IdPiso AS HAB_PISO_ID,
         h.IdCategoria AS HAB_CAT_ID,
@@ -89,7 +112,6 @@ DELIMITER $$
 CREATE PROCEDURE SP_I_HABITACION_01(
     IN HAB_NUM VARCHAR(50),
     IN HAB_DET VARCHAR(100),
-    IN HAB_PRE DECIMAL(10,2),
     IN HAB_EST_ID INT,
     IN HAB_PISO_ID INT,
     IN HAB_CAT_ID INT
@@ -122,7 +144,6 @@ BEGIN
         UPDATE habitacion 
         SET Estado = 1, 
             Detalle = HAB_DET,
-            Precio = HAB_PRE,
             IdEstadoHabitacion = HAB_EST_ID,
             IdPiso = HAB_PISO_ID,
             IdCategoria = HAB_CAT_ID,
@@ -132,8 +153,8 @@ BEGIN
         SELECT existing_id as IdHabitacion, 'Registro reactivado' as Mensaje;
     ELSE
         -- Si no existe, crear nuevo registro
-        INSERT INTO habitacion (Numero, Detalle, Precio, IdEstadoHabitacion, IdPiso, IdCategoria, Estado, FechaCreacion) 
-        VALUES (HAB_NUM, HAB_DET, HAB_PRE, HAB_EST_ID, HAB_PISO_ID, HAB_CAT_ID, 1, NOW());
+        INSERT INTO habitacion (Numero, Detalle,IdEstadoHabitacion, IdPiso, IdCategoria, Estado, FechaCreacion) 
+        VALUES (HAB_NUM, HAB_DET, HAB_EST_ID, HAB_PISO_ID, HAB_CAT_ID, 1, NOW());
         
         SELECT LAST_INSERT_ID() as IdHabitacion, 'Registro creado' as Mensaje;
     END IF;
@@ -155,7 +176,6 @@ CREATE PROCEDURE SP_U_HABITACION_01(
     IN HAB_ID INT,
     IN HAB_NUM VARCHAR(50),
     IN HAB_DET VARCHAR(100),
-    IN HAB_PRE DECIMAL(10,2),
     IN HAB_EST_ID INT,
     IN HAB_PISO_ID INT,
     IN HAB_CAT_ID INT
@@ -164,7 +184,6 @@ BEGIN
     UPDATE habitacion 
     SET Numero = HAB_NUM,
         Detalle = HAB_DET,
-        Precio = HAB_PRE,
         IdEstadoHabitacion = HAB_EST_ID,
         IdPiso = HAB_PISO_ID,
         IdCategoria = HAB_CAT_ID

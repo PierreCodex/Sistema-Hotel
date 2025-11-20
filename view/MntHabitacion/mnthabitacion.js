@@ -15,7 +15,6 @@ function guardaryeditar(e){
     // Validaciones del lado del cliente
     var hab_num = $("#hab_num").val().trim();
     var hab_det = $("#hab_det").val().trim();
-    var hab_pre = $("#hab_pre").val().trim();
     var hab_piso_id = $("#hab_piso_id").val();
     var hab_cat_id = $("#hab_cat_id").val();
     
@@ -59,15 +58,6 @@ function guardaryeditar(e){
         return false;
     }
     
-    if(hab_pre === "" || isNaN(hab_pre) || parseFloat(hab_pre) <= 0){
-        swal.fire({
-            title:'Error de Validación',
-            text: 'El precio debe ser un número mayor a 0',
-            icon: 'warning'
-        });
-        $("#hab_pre").focus();
-        return false;
-    }
     
     if(hab_piso_id === "" || hab_piso_id === null){
         swal.fire({
@@ -205,13 +195,12 @@ function editar(hab_id){
         $('#hab_id').val(data.HAB_ID);
         $('#hab_num').val(data.HAB_NUM);
         $('#hab_det').val(data.HAB_DET);
-        $('#hab_pre').val(data.HAB_PRE);
         $('#hab_piso_id').val(data.HAB_PISO_ID);
         $('#hab_cat_id').val(data.HAB_CAT_ID);
         $('#hab_est_id').val(data.HAB_EST_ID);
         
         // Remover clases de validación
-        $('#hab_num, #hab_det, #hab_pre').removeClass('is-invalid is-valid');
+        $('#hab_num, #hab_det').removeClass('is-invalid is-valid');
         
         // Validar los campos cargados
         if(data.HAB_NUM && data.HAB_NUM.trim().length > 0 && data.HAB_NUM.trim().length <= 10){
@@ -219,9 +208,6 @@ function editar(hab_id){
         }
         if(data.HAB_DET && data.HAB_DET.trim().length > 0 && data.HAB_DET.trim().length <= 100){
             $('#hab_det').addClass('is-valid');
-        }
-        if(data.HAB_PRE && !isNaN(data.HAB_PRE) && parseFloat(data.HAB_PRE) > 0){
-            $('#hab_pre').addClass('is-valid');
         }
     });
     $('#lbltitulo').html('Editar Habitación');
@@ -310,7 +296,6 @@ $(document).on("click","#btnnuevo",function(){
     $('#hab_id').val('');
     $('#hab_num').val('');
     $('#hab_det').val('');
-    $('#hab_pre').val('');
     $('#hab_piso_id').val('');
     $('#hab_cat_id').val('');
     $('#hab_est_id').val('');
@@ -318,7 +303,7 @@ $(document).on("click","#btnnuevo",function(){
     $("#mantenimiento_form")[0].reset();
     
     // Remover clases de validación
-    $('#hab_num, #hab_det, #hab_pre').removeClass('is-invalid is-valid');
+    $('#hab_num, #hab_det').removeClass('is-invalid is-valid');
     
     // Recargar combos
     combo_categoria();
@@ -367,20 +352,6 @@ $(document).on('input', '#hab_det', function(){
     }
 });
 
-// Validación en tiempo real del campo precio
-$(document).on('input', '#hab_pre', function(){
-    var valor = $(this).val().trim();
-    var campo = $(this);
-    
-    // Remover clases previas
-    campo.removeClass('is-invalid is-valid');
-    
-    if(valor.length === 0 || isNaN(valor) || parseFloat(valor) <= 0){
-        campo.addClass('is-invalid');
-    } else {
-        campo.addClass('is-valid');
-    }
-});
 
 // Función para cargar combo de categorías
 function combo_categoria(){
@@ -403,18 +374,6 @@ function combo_estado_habitacion(){
     });
 }
 
-// Formatear precio mientras se escribe
-$(document).on('input', '#hab_pre', function(){
-    var valor = $(this).val();
-    // Permitir solo números y punto decimal
-    valor = valor.replace(/[^0-9.]/g, '');
-    // Evitar múltiples puntos decimales
-    var partes = valor.split('.');
-    if(partes.length > 2){
-        valor = partes[0] + '.' + partes.slice(1).join('');
-    }
-    $(this).val(valor);
-});
 
 // Función para filtrar habitaciones por piso
 function filtrarPorPiso(piso_id){
@@ -431,18 +390,7 @@ function filtrarPorPiso(piso_id){
 }
 
 // Función para filtrar habitaciones por categoría
-function filtrarPorCategoria(cat_id){
-    if(cat_id === ""){
-        $('#table_data').DataTable().ajax.reload();
-        return;
-    }
-    
-    $.post("../../controller/habitacion.php?op=filtrar_por_categoria", {cat_id: cat_id}, function(data){
-        var habitaciones = JSON.parse(data);
-        // Aquí puedes implementar la lógica para mostrar los resultados filtrados
-        console.log(habitaciones);
-    });
-}
+
 
 // Función para filtrar habitaciones por estado
 function filtrarPorEstado(est_id){
@@ -459,3 +407,171 @@ function filtrarPorEstado(est_id){
 }
 
 init();
+
+
+// ===== Asignación de tarifas =====
+let tarifaAsignaciones = {}; // Map por IdTarifa -> asignación {id_habitacion_tarifa, fecha_inicio, fecha_fin}
+let tarifaHabId = null;
+
+function abrirModalTarifa(hab_id){
+    tarifaHabId = hab_id;
+    // Obtener contexto de la habitación
+    $.post("../../controller/habitacion.php?op=mostrar", {hab_id : hab_id}, function (data) {
+        try {
+            data = JSON.parse(data);
+            const ctx = `Habitación ${data.HAB_NUM} - ${data.HAB_DET}`;
+            $('#tarifa_hab_context').text(ctx);
+        } catch(e){
+            $('#tarifa_hab_context').text('');
+        }
+    });
+
+    // Cargar asignadas primero
+    $.post("../../controller/tarifa.php?op=listar_asignadas", {hab_id: hab_id}, function(resp){
+        try{
+            const asignadas = JSON.parse(resp);
+            tarifaAsignaciones = {};
+            asignadas.forEach(a => {
+                tarifaAsignaciones[a.id_tarifa] = a;
+            });
+        }catch(e){
+            tarifaAsignaciones = {};
+        }
+        // Luego cargar catálogo de tarifas y pintar tabla
+        $.post("../../controller/tarifa.php?op=listar-activas", function(r){
+            try{
+                const tarifas = JSON.parse(r);
+                pintarTablaTarifas(tarifas);
+            }catch(err){
+                pintarTablaTarifas([]);
+            }
+            $('#modaltarifa').modal('show');
+        });
+    });
+}
+
+function formatoDatetimeLocal(dt){
+    if(!dt) return '';
+    // dt esperado: "YYYY-MM-DD HH:MM:SS"
+    const parts = dt.replace('T',' ').split(/[- :]/);
+    if(parts.length < 5) return '';
+    const y = parts[0], m = parts[1].padStart(2, '0'), d = parts[2].padStart(2, '0');
+    const hh = parts[3].padStart(2, '0'), mm = parts[4].padStart(2, '0');
+    return `${y}-${m}-${d}T${hh}:${mm}`;
+}
+
+function pintarTablaTarifas(tarifas){
+    const tbody = $('#tabla_tarifas tbody');
+    tbody.empty();
+    tarifas.forEach(t => {
+        const asign = tarifaAsignaciones[t.IdTarifa] || null;
+        const checked = asign ? 'checked' : '';
+        const fi = asign ? formatoDatetimeLocal(asign.fecha_inicio) : '';
+        const ff = asign ? formatoDatetimeLocal(asign.fecha_fin) : '';
+        const row = `
+            <tr data-tarifa-id="${t.IdTarifa}" data-asignacion-id="${asign ? asign.id_habitacion_tarifa : ''}">
+                <td>${t.Descripcion}</td>
+                <td>${parseFloat(t.Precio).toFixed(2)}</td>
+                <td><input type="datetime-local" class="form-control form-control-sm vigencia-inicio" value="${fi}" /></td>
+                <td><input type="datetime-local" class="form-control form-control-sm vigencia-fin" value="${ff}" /></td>
+                <td>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input asignado-switch" type="checkbox" ${checked} />
+                    </div>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-primary btn-guardar-vigencia" ${asign ? '' : 'disabled'}>Guardar vigencia</button>
+                </td>
+            </tr>`;
+        tbody.append(row);
+    });
+
+    // Eventos
+    tbody.off('change', '.asignado-switch').on('change', '.asignado-switch', function(){
+        const tr = $(this).closest('tr');
+        const tarifaId = tr.data('tarifa-id');
+        const inicio = tr.find('.vigencia-inicio').val();
+        const fin = tr.find('.vigencia-fin').val();
+        const asignado = $(this).is(':checked');
+        const asignId = tr.data('asignacion-id');
+
+        if(asignado){
+            if(!inicio){
+                swal.fire({ title:'Vigencia requerida', text:'Ingrese fecha/hora de inicio', icon:'warning' });
+                $(this).prop('checked', false);
+                return;
+            }
+            $.post('../../controller/tarifa.php?op=asignar', {
+                hab_id: tarifaHabId,
+                tarifa_id: tarifaId,
+                fecha_inicio: inicio,
+                fecha_fin: fin
+            }, function(resp){
+                try{
+                    const r = JSON.parse(resp);
+                    if(r.status === 'success'){
+                        // Recargar asignaciones para actualizar id
+                        abrirModalTarifa(tarifaHabId);
+                    }else{
+                        swal.fire({ title:'Error', text:r.message||'No se pudo asignar', icon:'error' });
+                        tr.find('.asignado-switch').prop('checked', false);
+                    }
+                }catch(e){
+                    swal.fire({ title:'Error', text:'Respuesta inválida', icon:'error' });
+                    tr.find('.asignado-switch').prop('checked', false);
+                }
+            });
+        }else{
+            if(!asignId){
+                return; // Nada que eliminar
+            }
+            $.post('../../controller/tarifa.php?op=eliminar_asignada', {
+                habitacion_tarifa_id: asignId
+            }, function(resp){
+                try{
+                    const r = JSON.parse(resp);
+                    if(r.status === 'success'){
+                        abrirModalTarifa(tarifaHabId);
+                    }else{
+                        swal.fire({ title:'Error', text:r.message||'No se pudo eliminar', icon:'error' });
+                        tr.find('.asignado-switch').prop('checked', true);
+                    }
+                }catch(e){
+                    swal.fire({ title:'Error', text:'Respuesta inválida', icon:'error' });
+                    tr.find('.asignado-switch').prop('checked', true);
+                }
+            });
+        }
+    });
+
+    tbody.off('click', '.btn-guardar-vigencia').on('click', '.btn-guardar-vigencia', function(){
+        const tr = $(this).closest('tr');
+        const asignId = tr.data('asignacion-id');
+        const inicio = tr.find('.vigencia-inicio').val();
+        const fin = tr.find('.vigencia-fin').val();
+        if(!asignId){
+            swal.fire({ title:'No asignado', text:'Primero asigne la tarifa', icon:'info' });
+            return;
+        }
+        if(!inicio){
+            swal.fire({ title:'Vigencia requerida', text:'Ingrese fecha/hora de inicio', icon:'warning' });
+            return;
+        }
+        $.post('../../controller/tarifa.php?op=actualizar_vigencia', {
+            habitacion_tarifa_id: asignId,
+            fecha_inicio: inicio,
+            fecha_fin: fin
+        }, function(resp){
+            try{
+                const r = JSON.parse(resp);
+                if(r.status === 'success'){
+                    swal.fire({ title:'Actualizado', text:'Vigencia guardada', icon:'success', timer:1200, showConfirmButton:false });
+                }else{
+                    swal.fire({ title:'Error', text:r.message||'No se pudo actualizar', icon:'error' });
+                }
+            }catch(e){
+                swal.fire({ title:'Error', text:'Respuesta inválida', icon:'error' });
+            }
+        });
+    });
+}

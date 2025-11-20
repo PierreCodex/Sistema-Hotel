@@ -625,6 +625,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
 
+
+
 <!-- Sweet Alerts js -->
 <script src="../../assets/libs/sweetalert2/sweetalert2.min.js"></script>
 <!-- Sweet alert init js-->
@@ -643,10 +645,22 @@
 
 <!-- Session Manager -->
 <script src="../../assets/js/session-manager.js"></script>
+    <!-- Swiper Js -->
+<!-- ApexCharts -->
+<script src="../../assets/libs/apexcharts/apexcharts.min.js"></script>
 
 <!-- App js -->
 <script src="../../assets/js/app.js"></script>
+    <script src="../../assets/libs/swiper/swiper-bundle.min.js"></script>
+    <!-- crypto-wallet init-->
+    <script src="../../assets/js/pages/crypto-wallet.init.js"></script>
 
+  <script src="../../assets/js/style.js"></script>
+
+      <!-- init js -->
+    <script src="../../assets/js/pages/form-advanced.init.js"></script>
+     <!-- input spin init -->
+    <script src="../../assets/js/pages/form-input-spin.init.js"></script>
 <!-- Inicializar Session Manager -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
