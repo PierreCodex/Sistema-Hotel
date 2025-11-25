@@ -34,7 +34,7 @@ $(function () {
             </div>\
             <div class="card-footer">\
               <div class="text-center">\
-               <a href="javascript:void(0);" class="link-light btn-vender" data-id="' + escapeHtml(h.HAB_ID) + '" data-numero="' + escapeHtml(h.HAB_NUM) + '">Reservar <i class="ri-arrow-right-s-line align-middle lh-1"></i></a>\
+               <a href="javascript:void(0);" class="link-light btn-vender" data-id="' + escapeHtml(h.HAB_ID) + '" data-numero="' + escapeHtml(h.HAB_NUM) + '">Vender <i class="ri-arrow-right-s-line align-middle lh-1"></i></a>\
               </div>\
             </div>\
           </div>\

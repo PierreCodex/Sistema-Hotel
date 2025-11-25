@@ -42,7 +42,7 @@ class Habitacion extends Conectar{
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /* Eliminar habitación (cambio de estado) */
+    /* Eliminar habitación */
     public function delete_habitacion($hab_id){
         $conectar = parent::conexion();
         parent::set_names();
@@ -119,6 +119,18 @@ class Habitacion extends Conectar{
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
+   /* Cambiar tipo de estado de la habitación (OCUPADO, LIMPIEZA, DISPONIBLE) */
+    public function cambiar_tipo_estado_habitacion($hab_id, $id_estado_habitacion){
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_CAMBIAR_TIPO_ESTADO_HABITACION_01(?, ?)";
+        $sql = $conectar->prepare($sql);
+        $sql->bindValue(1, $hab_id);
+        $sql->bindValue(2, $id_estado_habitacion);
+        $sql->execute();
+        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
     /* Obtener habitaciones por piso */
     public function get_habitacion_x_piso($piso_id){
         $conectar = parent::conexion();

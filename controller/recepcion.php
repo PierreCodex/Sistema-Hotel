@@ -26,6 +26,8 @@
             // Normalizar y validar entradas mínimas
             $cli_id = isset($_POST['cli_id']) ? intval($_POST['cli_id']) : 0;
             $hab_id = isset($_POST['hab_id']) ? intval($_POST['hab_id']) : 0;
+            $tar_id = isset($_POST['tar_id']) ? intval($_POST['tar_id']) : null;
+            if ($tar_id === 0) $tar_id = null; // Convertir 0 a NULL
             // Precio inicial será calculado servidor (3 horas por defecto)
             $precio_inicial_post = isset($_POST['precio_inicial']) ? floatval($_POST['precio_inicial']) : 0.0;
             $adelanto = isset($_POST['adelanto']) ? floatval($_POST['adelanto']) : 0.0;
@@ -73,12 +75,13 @@
             }
 
             // Inserción usando precio determinado (sin forzar validación por HAB_PRE)
-            $rec_id = $recepcion->insert_recepcion($cli_id, $hab_id, $precio_inicial, $adelanto, $observacion, $fecha_salida_db);
+            $rec_id = $recepcion->insert_recepcion($cli_id, $hab_id, $precio_inicial, $adelanto, $observacion, $fecha_salida_db, $tar_id);
             echo json_encode(["success" => true, "rec_id" => $rec_id]);
             break;
 
         // Obtener detalle de recepción por Id
         case "obtener_x_id":
+            
             header('Content-Type: application/json');
             $rec_id = isset($_POST['rec_id']) ? intval($_POST['rec_id']) : 0;
             if ($rec_id <= 0) {
@@ -88,6 +91,25 @@
             try {
                 $row = $recepcion->get_recepcion_x_id($rec_id);
                 echo json_encode(["success" => true, "data" => $row]);
+            } catch (Exception $e) {
+                echo json_encode(["success" => false, "message" => $e->getMessage()]);
+            }
+            break;
+
+
+        case "confirmar_salida":
+            header('Content-Type: application/json');
+            try {
+                $rec_id = isset($_POST['rec_id']) ? intval($_POST['rec_id']) : 0;
+                $costo_penalidad = isset($_POST['costo_penalidad']) ? floatval($_POST['costo_penalidad']) : 0.0;
+                $total_pagado = isset($_POST['total_pagado']) ? floatval($_POST['total_pagado']) : 0.0;
+                $fecha_confirmacion = isset($_POST['fecha_confirmacion']) ? trim($_POST['fecha_confirmacion']) : date('Y-m-d H:i:s');
+                if ($rec_id <= 0) {
+                    echo json_encode(["success" => false, "message" => "Id de recepción inválido"]);
+                    break;
+                }
+                $recepcion->confirmar_salida($rec_id, $costo_penalidad, $total_pagado, $fecha_confirmacion);
+                echo json_encode(["success" => true]);
             } catch (Exception $e) {
                 echo json_encode(["success" => false, "message" => $e->getMessage()]);
             }

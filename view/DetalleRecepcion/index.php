@@ -133,25 +133,28 @@ if (isset($_SESSION["IdUsuario"])) {
                                                                 data-provider="flatpickr"
                                                                 data-enable-time="true"
                                                                 data-time_24hr="true"
+                                                                data-allow-input="false"
+                                                                data-click-opens="false"
                                                                 data-date-format="Y-m-d H:i" readonly>
                                                         </div>
-
-
+                                                    </div>
+                                               
+                                             
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="text-muted">
+                                                        <h6 class="mb-2 fw-semibold text-uppercase">Servicio a la Habitacion</h6>
                                                         <div class="pt-3 border-top border-top-dashed mt-4">
                                                         </div>
-
-
                                                     </div>
-
-                                                    <div class="card-body">
-                                                        <table id="table_data" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Producto</th>
-                                                                    <th>Cantidad</th>
-                                                                    <th>Precio Unitario</th>
-                                                                    <th>Estado Venta</th>
-                                                                    <th>Subtotal</th>
+                                                    <table id="table_data" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th>Producto</th>
+                                                                <th>Cantidad</th>
+                                                                <th>Precio Unitario</th>
+                                                                <th>Estado Venta</th>
+                                                                <th>Subtotal</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -160,7 +163,6 @@ if (isset($_SESSION["IdUsuario"])) {
                                                         </table>
                                                     </div>
 
-                                                </div>
                                             </form>
                                         </div>
 

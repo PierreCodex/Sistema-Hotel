@@ -120,6 +120,7 @@ $(document).on("click","#btnagregar",function(){
         }, function(data){
             try{ data = (typeof data === 'string') ? JSON.parse(data) : data; }catch(e){ data = { success:false, message:'Respuesta inválida' }; }
             if (data && data.success) {
+                // Stock se descuenta inmediatamente al agregar el producto
                 $.post("../../controller/venta.php?op=calculo", {vent_id: vent_id}, function(calc){
                     calc = (typeof calc === 'string') ? JSON.parse(calc) : calc;
                     $('#txtsubtotal').html(calc.VENT_SUBTOTAL);
@@ -129,7 +130,20 @@ $(document).on("click","#btnagregar",function(){
 
                 $("#prod_pventa").val('');
                 $("#detv_cant").val('');
+                
+                // Actualizar información de stock en pantalla
+                $("#pro_id").trigger('change'); // Recargar stock actual
+                
                 listar(vent_id);
+                
+                // Notificar que el stock se descontó
+                swal.fire({
+                    title:'Producto Agregado',
+                    text: 'El stock se ha descontado inmediatamente del inventario',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
             } else {
                 swal.fire({
                     title:'Venta',
@@ -155,7 +169,7 @@ function eliminar(detv_id,vent_id){
     }).then((result)=>{
         if (result.value){
             $.post("../../controller/venta.php?op=eliminardetalle", {detv_id: detv_id}, function(data){
-                // Opcional: manejar respuesta
+                // El stock se restaura automáticamente al eliminar el detalle
             });
 
             $.post("../../controller/venta.php?op=calculo", {vent_id: vent_id}, function(data){
@@ -168,8 +182,8 @@ function eliminar(detv_id,vent_id){
             listar(vent_id);
 
             swal.fire({
-                title:'Venta',
-                text: 'Registro Eliminado',
+                title:'Producto Eliminado',
+                text: 'El stock ha sido restaurado al inventario',
                 icon: 'success'
             });
         }
@@ -275,9 +289,9 @@ $(document).on("click","#btnguardar",function(){
                             icon: 'success',
                             footer: "<a href='../ViewVenta/?v="+vent_id+"' target='_blank'>Desea ver el Documento?</a>   |   <a href='../../assets/pdf/venta/v-"+vent_id+".pdf' target='_blank'>Descargar PDF?</a>"
                         });
-
-                        // Generar PDF solo después de guardar exitosamente
+     // Generar PDF solo después de guardar exitosamente
                         $.get("../../controller/pdfprint.php?op=pdfventa",{vent_id:vent_id},function(pdfResp){ /* opcional */ });
+                   
                     } else {
                         swal.fire({
                             title:'Venta',

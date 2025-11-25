@@ -1,22 +1,13 @@
 <?php
 /* TODO: Llamando Clases */
 // Determinar la ruta base del proyecto
-$base_path = dirname(__DIR__) . DIRECTORY_SEPARATOR;
-if (file_exists("../config/conexion.php")) {
-    // Llamado desde una vista
+
     require_once("../config/conexion.php");
     require_once("../models/Habitacion.php");
     require_once("../models/Categoria.php");
     require_once("../models/Piso.php");
     require_once("../models/Tarifa.php");
-} else {
-    // Llamado directamente
-    require_once("config/conexion.php");
-    require_once("models/Habitacion.php");
-    require_once("models/Categoria.php");
-    require_once("models/Piso.php");
-    require_once("models/Tarifa.php");
-}
+
 
 /* TODO: Inicializando clases */
 $habitacion = new Habitacion();
@@ -184,6 +175,25 @@ switch ($_GET["op"]) {
         echo json_encode(array("status" => "success", "message" => "Habitación eliminada correctamente"));
         break;
 
+    case 'cambiar_tipo_estado':
+        $hab_id = $_POST['hab_id'] ?? null;
+        $id_estado_habitacion = $_POST['id_estado_habitacion'] ?? null;
+        
+        if (!$hab_id || !$id_estado_habitacion) {
+            echo json_encode(['success' => false, 'message' => 'Parámetros inválidos']);
+            exit;
+        }
+        
+    
+        $resultado = $habitacion->cambiar_tipo_estado_habitacion($hab_id, $id_estado_habitacion);
+        
+        if ($resultado) {
+            echo json_encode(['success' => true, 'message' => 'Tipo de estado actualizado correctamente']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al actualizar el tipo de estado']);
+        }
+        break;
+    
     /* TODO: Combo de Categorías */
     case "combo_categoria":
         $datos = $categoria->get_categoria_activa();

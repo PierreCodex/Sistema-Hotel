@@ -1,23 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="TestAuth" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" tests="6" assertions="7" errors="0" failures="2" skipped="0" time="0.121272">
-    <testcase name="testFindUserByCredentials" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="53" class="TestAuth" classname="TestAuth" assertions="1" time="0.083735">
-      <failure type="PHPUnit\Framework\ExpectationFailedException">TestAuth::testFindUserByCredentials&#13;
-El método debe retornar datos del usuario, no false
-Failed asserting that false is not false.
-&#13;
-C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php:61</failure>
-    </testcase>
-    <testcase name="testFindUserWithInvalidCredentials" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="77" class="TestAuth" classname="TestAuth" assertions="1" time="0.008265"/>
-    <testcase name="testFindNonExistentUser" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="93" class="TestAuth" classname="TestAuth" assertions="1" time="0.006419"/>
-    <testcase name="testFindInactiveUser" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="109" class="TestAuth" classname="TestAuth" assertions="1" time="0.008301"/>
-    <testcase name="testEmailExists" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="128" class="TestAuth" classname="TestAuth" assertions="1" time="0.009278">
-      <failure type="PHPUnit\Framework\ExpectationFailedException">TestAuth::testEmailExists&#13;
-Debe encontrar el email existente
-Failed asserting that an array is not empty.
-&#13;
-C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php:136</failure>
-    </testcase>
-    <testcase name="testDatabaseConnection" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\TestAuth.php" line="146" class="TestAuth" classname="TestAuth" assertions="2" time="0.005273"/>
+  <testsuite name="RecepcionControllerCompleteTest" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\RecepcionControllerCompleteTest.php" tests="8" assertions="23" errors="0" failures="0" skipped="0" time="0.197428">
+    <testcase name="test_case_listar_ocupaciones_activas_completo" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\RecepcionControllerCompleteTest.php" line="61" class="RecepcionControllerCompleteTest" classname="RecepcionControllerCompleteTest" assertions="3" time="0.162176"/>
+    <testcase name="test_case_obtener_x_id_completo" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\RecepcionControllerCompleteTest.php" line="102" class="RecepcionControllerCompleteTest" classname="RecepcionControllerCompleteTest" assertions="3" time="0.016472"/>
+    <testcase name="test_case_confirmar_salida_completo" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\RecepcionControllerCompleteTest.php" line="148" class="RecepcionControllerCompleteTest" classname="RecepcionControllerCompleteTest" assertions="2" time="0.000680"/>
+    <testcase name="test_case_guardaryeditar_todas_ramas" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\RecepcionControllerCompleteTest.php" line="202" class="RecepcionControllerCompleteTest" classname="RecepcionControllerCompleteTest" assertions="3" time="0.001159"/>
+    <testcase name="test_case_default_operacion_no_soportada" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\RecepcionControllerCompleteTest.php" line="297" class="RecepcionControllerCompleteTest" classname="RecepcionControllerCompleteTest" assertions="3" time="0.007994"/>
+    <testcase name="test_catch_exception_listar_ocupaciones" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\RecepcionControllerCompleteTest.php" line="338" class="RecepcionControllerCompleteTest" classname="RecepcionControllerCompleteTest" assertions="3" time="0.008031"/>
+    <testcase name="test_obtener_x_id_validacion_error" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\RecepcionControllerCompleteTest.php" line="385" class="RecepcionControllerCompleteTest" classname="RecepcionControllerCompleteTest" assertions="3" time="0.000474"/>
+    <testcase name="test_confirmar_salida_validacion_error" file="C:\xampp\htdocs\SistemaHotel-PHP\tests\Integration\RecepcionControllerCompleteTest.php" line="430" class="RecepcionControllerCompleteTest" classname="RecepcionControllerCompleteTest" assertions="3" time="0.000441"/>
   </testsuite>
 </testsuites>

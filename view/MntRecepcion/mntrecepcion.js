@@ -552,6 +552,12 @@ $(document).on('submit', '#recepcion_form', function(e) {
     fd.set('precio_inicial', precioNum);
     fd.set('adelanto', adelantoNum);
     fd.set('observacion', observacion);
+    
+    // Tarifa seleccionada
+    var tarId = parseInt($('#tar_id').val() || '0', 10);
+    if (tarId > 0) {
+        fd.set('tar_id', tarId);
+    }
 
     // Fecha de salida: si existe el campo, enviar en formato Y-m-d H:i
     var fechaSalidaVal = ($('#fecha_salida').val() || '').trim();

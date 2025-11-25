@@ -230,3 +230,28 @@ BEGIN
 END$$
 DELIMITER ;
 
+
+-- Cambiar tipo de estado de la habitación (OCUPADO, LIMPIEZA, DISPONIBLE)
+DELIMITER $$
+CREATE PROCEDURE SP_CAMBIAR_TIPO_ESTADO_HABITACION_01(
+    IN HAB_ID INT,
+    IN ID_ESTADO_HABITACION INT
+)
+BEGIN
+    UPDATE habitacion 
+    SET IdEstadoHabitacion = ID_ESTADO_HABITACION
+    WHERE IdHabitacion = HAB_ID AND Estado = 1;
+    
+    -- Retornar el resultado de la actualización
+    SELECT 
+        h.IdHabitacion AS HAB_ID,
+        h.Numero AS HAB_NUM,
+        h.IdEstadoHabitacion AS HAB_EST_ID,
+        eh.Descripcion AS ESTADO_NOM,
+        'Tipo de estado actualizado' AS Mensaje
+    FROM habitacion h
+    LEFT JOIN estado_habitacion eh ON h.IdEstadoHabitacion = eh.IdEstadoHabitacion
+    WHERE h.IdHabitacion = HAB_ID;
+END$$
+DELIMITER ;
+

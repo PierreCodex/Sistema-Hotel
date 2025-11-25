@@ -1,4 +1,9 @@
 $(function () {
+  // Desactivar cache AJAX para evitar datos obsoletos
+  $.ajaxSetup({
+    cache: false
+  });
+
   const HAB_URL = '../../controller/habitacion.php?op=listar_activos';
   const PISO_URL = '../../controller/piso.php?op=listar_activos';
   const OCUPANTES_URL = '../../controller/recepcion.php?op=listar_ocupaciones_activas';
@@ -7,22 +12,32 @@ $(function () {
 
   // Construye el HTML de una card según estado
   function buildCard(h, ocupantesMap) {
-    const estado = String(h.ESTADO_NOM || '').toUpperCase().trim();
+    const estado = String(h.ESTADO_NOM || '').toUpperCase().trim(); const recId = (ocupantesMap && ocupantesMap[h.HAB_ID] && ocupantesMap[h.HAB_ID].REC_ID) ? ocupantesMap[h.HAB_ID].REC_ID : '';
     const num = h.HAB_NUM || '';
     const cat = h.CAT_NOM || '';
     
     const precio = (h.HAB_PRE != null ? Number(h.HAB_PRE) : 0).toFixed(2);
     const ocupante = (ocupantesMap && ocupantesMap[h.HAB_ID]) ? ocupantesMap[h.HAB_ID].CLI_NOMBRE : '';
 
+
+
+
+
     if (estado === 'OCUPADO') {
       const recId = (ocupantesMap && ocupantesMap[h.HAB_ID] && ocupantesMap[h.HAB_ID].REC_ID) ? ocupantesMap[h.HAB_ID].REC_ID : '';
+     
+     
+     
+     
+      const expire = (ocupantesMap && ocupantesMap[h.HAB_ID] && ocupantesMap[h.HAB_ID].FECHA_SALIDA) ? ocupantesMap[h.HAB_ID].FECHA_SALIDA : null;
       return (
         '<div class="col">\
           <div class="card ribbon-box border shadow-none right card-success mb-4" style="border-radius:16px; overflow:hidden;">\
             <div class="card-body position-relative">\
               <div class="ribbon ribbon-Success round-shape">Ocupada</div>\
-              <div class="d-flex align-items-center">\
+              <div class="d-flex align-items-center justify-content-between mt-2">\
                 <h2 class="card-title mb-3 fs-1">' + escapeHtml(num) + '</h2>\
+                ' + (expire ? ('<span class="badge badge-gradient-danger d-inline-flex align-items-center gap-1"><i class="ri-time-line align-middle"></i><span class="js-countdown small" data-expire="' + escapeHtml(expire) + '"></span></span>') : '') + '\
               </div>\
               <div class="row align-items-end g-0">\
                 <div class="col-6">\
@@ -35,8 +50,13 @@ $(function () {
               </div>\
             </div>\
             <div class="card-footer">\
-              <div class="text-center">\
-                <a href="' + (recId ? ('../../view/DetalleRecepcion/index.php?recepcion=' + encodeURIComponent(recId)) : 'javascript:void(0);') + '" class="link-light" ' + (recId ? '' : 'title="Sin recepción activa"') + '>Ocupada <i class="ri-arrow-right-s-line align-middle lh-1"></i></a>\
+              <div class="row g-2 align-items-center">\
+                <div class="col-6">\
+                  <a href="' + (recId ? ('../../view/DetalleRecepcion/index.php?recepcion=' + encodeURIComponent(recId)) : 'javascript:void(0);') + '" class="btn btn-primary btn-border w-100" ' + (recId ? '' : 'title="Sin recepción activa"') + '><i class=" bx bx-detail align-middle lh-1"></i></a>\
+                </div>\
+                <div class="col-6">\
+                  <button type="button" class="btn btn-danger waves-effect waves-light w-100 btn-finalizar" data-recepcion="' + escapeHtml(recId) + '" data-habitacion="' + escapeHtml(h.HAB_ID) + '"> <i class="ri-logout-box-line align-middle lh-1"></i></button>\
+                </div>\
               </div>\
             </div>\
           </div>\
@@ -65,7 +85,7 @@ $(function () {
             </div>\
             <div class="card-footer">\
               <div class="text-center">\
-                <a href="javascript:void(0);" class="link-light">Marcar lista <i class="ri-check-line align-middle lh-1"></i></a>\
+                <a href="javascript:void(0);" class="link-light btn-marcar-lista" data-habitacion="' + escapeHtml(h.HAB_ID) + '">Marcar lista <i class="ri-check-line align-middle lh-1"></i></a>\
               </div>\
             </div>\
           </div>\
@@ -122,6 +142,28 @@ $(function () {
     $container.append(html);
   }
 
+  function formatDuration(ms){
+    if (ms <= 0) return 'Finalizado';
+    var s = Math.floor(ms/1000);
+    var h = Math.floor(s/3600); s -= h*3600;
+    var m = Math.floor(s/60); s -= m*60;
+    return h + ' horas ' + m + ' min y ' + s + ' s';
+  }
+  function updateCountdowns(){
+    var now = Date.now();
+    $('.js-countdown').each(function(){
+      var val = $(this).attr('data-expire');
+      var ts = /^\\d+$/.test(String(val)) ? parseInt(val,10) : new Date(val).getTime();
+      var diff = (ts || 0) - now;
+      $(this).text(formatDuration(diff));
+    });
+  }
+  function initCountdowns(){
+    if (window._recepCountdownInterval) clearInterval(window._recepCountdownInterval);
+    updateCountdowns();
+    window._recepCountdownInterval = setInterval(updateCountdowns, 1000);
+  }
+
   // Eliminado: applySearch (no hay campo de búsqueda)
 
   function addPisoTab(piso) {
@@ -176,13 +218,10 @@ $(function () {
         pisos.forEach(addPisoTab);
       }
 
-      // Render TODOS
       renderCards('#todos-cards-row', Array.isArray(habs) ? habs : [], ocupantesMap);
 
-      // Render por piso
       const grouped = {};
       (Array.isArray(habs) ? habs : []).forEach(function (h) {
-        // Usar el campo correcto para piso: HAB_PISO_ID (fallbacks por seguridad)
         const pid = h.HAB_PISO_ID != null ? h.HAB_PISO_ID : (h.PISO_ID != null ? h.PISO_ID : h.IdPiso);
         if (pid == null) return;
         if (!grouped[pid]) grouped[pid] = [];
@@ -194,10 +233,10 @@ $(function () {
         renderCards('#piso-' + p.PISO_ID + '-cards-row', list, ocupantesMap);
       });
 
-      // Vincular carga por pestaña (estilo ViewCompra)
       bindTabEvents();
+      initCountdowns();
 
-      // Sin eventos de búsqueda
+      
     })
     .catch(function (err) {
       console.error('Error cargando datos de Recepción:', err);
@@ -221,10 +260,12 @@ $(function () {
           let data = [];
           try { data = JSON.parse(resp); } catch (e) { console.error('JSON inválido en filtrar_por_piso', e); }
           renderCards(container, Array.isArray(data) ? data : [], null);
+          updateCountdowns();
         })
         .fail(function (err) {
           console.error('Error al cargar habitaciones por piso', err);
           renderCards(container, [], null);
+          updateCountdowns();
         });
     });
   }
@@ -233,8 +274,41 @@ $(function () {
   $(document).on('click', '.btn-reservar', function () {
     const habitacionId = $(this).data('id');
     const habitacionNum = $(this).data('numero');
-    
-    // Redirigir a la vista de recepción con URL amigable
     window.location.href = '../../view/MntRecepcion/index.php?habitacion=' + encodeURIComponent(habitacionNum);
   });
+  // Evento click para finalizar recepción desde la card
+  $(document).on('click', '.btn-finalizar', function () {
+    const recId = $(this).data('recepcion');
+    if (!recId) return;
+    window.location.href = '../../view/DetalleSalida/index.php?recepcion=' + encodeURIComponent(recId);
+  });
+
+  // Evento click para marcar habitación como lista (disponible)
+  $(document).on('click', '.btn-marcar-lista', function () {
+    const habitacionId = $(this).data('habitacion');
+    if (!habitacionId) return;
+
+    $.ajax({
+      url: '../../controller/habitacion.php?op=cambiar_tipo_estado',
+      type: 'POST',
+      dataType: 'json',
+      data: {
+        hab_id: habitacionId,
+        id_estado_habitacion: 11  // Reemplaza 3 con el ID real del estado DISPONIBLE en tu BD
+      },
+      success: function (resp) {
+        if (resp.success) {
+          location.reload();
+        } else {
+          alert('Error: ' + (resp.message || 'No se pudo actualizar'));
+        }
+      },
+      error: function (err) {
+        console.error('Error al marcar como lista:', err);
+        alert('Error al actualizar la habitación');
+      }
+    });
+  });
+
+  
 });

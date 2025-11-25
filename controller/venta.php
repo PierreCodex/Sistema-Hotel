@@ -43,8 +43,10 @@
                     echo json_encode(["success" => false, "message" => "No se encontró recepción activa para registrar venta. Abra esta pantalla desde una recepción activa o envíe rec_id."]);
                     break;
                 }
-                $new_id = $venta->insert_venta($rec_id);
-                echo json_encode(["success" => true, "VENT_ID" => intval($new_id)]);
+                
+                // Reutilizar venta borrador existente o crear nueva
+                $vent_id = $venta->get_or_create_venta_borrador($rec_id);
+                echo json_encode(["success" => true, "VENT_ID" => intval($vent_id)]);
             } catch (Exception $e) {
                 echo json_encode(["success" => false, "message" => $e->getMessage()]);
             }

@@ -13,8 +13,8 @@ $(document).ready(function(){
     return;
   }
 
-  // Cargar la venta de la recepción que tenga detalles; si ninguna tiene, usar la más reciente
-  function cargarVentaConDetallesPorRecepcion(recId){
+  // Listar todas las ventas ligadas a la recepción (sin filtrar)
+  function cargarVentasPorRecepcion(recId){
     return $.post('../../controller/venta.php?op=listar_por_recepcion', { rec_id: recId })
       .then(function(resp){
         console.log('Respuesta ventas cruda:', resp);
@@ -24,35 +24,55 @@ $(document).ready(function(){
         }
         console.log('Ventas parseadas:', parsed);
         const ventas = (parsed && parsed.success && Array.isArray(parsed.data)) ? parsed.data : [];
-        if (ventas.length === 0) return null;
-
-        // Buscar secuencialmente la primera venta con detalles
-        const dfd = $.Deferred();
-        (function iter(i){
-          if (i >= ventas.length) {
-            // Ninguna con detalles: devolver la más reciente
-            dfd.resolve(ventas[0]);
-            return;
-          }
-          const v = ventas[i];
-          $.post('../../controller/venta.php?op=listardetalle', { vent_id: v.IdVenta })
-            .then(function(r){
-              let d = r;
-              if (typeof r === 'string') {
-                try { d = JSON.parse(r); } catch(e) {}
-              }
-              if (d && Array.isArray(d.aaData) && d.aaData.length > 0){
-                dfd.resolve(v);
-              } else {
-                iter(i+1);
-              }
-            })
-            .catch(function(){
-              iter(i+1);
-            });
-        })(0);
-        return dfd.promise();
+        return ventas;
       });
+  }
+
+  // Cargar y renderizar detalles de todas las ventas de la recepción
+  function cargarDetallesDeVentas(ventas){
+    const tbody = $('#table_data tbody');
+    tbody.empty();
+    const dfd = $.Deferred();
+    let pending = ventas.length;
+    if (pending === 0) {
+      tbody.html('<tr><td colspan="5" class="text-center">Sin venta registrada o sin detalles para esta recepción.</td></tr>');
+      dfd.resolve();
+      return dfd.promise();
+    }
+    ventas.forEach(function(v){
+      $.post('../../controller/venta.php?op=listardetalle', { vent_id: v.IdVenta })
+        .then(function(resp){
+          let data = resp;
+          if (typeof resp === 'string') { try { data = JSON.parse(resp); } catch(e) {} }
+          const rows = Array.isArray(data.aaData)
+            ? data.aaData
+            : (Array.isArray(data.data) ? data.data.map(function(r){
+                return [r.DETV_ID, r.PRO_NOM, r.DETV_CANT, r.PROD_PVENTA, r.DETV_TOTAL];
+              }) : []);
+          if (rows.length > 0){
+            rows.forEach(function(row){
+              const tr = '<tr>' +
+                '<td>' + row[1] + '</td>' +
+                '<td>' + row[2] + '</td>' +
+                '<td>' + row[3] + '</td>' +
+                '<td>' + (v.Estado || '') + '</td>' +
+                '<td>' + row[4] + '</td>' +
+              '</tr>';
+              tbody.append(tr);
+            });
+          }
+        })
+        .always(function(){
+          pending--;
+          if (pending === 0){
+            if (tbody.children().length === 0){
+              tbody.html('<tr><td colspan="5" class="text-center">Sin detalles de productos para esta recepción.</td></tr>');
+            }
+            dfd.resolve();
+          }
+        });
+    });
+    return dfd.promise();
   }
 
   // Cargar detalle de la recepción por Id
@@ -116,23 +136,21 @@ $(document).ready(function(){
     });
   }
 
-  function cargarDetalle(ventId, estadoVenta){
+  function cargarDetalle(ventId, estadoVenta, opts){
+    const append = opts && opts.append === true;
     return $.post('../../controller/venta.php?op=listardetalle', { vent_id: ventId })
       .then(function(resp){
         console.log('Respuesta detalles cruda:', resp);
         let data = resp;
-        if (typeof resp === 'string') {
-          try { data = JSON.parse(resp); } catch(e) {}
-        }
+        if (typeof resp === 'string') { try { data = JSON.parse(resp); } catch(e) {} }
         console.log('Detalles parseados:', data);
         const tbody = $('#table_data tbody');
-        tbody.empty();
+        if (!append) tbody.empty();
         const rows = Array.isArray(data.aaData)
           ? data.aaData
           : (Array.isArray(data.data) ? data.data.map(function(r){
               return [r.DETV_ID, r.PRO_NOM, r.DETV_CANT, r.PROD_PVENTA, r.DETV_TOTAL];
             }) : []);
-
         if (rows.length > 0){
           rows.forEach(function(row){
             const tr = '<tr>' +
@@ -144,55 +162,32 @@ $(document).ready(function(){
             '</tr>';
             tbody.append(tr);
           });
-        } else {
+        } else if (!append){
           tbody.html('<tr><td colspan="5" class="text-center">Sin detalles de productos para esta venta.</td></tr>');
         }
       });
   }
 
-  let ventaEstadoActual = '';
-
-  $.when(cargarRecepcion(recId), cargarVentaConDetallesPorRecepcion(recId))
-    .then(function(recData, ventaCab){
-      // Poblar campos de recepción
+  $.when(cargarRecepcion(recId), cargarVentasPorRecepcion(recId))
+    .then(function(recData, ventas){
       if (recData) {
         console.log('Datos de recepción:', recData);
         const feOut = recData.FechaSalida || '';
         $('#fecha_salida').val(feOut);
-        // Moneda: los inputs ya tienen prefijo S/. en el grupo
-        function num(val){
-          const n = parseFloat(val);
-          return isNaN(n) ? '' : n.toFixed(2);
-        }
-        console.log('PrecioInicial:', recData.PrecioInicial);
-        console.log('Adelanto:', recData.Adelanto);
+        function num(val){ const n = parseFloat(val); return isNaN(n) ? '' : n.toFixed(2); }
         $('#txtcosto').val(num(recData.PrecioInicial));
         $('#Adelanto').val(num(recData.Adelanto));
-        // Restante basado solo en costo inicial y adelanto
         var restanteCalc = 0;
         var pi = parseFloat(recData.PrecioInicial);
         var ad = parseFloat(recData.Adelanto);
         if (!isNaN(pi) || !isNaN(ad)) {
           restanteCalc = (isNaN(pi) ? 0 : pi) - (isNaN(ad) ? 0 : ad);
         }
-        console.log('Cantidad Restante calculada:', restanteCalc);
         $('#txtcantidadrestante').val(num(restanteCalc));
-        // Cargar resumen de habitación y cliente desde recepción
         cargarHabitacionYCliente(recData.IdHabitacion, recData.IdCliente);
-      } else {
-        console.log('No se recibieron datos de recepción');
       }
-
-      // Poblar detalles de venta si existe
-      if (ventaCab) {
-        ventaEstadoActual = ventaCab.Estado || '';
-        return $.when(
-          cargarDetalle(ventaCab.IdVenta, ventaCab.Estado || ''),
-          $.post('../../controller/venta.php?op=calculo', { vent_id: ventaCab.IdVenta }).then(function(resp){
-            // Totales de venta en consola (si se requiere)
-            // let data = {}; try { data = JSON.parse(resp); } catch(e) {}
-          })
-        );
+      if (Array.isArray(ventas) && ventas.length > 0){
+        return cargarDetallesDeVentas(ventas);
       } else {
         $('#table_data tbody').html('<tr><td colspan="5" class="text-center">Sin venta registrada o sin detalles para esta recepción.</td></tr>');
       }

@@ -44,6 +44,16 @@
         <junit outputFile="tests/reports/junit.xml"/>
     </logging>
 
+    <!-- Configuración de reportes de cobertura -->
+    <coverage>
+        <report>
+            <html outputDirectory="tests/reports/coverage-html" lowUpperBound="50" highLowerBound="80"/>
+            <xml outputDirectory="tests/reports/coverage-xml"/>
+            <text outputFile="tests/reports/coverage.txt" showUncoveredFiles="true"/>
+            <clover outputFile="tests/reports/coverage.xml"/>
+        </report>
+    </coverage>
+
     <!-- Variables de entorno para pruebas -->
     <php>
         <env name="APP_ENV" value="testing"/>
