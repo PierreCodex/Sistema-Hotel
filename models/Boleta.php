@@ -14,11 +14,15 @@ use Greenter\See;
 
 class Boleta extends Conectar {
     
+    private $metodo_pago = 'EFECTIVO';
+    
     /**
      * Generar Boleta electrónica
      */
-    public function generarBoleta($rec_id, $cliente_data, $detalles, $totales, $tipo_doc = '03') {
+    public function generarBoleta($rec_id, $cliente_data, $detalles, $totales, $tipo_doc = '03', $metodo_pago = 'EFECTIVO') {
         try {
+            $this->metodo_pago = $metodo_pago;
+            
             $see = $this->configurarSee();
             
             // Cliente
@@ -238,8 +242,8 @@ class Boleta extends Conectar {
         $sql = "INSERT INTO boleta (rec_id, bol_tipo, bol_serie, bol_correlativo, 
                 bol_fecha_emision, bol_cliente_tipo_doc, bol_cliente_num_doc, 
                 bol_cliente_razon_social, bol_cliente_direccion,
-                bol_subtotal, bol_igv, bol_total, bol_estado, bol_xml, bol_cdr, bol_observaciones) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                bol_subtotal, bol_igv, bol_total, bol_estado, bol_metodo_pago, bol_xml, bol_cdr, bol_observaciones) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         $stmt = $conectar->prepare($sql);
         $stmt->execute([
@@ -256,6 +260,7 @@ class Boleta extends Conectar {
             $totales['igv'] ?? 0,
             $invoice->getMtoImpVenta(),
             $estado,
+            $this->metodo_pago,
             $xml,
             base64_encode($cdrZip),
             $descripcion
@@ -397,7 +402,7 @@ class Boleta extends Conectar {
             $fecha_emision = date('d/m/Y H:i:s', strtotime($boleta['bol_fecha_emision']));
             $total_letras = $this->numeroALetras($total);
             $forma_pago = 'CONTADO';
-            $metodo_pago = 'EFECTIVO';
+            $metodo_pago = $boleta['bol_metodo_pago'] ?? 'EFECTIVO';
             $url_consulta = 'sunat.gob.pe';
             $hash_cpe = $boleta['bol_hash'] ?? '';
             
@@ -441,10 +446,51 @@ class Boleta extends Conectar {
             $dompdf->setPaper([0, 0, $formato['ancho'], 1000], 'portrait');
             $dompdf->render();
             
+            // Auto-guardar PDF en storage
+            $this->guardarPDFEnStorage($boleta['bol_id'], $serie, $correlativo, $dompdf->output());
+            
             return $dompdf->stream($serie . '-' . $correlativo . '.pdf', ['Attachment' => false]);
             
         } catch (Exception $e) {
             throw new Exception("Error al generar PDF: " . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Guardar PDF en carpeta storage y actualizar ruta en BD
+     */
+    private function guardarPDFEnStorage($bol_id, $serie, $correlativo, $pdfContent) {
+        try {
+            // Crear estructura de carpetas por año/mes
+            $year = date('Y');
+            $month = date('m');
+            $storageDir = __DIR__ . '/../storage/boletas/' . $year . '/' . $month;
+            
+            // Crear directorio si no existe
+            if (!is_dir($storageDir)) {
+                mkdir($storageDir, 0755, true);
+            }
+            
+            // Nombre del archivo: SERIE-CORRELATIVO_FECHA.pdf
+            $filename = $serie . '-' . $correlativo . '_' . date('Ymd_His') . '.pdf';
+            $filepath = $storageDir . '/' . $filename;
+            $relativePath = 'storage/boletas/' . $year . '/' . $month . '/' . $filename;
+            
+            // Guardar archivo
+            file_put_contents($filepath, $pdfContent);
+            
+            // Actualizar ruta en la base de datos
+            $conectar = parent::conexion();
+            $sql = "UPDATE boleta SET bol_pdf_ruta = ? WHERE bol_id = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->execute([$relativePath, $bol_id]);
+            
+            return $relativePath;
+            
+        } catch (Exception $e) {
+            // Si falla el guardado, no interrumpir el flujo principal
+            error_log("Error al guardar PDF en storage: " . $e->getMessage());
+            return null;
         }
     }
     

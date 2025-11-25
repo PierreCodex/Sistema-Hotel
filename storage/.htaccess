@@ -1,0 +1,11 @@
+# Proteger acceso directo a los archivos
+# Solo accesible mediante PHP
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^boletas/.*$ - [F,L]
+</IfModule>
+
+# Alternativa: denegar todo acceso
+# Deny from all

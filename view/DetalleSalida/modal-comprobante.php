@@ -36,9 +36,7 @@
                     <button type="button" id="btn_generar_factura" class="btn btn-success waves-effect waves-light">
                         <i class="ri-file-text-line"></i> Generar Comprobante Electrónico
                     </button>
-                    <button type="button" id="btn_descargar_pdf" class="btn btn-primary waves-effect waves-light">
-                        <i class="ri-download-line"></i> Descargar PDF
-                    </button>
+                 
                 </div>
                 
                 <div id="mensaje_factura" class="mt-3" style="display: none;"></div>

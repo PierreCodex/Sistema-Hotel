@@ -269,6 +269,16 @@ if (isset($_SESSION["IdUsuario"])) {
                                                                     <input type="text" id="total_pagar" name="total_pagar" class="form-control" aria-label="Total a pagar" readonly>
                                                                 </div>
                                                             </div>
+                                                            <div class="col-lg-3 col-6">
+                                                                <p class="text-muted mb-2  fw-semibold">Método de Pago</p>
+                                                                <select id="metodo_pago" name="metodo_pago" class="form-select">
+                                                                    <option value="EFECTIVO" selected>Efectivo</option>
+                                                                    <option value="YAPE">Yape</option>
+                                                                    <option value="PLIN">Plin</option>
+                                                                    <option value="TARJETA">Tarjeta</option>
+                                                                    <option value="TRANSFERENCIA">Transferencia</option>
+                                                                </select>
+                                                            </div>
                                                             <div class="col-lg-3 col-6 d-flex align-items-end">
                                                                 <button type="button" id="btn_confirmar_salida" class="btn btn-primary w-100">Confirmar salida</button>
                                                             </div>

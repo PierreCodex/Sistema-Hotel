@@ -23,6 +23,7 @@ switch ($op) {
         try {
             $rec_id = isset($_POST['rec_id']) ? intval($_POST['rec_id']) : 0;
             $tipo_doc = isset($_POST['tipo_doc']) ? $_POST['tipo_doc'] : '03'; // 03=Boleta
+            $metodo_pago = isset($_POST['metodo_pago']) ? $_POST['metodo_pago'] : 'EFECTIVO';
             
             if ($rec_id <= 0) {
                 echo json_encode(["success" => false, "message" => "ID de recepción inválido"]);
@@ -127,7 +128,7 @@ switch ($op) {
             ];
             
             // Generar Boleta electrónica
-            $resultado = $boleta->generarBoleta($rec_id, $cliente_boleta, $detalles, $totales, $tipo_doc);
+            $resultado = $boleta->generarBoleta($rec_id, $cliente_boleta, $detalles, $totales, $tipo_doc, $metodo_pago);
             
             echo json_encode($resultado);
             

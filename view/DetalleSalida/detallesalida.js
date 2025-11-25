@@ -146,6 +146,14 @@ $(document).ready(function(){
     });
 
   $('#btn_confirmar_salida').on('click', function(){
+    var btn = $(this);
+    
+    // Si ya se confirmó la salida, redirigir
+    if (btn.data('confirmado')) {
+      window.location.href = '../ListRecepcion/index.php';
+      return;
+    }
+    
     var penal = parseFloat($('#costo_penalidad').val());
     var total = parseFloat($('#total_pagar').val());
     var adelanto = parseFloat($('#Adelanto').val());
@@ -160,22 +168,31 @@ $(document).ready(function(){
         try { 
           var r = typeof resp === 'string' ? JSON.parse(resp) : resp; 
           if (r && r.success) { 
+            // Marcar como confirmado y cambiar botón
+            btn.data('confirmado', true);
+            btn.removeClass('btn-primary').addClass('btn-secondary');
+            btn.html('<i class="ri-arrow-left-line"></i> Regresar');
+            
+            // Deshabilitar campos
+            $('#costo_penalidad').prop('readonly', true);
+            $('#metodo_pago').prop('disabled', true);
+            
             // Abrir el modal de comprobante
             $('#modal-comprobante').modal('show');
             return; 
           } 
         } catch(e) {}
-        // Si hay error, abrir el modal de todas formas
-        $('#modal-comprobante').modal('show');
+        // Si hay error, mostrar mensaje
+        alert('Error al confirmar la salida');
       })
       .fail(function(){
         alert('Error al confirmar la salida');
       });
   });
 
-  // Evento cuando se cierra el modal de comprobante
+  // Evento cuando se cierra el modal de comprobante - NO redirigir automáticamente
   $('#modal-comprobante').on('hidden.bs.modal', function(){
-    window.location.href = '../ListRecepcion/index.php';
+    // Ya no redirigimos automáticamente, el usuario usa el botón "Regresar"
   });
 
   // Generar factura electrónica
@@ -185,10 +202,12 @@ $(document).ready(function(){
     btn.prop('disabled', true).html('<i class="bx bx-loader bx-spin"></i> Generando...');
     
     var tipoDoc = $('#tipo_comprobante').val();
+    var metodoPago = $('#metodo_pago').val();
     
     $.post('../../controller/boleta.php?op=generar_boleta', {
       rec_id: recId,
-      tipo_doc: tipoDoc
+      tipo_doc: tipoDoc,
+      metodo_pago: metodoPago
     })
     .done(function(resp){
       try {
