@@ -1,11 +1,22 @@
 <?php
 class Categoria extends Conectar{
 
-    /* Listar todas las categorías activas */
+    /* Listar todas las categorías activas e inactivas */
     public function get_categoria(){
         $conectar = parent::conexion();
         parent::set_names();
         $sql = "CALL SP_L_CATEGORIA_01()";
+        $sql = $conectar->prepare($sql);
+        $sql->execute();
+        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /* Listar todas las categorías activas */
+
+    public function get_categoria_activa(){
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_L_CATEGORIA_03()";
         $sql = $conectar->prepare($sql);
         $sql->execute();
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
@@ -77,6 +88,18 @@ class Categoria extends Conectar{
         $sql->execute();
         $resultado = $sql->fetch(PDO::FETCH_ASSOC);
         return $resultado['total'] > 0;
+    }
+
+     /* Cambiar estado del Categoria (activar/desactivar) */
+     public function cambiar_estado_categoria($cat_id, $nuevo_estado){
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_CAMBIAR_ESTADO_CATEGORIA_01(?, ?)";
+        $sql = $conectar->prepare($sql);
+        $sql->bindValue(1, $cat_id);
+        $sql->bindValue(2, $nuevo_estado);
+        $sql->execute();
+        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
 }

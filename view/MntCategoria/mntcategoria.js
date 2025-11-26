@@ -20,16 +20,6 @@ function guardaryeditar(e){
         return false;
     }
     
-    if(cat_nom.length < 2){
-        swal.fire({
-            title:'Error de Validación',
-            text: 'El nombre de la categoría debe tener al menos 2 caracteres',
-            icon: 'warning'
-        });
-        $("#cat_nom").focus();
-        return false;
-    }
-    
     if(cat_nom.length > 50){
         swal.fire({
             title:'Error de Validación',
@@ -160,7 +150,7 @@ function editar(cat_id){
         $('#cat_nom').removeClass('is-invalid is-valid');
         
         // Validar el campo cargado
-        if(data.CAT_NOM && data.CAT_NOM.trim().length >= 2 && data.CAT_NOM.trim().length <= 50){
+        if(data.CAT_NOM && data.CAT_NOM.trim().length > 0 && data.CAT_NOM.trim().length <= 50){
             $('#cat_nom').addClass('is-valid');
         }
     });
@@ -172,6 +162,8 @@ function editar(cat_id){
         $('#cat_nom').focus().select();
     });
 }
+
+
 
 function eliminar(cat_id){
     swal.fire({
@@ -198,7 +190,53 @@ function eliminar(cat_id){
     });
 }
 
-
+// Función para cambiar el estado del Categoria via checkbox
+function cambiarEstado(cat_id, estado) {
+    var accion = estado ? 'activar' : 'desactivar';
+    var titulo = estado ? 'Activar Categoria' : 'Desactivar Categoria';
+    var texto = '¿Está seguro que desea ' + accion + ' este Categoria?';
+    
+    swal.fire({
+        title: titulo,
+        text: texto,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, ' + accion,
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post("../../controller/categoria.php?op=cambiar_estado", {
+                cat_id: cat_id,
+                estado: estado
+            }, function(data) {
+                var response = JSON.parse(data);
+                if(response.status === 'success') {
+                    $('#table_data').DataTable().ajax.reload();
+                    swal.fire({
+                        title: 'Categoria',         
+                        text: response.message,
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            }).fail(function() {
+                swal.fire({
+                    title: 'Error',
+                    text: 'No se pudo actualizar el estado',
+                    icon: 'error'
+                });
+                // Revertir el checkbox en caso de error
+                $('#switch' + cat_id).prop('checked', !estado);
+            });
+        } else {
+            // Si el usuario cancela, revertir el checkbox
+            $('#switch' + cat_id).prop('checked', !estado);
+        }
+    });
+}
 
 $(document).on("click","#btnnuevo",function(){
     $('#cat_id').val('');
@@ -226,8 +264,6 @@ $(document).on('input', '#cat_nom', function(){
     campo.removeClass('is-invalid is-valid');
     
     if(valor.length === 0){
-        campo.addClass('is-invalid');
-    } else if(valor.length < 2){
         campo.addClass('is-invalid');
     } else if(valor.length > 50){
         campo.addClass('is-invalid');

@@ -26,19 +26,6 @@ function guardaryeditar(e){
         return false;
     }
     
-    // Validar longitud mínima
-    if(rol_nom.length < 2){
-        $('#rol_nom').addClass('is-invalid');
-        swal.fire({
-            title: 'Error de Validación',
-            text: 'El nombre del rol debe tener al menos 2 caracteres',
-            icon: 'warning',
-            confirmButtonText: 'Entendido'
-        });
-        $('#rol_nom').focus();
-        return false;
-    }
-    
     // Validar longitud máxima
     if(rol_nom.length > 50){
         $('#rol_nom').addClass('is-invalid');
@@ -185,6 +172,55 @@ function editar(rol_id){
     });
 }
 
+// Función para cambiar el estado del rol via checkbox
+function cambiarEstado(rol_id, estado) {
+    var accion = estado ? 'activar' : 'desactivar';
+    var titulo = estado ? 'Activar Rol' : 'Desactivar Rol';
+    var texto = '¿Está seguro que desea ' + accion + ' este rol?';
+    
+    swal.fire({
+        title: titulo,
+        text: texto,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, ' + accion,
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post("../../controller/rol.php?op=cambiar_estado", {
+                rol_id: rol_id,
+                estado: estado
+            }, function(data) {
+                var response = JSON.parse(data);
+                if(response.status === 'success') {
+                    $('#table_data').DataTable().ajax.reload();
+                    swal.fire({
+                        title: 'Rol',
+                        text: response.message,
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            }).fail(function() {
+                swal.fire({
+                    title: 'Error',
+                    text: 'No se pudo actualizar el estado',
+                    icon: 'error'
+                });
+                // Revertir el checkbox en caso de error
+                $('#switch' + rol_id).prop('checked', !estado);
+            });
+        } else {
+            // Si el usuario cancela, revertir el checkbox
+            $('#switch' + rol_id).prop('checked', !estado);
+        }
+    });
+}
+
+
 function eliminar(rol_id){
     swal.fire({
         title:"Eliminar!",
@@ -210,30 +246,6 @@ function eliminar(rol_id){
     });
 }
 
-function activar(rol_id){
-    swal.fire({
-        title:"Activar!",
-        text:"Desea Activar el Registro?",
-        icon: "question",
-        confirmButtonText : "Si",
-        showCancelButton : true,
-        cancelButtonText: "No",
-    }).then((result)=>{
-        if (result.value){
-            $.post("../../controller/rol.php?op=activar",{rol_id:rol_id},function(data){
-                console.log(data);
-            });
-
-            $('#table_data').DataTable().ajax.reload();
-
-            swal.fire({
-                title:'Rol',
-                text: 'Registro Activado',
-                icon: 'success'
-            });
-        }
-    });
-}
 
 // Función para validar el nombre del rol en tiempo real
 function validarRolNombre(){
@@ -243,9 +255,6 @@ function validarRolNombre(){
     $('#rol_nom').removeClass('is-invalid is-valid');
     
     if(rol_nom === ''){
-        $('#rol_nom').addClass('is-invalid');
-        return false;
-    } else if(rol_nom.length < 2){
         $('#rol_nom').addClass('is-invalid');
         return false;
     } else if(rol_nom.length > 50){
@@ -278,5 +287,80 @@ $(document).on("click","#btnnuevo",function(){
 $(document).on('input', '#rol_nom', function(){
     validarRolNombre();
 });
+function permiso(rol_id){
+
+    $.post("../../controller/menu.php?op=insert",{rol_id:rol_id},function(data){
+        console.log(data);
+    });
+
+    $('#permisos_data').DataTable({
+        "aProcessing": true,
+        "aServerSide": true,
+        dom: 'Bfrtip',
+        buttons: [
+            'copyHtml5',
+            'excelHtml5',
+            'csvHtml5',
+        ],
+        "ajax":{
+            url:"../../controller/menu.php?op=listar",
+            type:"post",
+            data:{rol_id:rol_id}
+        },
+        "bDestroy": true,
+        "responsive": true,
+        "bInfo":true,
+        "iDisplayLength": 15,
+        "order": [[ 0, "desc" ]],
+        "language": {
+            "sProcessing":     "Procesando...",
+            "sLengthMenu":     "Mostrar _MENU_ registros",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+            "sInfoPostFix":    "",
+            "sSearch":         "Buscar:",
+            "sUrl":            "",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        },
+    });
+
+    $('#modalpermiso').modal('show');
+}
+
+function habilitar(mend_id){
+    $.post("../../controller/menu.php?op=habilitar",{mend_id:mend_id},function(data){
+        $('#permisos_data').DataTable().ajax.reload();
+    });
+}
+
+function deshabilitar(mend_id){
+    $.post("../../controller/menu.php?op=deshabilitar",{mend_id:mend_id},function(data){
+        $('#permisos_data').DataTable().ajax.reload();
+    });
+}
+
+
+$(document).on("click","#btnnuevo",function(){
+    $('#rol_id').val('');
+    $('#rol_nom').val('');
+    $('#lbltitulo').html('Nuevo Registro');
+    $("#mantenimiento_form")[0].reset();
+    $('#modalmantenimiento').modal('show');
+});
+
 
 init();

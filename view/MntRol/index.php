@@ -1,12 +1,15 @@
 <?php
     require_once("../../config/conexion.php");
+        require_once("../../models/Rol.php");
+    $rol = new Rol();
     if(isset($_SESSION["IdUsuario"])){
 ?>
+
 
 <!doctype html>
 <html lang="es" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none">
 <head>
-    <title>AnderCode | Rol</title>
+    <title>Hotel Las Palmeras | Rol</title>
     <?php require_once("../html/head.php"); ?>
 </head>
 
@@ -46,9 +49,11 @@
                                         <thead>
                                             <tr>
                                                 <th>Nombre</th>
-                                                <th>FechaCreacion</th>
+                                                <th>Estado</th>
                                                 <th></th>
                                                 <th></th>
+                                                <th></th>
+                                                <th>Activar/Desactivar</th>
                                                
                                             </tr>
                                         </thead>
@@ -70,6 +75,7 @@
     </div>
 
     <?php require_once("mantenimiento.php"); ?>
+        <?php require_once("modalpermiso.php"); ?>
 
     <?php require_once("../html/js.php"); ?>
     <script type="text/javascript" src="mntrol.js"></script>

@@ -12,6 +12,8 @@
 <!-- Sweet Alert css-->
 <link href="../../assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css" />
 
+<link href="../../assets/libs/swiper/swiper-bundle.min.css" rel="stylesheet" />
+
 <!-- Password Strength CSS -->
 <link href="password-strength.css" rel="stylesheet" type="text/css" />
 

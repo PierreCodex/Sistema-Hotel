@@ -6,7 +6,7 @@
 <!doctype html>
 <html lang="es" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none">
 <head>
-    <title>AnderCode | Categoria</title>
+    <title>Hotel Las Palmeras | Categoria</title>
     <?php require_once("../html/head.php"); ?>
 </head>
 
@@ -46,7 +46,8 @@
                                         <thead>
                                             <tr>
                                                 <th>Nombre</th>
-                                                <th>FechaCreacion</th>
+                                                <th>Estado</th>
+                                                <th></th>
                                                 <th></th>
                                                 <th></th>
                                             </tr>

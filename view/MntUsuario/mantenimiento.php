@@ -13,7 +13,7 @@
                         <div class="col-md-12">
                             <div>
                                 <label for="valueInput" class="form-label">Nombre</label>
-                                <input type="text" class="form-control" id="usu_nom" name="usu_nom" required/>
+                                <input type="text" class="form-control" id="usu_nom" name="usu_nom" />
                             </div>
                         </div>
                     </div>
@@ -22,7 +22,7 @@
                         <div class="col-md-12">
                             <div>
                                 <label for="valueInput" class="form-label">Apellido</label>
-                                <input type="text" class="form-control" id="usu_ape" name="usu_ape" required/>
+                                <input type="text" class="form-control" id="usu_ape" name="usu_ape" />
                                 
                             </div>
                         </div>
@@ -32,10 +32,14 @@
                         <div class="col-md-12">
                             <div>
                                 <label for="valueInput" class="form-label">DNI</label>
-                                <input type="text" class="form-control" id="usu_dni" name="usu_dni" required maxlength="8" pattern="[0-9]{8}"/>
+                                <input type="text" class="form-control" id="usu_dni" name="usu_dni"  maxlength="8" pattern="[0-9]{8}"/>
                              
-                                <div class="invalid-feedback">
+                                <div class="invalid-feedback" id="dni-feedback">
                                     DEBE SER EXACTAMENTE 8 CARACTERES
+                                </div>
+                                <!-- Mensaje específico para DNI duplicado -->
+                                <div class="text-danger mt-1" id="dni-duplicate-message" style="display: none;">
+                                    <i class="ri-error-warning-line"></i> DNI ya existente
                                 </div>
                             </div>
                         </div>
@@ -45,7 +49,17 @@
                         <div class="col-md-12">
                             <div>
                                 <label for="valueInput" class="form-label">Correo</label>
-                                <input type="email" class="form-control" id="usu_correo" name="usu_correo" required/>
+                                <input type="email" class="form-control" id="usu_correo" name="usu_correo" />
+                                <div class="valid-feedback">
+                                    Email disponible
+                                </div>
+                                <div class="invalid-feedback" id="email-feedback">
+                                    Por favor, ingrese un email válido
+                                </div>
+                                <!-- Mensaje específico para email duplicado -->
+                                <div class="text-danger mt-1" id="email-duplicate-message" style="display: none;">
+                                    <i class="ri-error-warning-line"></i> Email ya existente
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -55,7 +69,7 @@
                             <div>
                                 <label for="usu_pass" class="form-label">Contraseña</label>
                                 <div class="input-group">
-                                    <input type="password" class="form-control" id="usu_pass" name="usu_pass" required minlength="8" maxlength="20"/>
+                                    <input type="password" class="form-control" id="usu_pass" name="usu_pass"  minlength="8" maxlength="20"/>
                                     <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                                         <i class="ri-eye-line" id="toggleIcon"></i>
                                     </button>

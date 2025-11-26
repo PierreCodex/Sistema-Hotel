@@ -1,5 +1,9 @@
 <?php
     require_once("../../config/conexion.php");
+    require_once("../../config/session.php");
+    
+    // Verificar autenticación
+    if(isset($_SESSION["IdUsuario"])){
 ?>
 
 <!doctype html>
@@ -252,3 +256,8 @@
 </body>
 
 </html>
+<?php
+    }else{
+        header("Location:".Conectar::ruta()."view/404/");
+    }
+?>

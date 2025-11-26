@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <build time="Fri Nov 21 23:27:21 -05 2025" phpunit="10.0.0" coverage="10.1.16">
+    <runtime name="PHP" version="8.2.12" url="https://www.php.net/"/>
+    <driver name="xdebug" version="3.4.7"/>
+  </build>
+  <project source="C:\xampp\htdocs\SistemaHotel-PHP\controller">
+    <tests>
+      <test name="ClienteControllerTest::guardaryeditar_logica_insertar_vs_actualizar" size="unknown" status="success"/>
+    </tests>
+    <directory name="/">
+      <totals>
+        <lines total="2167" comments="221" code="1946" executable="1399" executed="0" percent="0.00"/>
+        <methods count="10" tested="0" percent="0.00"/>
+        <functions count="0" tested="0" percent="0"/>
+        <classes count="1" tested="0" percent="0.00"/>
+        <traits count="0" tested="0" percent="0"/>
+      </totals>
+      <file name="auth.php" href="auth.php.xml">
+        <totals>
+          <lines total="149" comments="45" code="104" executable="50" executed="0" percent="0.00"/>
+          <methods count="10" tested="0" percent="0.00"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="1" tested="0" percent="0.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="categoria.php" href="categoria.php.xml">
+        <totals>
+          <lines total="124" comments="11" code="113" executable="84" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="cliente.php" href="cliente.php.xml">
+        <totals>
+          <lines total="126" comments="8" code="118" executable="89" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="estadohabitacion.php" href="estadohabitacion.php.xml">
+        <totals>
+          <lines total="122" comments="6" code="116" executable="86" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="habitacion.php" href="habitacion.php.xml">
+        <totals>
+          <lines total="379" comments="31" code="348" executable="260" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="menu.php" href="menu.php.xml">
+        <totals>
+          <lines total="48" comments="6" code="42" executable="31" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="piso.php" href="piso.php.xml">
+        <totals>
+          <lines total="131" comments="12" code="119" executable="88" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="producto.php" href="producto.php.xml">
+        <totals>
+          <lines total="131" comments="11" code="120" executable="91" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="recepcion.php" href="recepcion.php.xml">
+        <totals>
+          <lines total="121" comments="13" code="108" executable="74" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="rol.php" href="rol.php.xml">
+        <totals>
+          <lines total="132" comments="15" code="117" executable="86" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="tarifa.php" href="tarifa.php.xml">
+        <totals>
+          <lines total="281" comments="20" code="261" executable="188" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="usuario.php" href="usuario.php.xml">
+        <totals>
+          <lines total="230" comments="27" code="203" executable="143" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="venta.php" href="venta.php.xml">
+        <totals>
+          <lines total="193" comments="16" code="177" executable="129" executed="0" percent="0.00"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+    </directory>
+  </project>
+</phpunit>

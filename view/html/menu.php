@@ -1,28 +1,29 @@
 <?php
-    require_once("../../models/Menu.php");
-    $menu = new Menu();
-    $datos = $menu->get_menu_x_rol_id($_SESSION["IdUsuario"]);
+require_once("../../models/Menu.php");
+$menu = new Menu();
+/* TODO: Obtener listado de acceso por ROL ID del Usuario */
+$datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
 ?>
 
 <div class="app-menu navbar-menu">
 
     <div class="navbar-brand-box">
 
-        <a href="index.html" class="logo logo-dark">
+        <a href="index.html" class="logo Logo-dark">
             <span class="logo-sm">
-                <img src="../../assets/images/logo-sm.png" alt="" height="22">
+                <img src="../../assets/images/logo-sm.png" alt="" height="42">
             </span>
             <span class="logo-lg">
-                <img src="../../assets/images/logo-dark.png" alt="" height="17">
+                <img src="../../assets/images/Logo-dark.png" alt="" height="80">
             </span>
         </a>
 
-        <a href="index.html" class="logo logo-light">
+    <a href="index.html" class="logo Logo-light">
             <span class="logo-sm">
-                <img src="../../assets/images/logo-sm.png" alt="" height="22">
+                <img src="../../assets/images/ogo-sm.png" alt="" height="22">
             </span>
             <span class="logo-lg">
-                <img src="../../assets/images/logo-light.png" alt="" height="17">
+                <img src="../../assets/images/ogo-light.png" alt="" height="77">
             </span>
         </a>
 
@@ -39,38 +40,75 @@
             <div id="two-column-menu">
             </div>
             <ul class="navbar-nav" id="navbar-nav">
+
+
                 <li class="menu-title"><span data-key="t-menu">Menu</span></li>
 
                 <?php
-                    foreach ($datos as $row) {
-                       if ($row["MEN_GRUPO"]=="Dashboard" && $row["MEND_PERMI"]=="Si"){
-                            ?>
-                                <li class="nav-item">
-                                    <a class="nav-link menu-link" href="<?php echo $row["MEN_RUTA"];?>">
-                                        <i class="ri-honour-line"></i> <span data-key="t-widgets"><?php echo $row["MEN_NOM"];?></span>
-                                    </a>
-                                </li>
-                            <?php
-                        }
-                    }
+                foreach ($datos as $row) {
+                    if ($row["MEN_GRUPO"] == "Principal" && $row["MEND_PERMI"] == "Si") {
                 ?>
-
-                <li class="menu-title"><span data-key="t-menu">Hotel</span></li>
-
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="<?php echo $row["MEN_RUTA"]; ?>">
+                                <i class="ri-honour-line"></i> <span data-key="t-widgets"><?php echo $row["MEN_NOM"]; ?></span>
+                            </a>
+                        </li>
                 <?php
-                    foreach ($datos as $row) {
-                       if ($row["MEN_GRUPO"]=="Hotel" && $row["MEND_PERMI"]=="Si"){
-                            ?>
-                                <li class="nav-item">
-                                    <a class="nav-link menu-link" href="<?php echo $row["MEN_RUTA"];?>">
-                                        <i class="ri-honour-line"></i> <span data-key="t-widgets"><?php echo $row["MEN_NOM"];?></span>
-                                    </a>
-                                </li>
-                            <?php
-                        }
                     }
+                }
                 ?>
 
+                <li class="menu-title"><span data-key="t-menu">Modulo de Gestion</span></li>
+
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarGestion" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarGestion">
+                        <i class=" ri-hotel-line"></i> <span data-key="t-mantenimiento">Gestion</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarGestion">
+                        <ul class="nav nav-sm flex-column">
+                            <?php
+                            foreach ($datos as $row) {
+                                if ($row["MEN_GRUPO"] == "Gestion" && $row["MEND_PERMI"] == "Si") {
+                            ?>
+                                    <li class="nav-item">
+                                        <a href="<?php echo $row["MEN_RUTA"]; ?>" class="nav-link" data-key="t-<?php echo strtolower($row["MEN_NOM"]); ?>">
+                                            <?php echo $row["MEN_NOM"]; ?>
+                                        </a>
+                                    </li>
+                            <?php
+                                }
+                            }
+                            ?>
+                        </ul>
+                    </div>
+                </li> <!-- end Gestion Menu -->
+
+                <!--  Gestion Tienda -->
+          
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarTienda" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarTienda">
+                        <i class="ri-store-2-line"></i> <span data-key="t-mantenimiento">Tienda</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarTienda">
+                        <ul class="nav nav-sm flex-column">
+                            <?php
+                            foreach ($datos as $row) {
+                                if ($row["MEN_GRUPO"] == "Tienda" && $row["MEND_PERMI"] == "Si") {
+                            ?>
+                                    <li class="nav-item">
+                                        <a href="<?php echo $row["MEN_RUTA"]; ?>" class="nav-link" data-key="t-<?php echo strtolower($row["MEN_NOM"]); ?>">
+                                            <?php echo $row["MEN_NOM"]; ?>
+                                        </a>
+                                    </li>
+                            <?php
+                                }
+                            }
+                            ?>
+                        </ul>
+                    </div>
+                </li> <!-- end Gestion Tienda -->
+
+                <!-- Getiona  -->
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarMantenimiento" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarMantenimiento">
                         <i class="ri-settings-3-line"></i> <span data-key="t-mantenimiento">Mantenimiento</span>
@@ -78,52 +116,92 @@
                     <div class="collapse menu-dropdown" id="sidebarMantenimiento">
                         <ul class="nav nav-sm flex-column">
                             <?php
-                                foreach ($datos as $row) {
-                                   if ($row["MEN_GRUPO"]=="Mantenimiento" && $row["MEND_PERMI"]=="Si"){
-                                        ?>
-                                            <li class="nav-item">
-                                                <a href="<?php echo $row["MEN_RUTA"];?>" class="nav-link" data-key="t-<?php echo strtolower($row["MEN_NOM"]);?>">
-                                                    <?php echo $row["MEN_NOM"];?>
-                                                </a>
-                                            </li>
-                                        <?php
-                                    }
+                            foreach ($datos as $row) {
+                                if ($row["MEN_GRUPO"] == "Mantenimiento" && $row["MEND_PERMI"] == "Si") {
+                            ?>
+                                    <li class="nav-item">
+                                        <a href="<?php echo $row["MEN_RUTA"]; ?>" class="nav-link" data-key="t-<?php echo strtolower($row["MEN_NOM"]); ?>">
+                                            <?php echo $row["MEN_NOM"]; ?>
+                                        </a>
+                                    </li>
+                            <?php
                                 }
+                            }
                             ?>
                         </ul>
                     </div>
                 </li> <!-- end Mantenimiento Menu -->
-                
-                
-                
-                <!-- Mantenimiento Usuario -->
-                  <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarUsuario" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarUsuario">
-                        <i class="ri-settings-3-line"></i> <span data-key="t-mantenimiento">Usuarios</span>
+
+                <!-- Modulo de Reportes -->
+
+               
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarReportes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarReportes">
+                        <i class="bx bxs-report"></i> <span data-key="t-mantenimiento">Reportes </span>
                     </a>
-                    <div class="collapse menu-dropdown" id="sidebarUsuario">
+                    <div class="collapse menu-dropdown" id="sidebarReportes">
                         <ul class="nav nav-sm flex-column">
                             <?php
-                                foreach ($datos as $row) {
-                                   if ($row["MEN_GRUPO"]=="Usuarios" && $row["MEND_PERMI"]=="Si"){
-                                        ?>
-                                            <li class="nav-item">
-                                                <a href="<?php echo $row["MEN_RUTA"];?>" class="nav-link" data-key="t-<?php echo strtolower($row["MEN_NOM"]);?>">
-                                                    <?php echo $row["MEN_NOM"];?>
-                                                </a>
-                                            </li>
-                                        <?php
-                                    }
+                            foreach ($datos as $row) {
+                                if ($row["MEN_GRUPO"] == "Reportes" && $row["MEND_PERMI"] == "Si") {
+                            ?>
+                                    <li class="nav-item">
+                                        <a href="<?php echo $row["MEN_RUTA"]; ?>" class="nav-link" data-key="t-<?php echo strtolower($row["MEN_NOM"]); ?>">
+                                            <?php echo $row["MEN_NOM"]; ?>
+                                        </a>
+                                    </li>
+                            <?php
                                 }
+                            }
                             ?>
                         </ul>
                     </div>
-                </li> <!-- end Mantenimiento Usuario -->
+                </li> <!-- end Mantenimiento Clientes -->
+
+
+                <!-- Mantenimiento Usuarios -->
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarUsuarios" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarUsuarios">
+                        <i class="bx bx-user-circle"></i> <span data-key="t-mantenimiento">Usuarios </span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarUsuarios">
+                        <ul class="nav nav-sm flex-column">
+                            <?php
+                            foreach ($datos as $row) {
+                                if ($row["MEN_GRUPO"] == "Usuarios" && $row["MEND_PERMI"] == "Si") {
+                            ?>
+                                    <li class="nav-item">
+                                        <a href="<?php echo $row["MEN_RUTA"]; ?>" class="nav-link" data-key="t-<?php echo strtolower($row["MEN_NOM"]); ?>">
+                                            <?php echo $row["MEN_NOM"]; ?>
+                                        </a>
+                                    </li>
+                            <?php
+                                }
+                            }
+                            ?>
+                        </ul>
+                    </div>
+                </li> <!-- end Mantenimiento Clientes -->
+
+                <!-- Mantenimiento CLientes -->
+                <?php
+                foreach ($datos as $row) {
+                    if ($row["MEN_GRUPO"] == "Clientes" && $row["MEND_PERMI"] == "Si") {
+                ?>
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="<?php echo $row["MEN_RUTA"]; ?>">
+                                <i class="ri-honour-line"></i> <span data-key="t-widgets"><?php echo $row["MEN_NOM"]; ?></span>
+                            </a>
+                        </li>
+                <?php
+                    }
+                }
+                ?>
 
 
 
 
-            </ul>
+
         </div>
 
     </div>

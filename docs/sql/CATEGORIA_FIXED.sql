@@ -1,22 +1,35 @@
 -- =============================================
 -- STORED PROCEDURES CORREGIDOS PARA TABLA CATEGORIA
--- Estructura: IdCategoria, Descripcion, Estado, FechaCreacion
+-- Estructura: IdCategoria, Descripcion, Tarifa, Estado, FechaCreacion
 -- =============================================
 
 -- Eliminar procedimientos existentes si existen
-DROP PROCEDURE IF EXISTS SP_L_CATEGORIA_01;
-DROP PROCEDURE IF EXISTS SP_L_CATEGORIA_02;
-DROP PROCEDURE IF EXISTS SP_D_CATEGORIA_01;
-DROP PROCEDURE IF EXISTS SP_I_CATEGORIA_01;
-DROP PROCEDURE IF EXISTS SP_U_CATEGORIA_01;
 
--- 1. Listar todas las categorías activas
+
+-- 1. Listar todas las categorías activas e inactivas:
 DELIMITER $$
 CREATE PROCEDURE SP_L_CATEGORIA_01()
 BEGIN
     SELECT 
         IdCategoria AS CAT_ID,
         Descripcion AS CAT_NOM,
+        Tarifa AS CAT_TAR,
+        Estado AS EST,
+        DATE_FORMAT(FechaCreacion, '%d/%m/%Y %H:%i:%s') AS FECH_CREA
+    FROM categoria 
+    ORDER BY FechaCreacion DESC;
+END$$
+DELIMITER ;
+
+
+-- 1. Listar todas las categorías activas
+DELIMITER $$
+CREATE PROCEDURE SP_L_CATEGORIA_03()
+BEGIN
+    SELECT 
+        IdCategoria AS CAT_ID,
+        Descripcion AS CAT_NOM,
+        Tarifa AS CAT_TAR,
         Estado AS EST,
         DATE_FORMAT(FechaCreacion, '%d/%m/%Y %H:%i:%s') AS FECH_CREA
     FROM categoria 
@@ -25,6 +38,8 @@ BEGIN
 END$$
 DELIMITER ;
 
+
+
 -- 2. Obtener categoría por ID específico
 DELIMITER $$
 CREATE PROCEDURE SP_L_CATEGORIA_02(IN CAT_ID INT)
@@ -32,6 +47,7 @@ BEGIN
     SELECT 
         IdCategoria AS CAT_ID,
         Descripcion AS CAT_NOM,
+        Tarifa AS CAT_TAR,
         Estado AS EST,
         FechaCreacion AS FECH_CREA
     FROM categoria 
@@ -39,17 +55,16 @@ BEGIN
 END$$
 DELIMITER ;
 
--- 3. Eliminar categoría (cambio de estado)
+-- 3. Eliminar categoría
 DELIMITER $$
 CREATE PROCEDURE SP_D_CATEGORIA_01(IN CAT_ID INT)
 BEGIN
-    UPDATE categoria 
-    SET Estado = 0 
+    DELETE FROM categoria 
     WHERE IdCategoria = CAT_ID;
 END$$
 DELIMITER ;
 
--- 4. Insertar nueva categoría (versión mejorada)
+-- 4. Insertar nueva categoría
 DELIMITER $$
 CREATE PROCEDURE SP_I_CATEGORIA_01(IN CAT_NOM VARCHAR(150))
 BEGIN
@@ -79,15 +94,30 @@ BEGIN
 END$$
 DELIMITER ;
 
--- 5. Actualizar categoría existente
+-- 5. Actualizar categoría existente (incluye Tarifa)
 DELIMITER $$
-CREATE PROCEDURE SP_U_CATEGORIA_01(IN CAT_ID INT, IN CAT_NOM VARCHAR(150))
+CREATE PROCEDURE SP_U_CATEGORIA_01(IN CAT_ID INT, IN CAT_NOM VARCHAR(150), IN CAT_TAR DECIMAL(10,2))
 BEGIN
     UPDATE categoria 
-    SET Descripcion = CAT_NOM 
+    SET Descripcion = CAT_NOM, 
+        Tarifa = CAT_TAR
     WHERE IdCategoria = CAT_ID AND Estado = 1;
 END$$
 DELIMITER ;
 
 -- Verificar que los procedimientos se crearon correctamente
 SHOW PROCEDURE STATUS WHERE Name LIKE 'SP_%CATEGORIA%';
+
+--Cambiar estado del Categoria (activar/desactivar)
+DELIMITER $$
+CREATE PROCEDURE SP_CAMBIAR_ESTADO_CATEGORIA_01(IN CAT_ID INT, IN NUEVO_ESTADO INT)
+BEGIN
+    UPDATE categoria 
+    SET Estado = NUEVO_ESTADO 
+    WHERE IdCategoria = CAT_ID;
+END$$
+DELIMITER ;
+
+-- NOTA DE MIGRACIÓN:
+-- Antes de usar estos procedimientos, ejecutar la siguiente sentencia una vez:
+-- ALTER TABLE categoria ADD COLUMN Tarifa DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER Descripcion;

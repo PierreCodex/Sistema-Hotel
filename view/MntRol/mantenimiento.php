@@ -17,12 +17,10 @@
                                        class="form-control" 
                                        id="rol_nom" 
                                        name="rol_nom" 
-                                       required
-                                       minlength="2"
                                        maxlength="50"
                                        placeholder="Ingrese el nombre del rol"
                                        autocomplete="off"/>
-                                <small class="text-muted">Mínimo 2 caracteres, máximo 50 caracteres</small>
+                                <small class="text-muted">Máximo 50 caracteres</small>
                             </div>
                         </div>
                     </div>

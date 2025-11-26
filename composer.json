@@ -1,0 +1,22 @@
+{
+    "name": "hotel/sistema-hotel-php",
+    "description": "Sistema de gestión hotelera",
+    "type": "project",
+    "require": {
+        "dompdf/dompdf": "^2.0",
+        "greenter/lite": "^4.0",
+        "endroid/qr-code": "^6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "10.0"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://repo.packagist.org"
+        }
+    ],
+    "config": {
+        "secure-http": false
+    }
+}
