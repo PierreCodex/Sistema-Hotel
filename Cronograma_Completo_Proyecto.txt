@@ -1,5 +1,7 @@
 CRONOGRAMA DE ACTIVIDADES - SISTEMA DE GESTIÓN HOTELERA
 ================================================================
+Última actualización: 26 de noviembre de 2025
+================================================================
 
 FASES SCRUM                                    | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |10 |11 |12 |13 |14 |15 |16 |
 ------------------------------------------------|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -22,10 +24,14 @@ Reunión de Sprint Planning                     |   |   | X |   |   |   |   |   
 
 SPRINT 1 - GESTIÓN DE USUARIOS, ACCESO Y ROLES
 Fase de Implementación                          |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-Desarrollo de características: US001, US002,   |   |   | X | X | X | X |   |   |   |   |   |   |   |   |   |   |
-US003, US004, US005, US006 y US007            |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-Desarrollo de características: US008, US009,   |   |   |   |   |   | X | X |   |   |   |   |   |   |   |   |   |
-US010, US011, US012 y US013                   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo US001-US004: Login, Logout,         |   |   | X | X |   |   |   |   |   |   |   |   |   |   |   |   |
+Validación credenciales, Control acceso        |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo US005-US009: CRUD Roles,            |   |   |   |   | X | X |   |   |   |   |   |   |   |   |   |   |
+Asignación de permisos a roles                 |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo US010-US013: CRUD Usuarios,         |   |   |   |   |   | X | X |   |   |   |   |   |   |   |   |   |
+Activar/desactivar usuarios                    |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo US060-US062: Control de sesiones,   |   |   |   |   |   |   | X |   |   |   |   |   |   |   |   |   |
+Expiración automática, Renovación sesión       |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
 
 Fase de Revisión y Retrospectiva               |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
 Demostración y validación del sprint           |   |   |   |   |   |   | X |   |   |   |   |   |   |   |   |   |
@@ -34,12 +40,18 @@ Retrospectiva del sprint                        |   |   |   |   |   |   | X |   
 Fase de Planificación y Estimación            |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
 Reunión de Sprint Planning                     |   |   |   |   |   |   |   | X |   |   |   |   |   |   |   |   |
 
-SPRINT 2 - GESTIÓN DE PISOS Y HABITACIONES
+SPRINT 2 - GESTIÓN DE PISOS, CATEGORÍAS, HABITACIONES, TARIFAS Y CLIENTES
 Fase de Implementación                          |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-Desarrollo de características: US014, US015,   |   |   |   |   |   |   |   | X | X | X |   |   |   |   |   |   |
-US016, US017, US018, US019                    |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-Desarrollo de características: US020, US021,   |   |   |   |   |   |   |   |   |   | X | X |   |   |   |   |   |
-US022, US023, US024 y US025                   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo US014-US018: CRUD Pisos             |   |   |   |   |   |   |   | X |   |   |   |   |   |   |   |   |
+Desarrollo US019-US023: CRUD Categorías        |   |   |   |   |   |   |   | X | X |   |   |   |   |   |   |   |
+Desarrollo US024-US029: Habitaciones (vistas   |   |   |   |   |   |   |   |   | X | X |   |   |   |   |   |   |
+empleado/admin), Estados, Disponibilidad       |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo US043-US046: CRUD Tarifas,          |   |   |   |   |   |   |   |   |   | X |   |   |   |   |   |   |
+Tarifas por categoría y modalidad              |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo US047-US051: CRUD Clientes,         |   |   |   |   |   |   |   |   |   | X | X |   |   |   |   |   |
+Integración API RENIEC (autocompletado DNI)    |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo US052-US055: CRUD Estados de        |   |   |   |   |   |   |   |   |   |   | X |   |   |   |   |   |
+Habitación (Disponible, Ocupado, Limpieza)     |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
 
 Fase de Revisión y Retrospectiva               |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
 Demostración y validación del sprint           |   |   |   |   |   |   |   |   |   |   | X |   |   |   |   |   |
@@ -48,12 +60,20 @@ Retrospectiva del sprint                        |   |   |   |   |   |   |   |   
 Fase de Planificación y Estimación            |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
 Reunión de Sprint Planning                     |   |   |   |   |   |   |   |   |   |   |   | X |   |   |   |   |
 
-SPRINT 3 - PRODUCTOS, RESERVAS Y VENTAS
+SPRINT 3 - PRODUCTOS, RESERVAS, VENTAS, STOCK Y FACTURACIÓN ELECTRÓNICA
 Fase de Implementación                          |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-Desarrollo de características: US030, US031,   |   |   |   |   |   |   |   |   |   |   |   | X | X | X |   |   |
-US032, US033, US034, US035                    |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-Desarrollo de características: US036, US037,   |   |   |   |   |   |   |   |   |   |   |   |   |   | X | X |   |
-US038, US039, US040, US041 y US042            |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo US030-US034: CRUD Productos,        |   |   |   |   |   |   |   |   |   |   |   | X |   |   |   |   |
+Vistas admin/empleado, Indicadores stock       |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo US035-US038: Recepciones,           |   |   |   |   |   |   |   |   |   |   |   | X | X |   |   |   |
+Check-in, Check-out, Modalidad 3 horas         |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo US039-US040: Ventas de productos,   |   |   |   |   |   |   |   |   |   |   |   |   | X | X |   |   |
+Historial de ventas, Estados Pend/Pagado       |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo US063-US066: Control de Stock,      |   |   |   |   |   |   |   |   |   |   |   |   |   | X |   |   |
+Descuento/restauración tiempo real             |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo US056-US059: Boletas electrónicas   |   |   |   |   |   |   |   |   |   |   |   |   |   | X | X |   |
+SUNAT, XML firmado, PDF, Envío Beta            |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo US041-US042: Reportes de ventas     |   |   |   |   |   |   |   |   |   |   |   |   |   |   | X |   |
+y recepciones (Pendiente)                      |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
 
 REVISIÓN Y RETROSPECTIVA FINAL
 Demostración y validación del sprint           |   |   |   |   |   |   |   |   |   |   |   |   |   |   | X |   |
@@ -65,15 +85,60 @@ Retrospectiva del Proyecto                      |   |   |   |   |   |   |   |   
 Cierre del proyecto                             |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | X |
 
 ================================================================
-RESUMEN DEL PROYECTO:
+RESUMEN DEL PROYECTO ACTUALIZADO:
 
-DISTRIBUCIÓN DE USER STORIES:
-• Sprint 1 (Semanas 3-7): US001-US013 - Gestión de usuarios, acceso y roles (13 US)
-• Sprint 2 (Semanas 8-11): US014-US025 - Gestión de pisos y habitaciones (12 US)  
-• Sprint 3 (Semanas 12-15): US030-US042 - Productos, reservas y ventas (13 US)
+DISTRIBUCIÓN DE USER STORIES POR SPRINT:
 
-TOTAL: 42 User Stories distribuidas en 3 Sprints
+• Sprint 1 (Semanas 3-7): Gestión de Acceso y Usuarios
+  - US001-US013: Usuarios, Roles, Permisos (13 US)
+  - US060-US062: Control de Sesiones (3 US)
+  Total: 16 User Stories
+
+• Sprint 2 (Semanas 8-11): Gestión de Infraestructura Hotelera
+  - US014-US018: Pisos (5 US)
+  - US019-US023: Categorías (5 US)
+  - US024-US029: Habitaciones (6 US)
+  - US043-US046: Tarifas (4 US)
+  - US047-US051: Clientes + API RENIEC (5 US)
+  - US052-US055: Estados de Habitación (4 US)
+  Total: 29 User Stories
+
+• Sprint 3 (Semanas 12-15): Operaciones y Facturación
+  - US030-US034: Productos (5 US)
+  - US035-US038: Recepciones/Reservas (4 US)
+  - US039-US040: Ventas (2 US)
+  - US041-US042: Reportes (2 US) - PENDIENTE
+  - US056-US059: Boletas Electrónicas SUNAT (4 US)
+  - US063-US066: Control de Stock (4 US)
+  Total: 21 User Stories
+
+================================================================
+TOTAL GENERAL: 66 User Stories distribuidas en 3 Sprints
+COMPLETADAS: 64 User Stories (97%)
+PENDIENTES: 2 User Stories (US041, US042 - Reportes)
 DURACIÓN TOTAL: 16 semanas
+================================================================
+
+ÉPICAS DEL PROYECTO (16 en total):
+
+EP001 - Gestión de Acceso al Sistema ✅
+EP002 - Gestión de Roles ✅
+EP003 - Gestión de Usuarios ✅
+EP004 - Gestión de Pisos ✅
+EP005 - Gestión de Categorías ✅
+EP006 - Gestión de Habitaciones ✅
+EP007 - Gestión de Productos ✅
+EP008 - Gestión de Reservas/Recepciones ✅
+EP009 - Gestión de Ventas ✅
+EP010 - Reportes 🟡 (Parcial)
+EP011 - Gestión de Tarifas ✅
+EP012 - Gestión de Clientes ✅
+EP013 - Estados de Habitación ✅
+EP014 - Comprobantes Electrónicos SUNAT ✅
+EP015 - Control de Sesiones ✅
+EP016 - Control de Stock en Ventas ✅
+
+================================================================
 
 CEREMONIAS SCRUM INCLUIDAS:
 ✓ Sprint Planning (inicio de cada sprint)
@@ -86,3 +151,22 @@ FASES PRINCIPALES:
 2. Sprint 0 (Semana 2): Configuración técnica y arquitectura
 3. Desarrollo (Semanas 3-15): 3 Sprints de implementación
 4. Cierre (Semana 16): Entregables finales y retrospectiva del proyecto
+
+================================================================
+FUNCIONALIDADES DESTACADAS IMPLEMENTADAS:
+
+✅ Sistema de autenticación con hash bcrypt y migración automática
+✅ Control de sesiones con expiración automática (30 min)
+✅ Menú dinámico según permisos del rol
+✅ Ocultamiento de módulos sin acceso
+✅ Vistas diferenciadas para Admin y Empleado
+✅ Integración API RENIEC para autocompletado de clientes
+✅ Gestión de tarifas por categoría y modalidad
+✅ Modalidad de reserva por horas (3 horas)
+✅ Control de stock en tiempo real (descuento/restauración)
+✅ Boletas electrónicas SUNAT con XML firmado y PDF
+✅ Cálculo automático de IGV 18%
+✅ Estados de habitación con indicadores visuales de color
+✅ Iconos de amenidades con tooltips
+
+================================================================
