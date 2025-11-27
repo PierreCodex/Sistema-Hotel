@@ -48,10 +48,10 @@ function guardaryeditar(e){
         return false;
     }
     
-    if(hab_det.length > 100){
+    if(hab_det.length > 500){
         swal.fire({
             title:'Error de Validación',
-            text: 'La descripción no puede exceder 100 caracteres',
+            text: 'La descripción no puede exceder 500 caracteres',
             icon: 'warning'
         });
         $("#hab_det").focus();
@@ -161,6 +161,18 @@ $(document).ready(function(){
         "bInfo":true,
         "iDisplayLength": 10,
         "order": [[ 0, "asc" ]],
+        "columnDefs": [
+            {
+                "targets": 1,
+                "className": "descripcion-cell",
+                "render": function(data, type, row) {
+                    if (type === 'display' && data && data.length > 80) {
+                        return '<span title="' + data + '">' + data.substr(0, 80) + '...</span>';
+                    }
+                    return data;
+                }
+            }
+        ],
         "language": {
             "sProcessing":     "Procesando...",
             "sLengthMenu":     "Mostrar _MENU_ registros",
@@ -206,7 +218,7 @@ function editar(hab_id){
         if(data.HAB_NUM && data.HAB_NUM.trim().length > 0 && data.HAB_NUM.trim().length <= 10){
             $('#hab_num').addClass('is-valid');
         }
-        if(data.HAB_DET && data.HAB_DET.trim().length > 0 && data.HAB_DET.trim().length <= 100){
+        if(data.HAB_DET && data.HAB_DET.trim().length > 0 && data.HAB_DET.trim().length <= 500){
             $('#hab_det').addClass('is-valid');
         }
     });
@@ -345,7 +357,7 @@ $(document).on('input', '#hab_det', function(){
     
     if(valor.length === 0){
         campo.addClass('is-invalid');
-    } else if(valor.length > 100){
+    } else if(valor.length > 500){
         campo.addClass('is-invalid');
     } else {
         campo.addClass('is-valid');
@@ -374,37 +386,37 @@ function combo_estado_habitacion(){
     });
 }
 
-
 // Función para filtrar habitaciones por piso
-function filtrarPorPiso(piso_id){
-    if(piso_id === ""){
-        $('#table_data').DataTable().ajax.reload();
-        return;
-    }
+
+//function filtrarPorPiso(piso_id){
+  //  if(piso_id === ""){
+ ////       $('#table_data').DataTable().ajax.reload();
+  //      return;
+  //  }
     
-    $.post("../../controller/habitacion.php?op=filtrar_por_piso", {piso_id: piso_id}, function(data){
-        var habitaciones = JSON.parse(data);
-        // Aquí puedes implementar la lógica para mostrar los resultados filtrados
-        console.log(habitaciones);
-    });
-}
+  //  $.post("../../controller/habitacion.php?op=filtrar_por_piso", {piso_id: piso_id}, function(data){
+ //       var habitaciones = JSON.parse(data);
+ //       // Aquí puedes implementar la lógica para mostrar los resultados filtrados
+       // console.log(habitaciones);
+  //  });
+//}
 
 // Función para filtrar habitaciones por categoría
 
 
 // Función para filtrar habitaciones por estado
-function filtrarPorEstado(est_id){
-    if(est_id === ""){
-        $('#table_data').DataTable().ajax.reload();
-        return;
-    }
+//function filtrarPorEstado(est_id){
+   // if(est_id === ""){
+   //     $('#table_data').DataTable().ajax.reload();
+   //     return;
+   // }
     
-    $.post("../../controller/habitacion.php?op=filtrar_por_estado", {est_id: est_id}, function(data){
-        var habitaciones = JSON.parse(data);
+ //   $.post("../../controller/habitacion.php?op=filtrar_por_estado", {est_id: est_id}, function(data){
+      //  var habitaciones = JSON.parse(data);
         // Aquí puedes implementar la lógica para mostrar los resultados filtrados
-        console.log(habitaciones);
-    });
-}
+     //   console.log(habitaciones);
+//    });
+//}
 
 init();
 

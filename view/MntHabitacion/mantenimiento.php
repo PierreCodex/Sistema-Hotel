@@ -37,13 +37,13 @@
                                 <textarea class="form-control" 
                                           id="hab_det" 
                                           name="hab_det" 
-                                          rows="3"
-                                          maxlength="100"
+                                          rows="5"
+                                          maxlength="500"
                                           placeholder="Descripción de la habitación, características, etc."
                                           autocomplete="off"
                                           required></textarea>
                                 <div class="form-text">
-                                    <small class="text-muted">Máximo 100 caracteres. Describe las características de la habitación.</small>
+                                    <small class="text-muted">Máximo 500 caracteres. Describe las características de la habitación.</small>
                                 </div>
                             </div>
                         </div>

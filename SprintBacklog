@@ -1,0 +1,216 @@
+SPRINT 1 — Acceso y configuración inicial del sistema					
+					
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA01-01	Diseñar interfaz de inicio de sesión	US001	Desarrollador	Completado	1
+TA01-02	Implementar lógica de autenticación	US001	Desarrollador	Completado	3
+TA01-03	Validar credenciales en base de datos	US001	Desarrollador	Completado	1
+TA01-04	Realizar pruebas de inicio de sesión	US001	Tester	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA02-01	Implementar botón de cierre de sesión	US002	Desarrollador	Completado	1
+TA02-02	Eliminar sesión activa y limpiar variables	US002	Desarrollador	Completado	1
+TA02-03	Probar cierre de sesión en diferentes roles	US002	Tester	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA03-01	Implementar validación de credenciales	US003	Pierre	Completado	1
+TA03-02	Diseñar manejo de errores de autenticación	US003	Pierre	Completado	1
+TA03-03	Probar acceso con credenciales incorrectas	US003	Tester	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA04-01	Crear sistema de roles (admin, empleado)	US004	Desarrollador	Completado	2
+TA04-02	Configurar redirección según rol	US004	Desarrollador	Completado	1
+TA04-03	Validar vistas restringidas por rol	US004	Tester	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA05-01	Diseñar vista de lista de roles	US005	Desarrollador	Completado	1
+TA05-02	Implementar tabla dinámica para roles	US005	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA06-01	Diseñar formulario para crear roles	US006	Desarrollador	Completado	1
+TA06-02	Validar campos obligatorios	US006	Desarrollador	Completado	1
+TA06-03	Realizar pruebas de creación de roles	US006	Tester	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA07-01	Diseñar interfaz de edición de roles	US007	Desarrollador	Completado	1
+TA07-02	Implementar actualización de roles	US007	Desarrollador	Completado	1
+TA07-03	Probar cambios en roles existentes	US007	Tester	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA08-01	Diseñar interfaz para activar/desactivar roles	US008	Desarrollador	Completado	1
+TA08-02	Implementar lógica de cambio de estado	US008	Desarrollador	Completado	1
+TA08-03	Probar activación/desactivación de roles	US008	Tester	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA09-01	Diseñar interfaz para asignar permisos a roles	US009	Desarrollador	Completado	1
+TA09-02	Implementar lógica para asignar vistas por rol	US009	Desarrollador	Completado	3
+TA09-03	Probar permisos y accesos por rol	US009	Tester	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA10-01	Diseñar vista lista de usuarios	US010	Desarrollador	Completado	1
+TA10-02	Implementar tabla dinámica de usuarios	US010	Desarrollador	Completado	1
+TA10-03	Validar visualización por tipo de usuario	US010	Tester	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA11-01	Diseñar formulario para nuevos usuarios	US011	Desarrollador	Completado	1
+TA11-02	Implementar registro en base de datos	US011	Desarrollador	Completado	1
+TA11-03	Probar creación de usuarios empleados	US011	Tester	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA12-01	Diseñar formulario de edición de usuario	US012	Desarrollador	Completado	1
+TA12-02	Implementar actualización de datos	US012	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA13-01	Diseñar control de activación/desactivación	US013	Desarrollador	Completado	1
+TA13-02	Implementar lógica de cambio de estado	US013	Desarrollador	Completado	1
+TA13-03	Probar funcionalidad de activación/desactivación	US013	Tester	Completado	1
+					
+SPRINT 2 – Gestión de pisos, categorías y habitaciones					
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA14-01	Diseñar interfaz lista de pisos	US014	Desarrollador	Completado	1
+TA14-02	Implementar consulta de pisos en BD	US014	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA15-01	Diseñar formulario creación de pisos	US015	Desarrollador	Completado	1
+TA15-02	Implementar registro de nuevos pisos	US015	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA16-01	Diseñar formulario edición de pisos	US016	Desarrollador	Completado	1
+TA16-02	Implementar actualización de pisos	US016	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA17-01	Diseñar control para eliminar pisos 	US017	Desarrollador	Completado	1
+TA17-02	Implementar validación de dependencia habitaciones	US017	Desarrollador	Completado	2
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA18-01	Diseñar control activación/desactivación de pisos	US018	Desarrollador	Completado	1
+TA18-02	Probar cambios de estado de pisos	US018	Tester	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA19-01	Diseñar vista lista de categorías de habitación	US019	Desarrollador	Completado	1
+TA19-02	Implementar consulta de categorías	US019	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA20-01	Diseñar formulario creación de categoría	US020	Desarrollador	Completado	1
+TA20-02	Implementar registro de nuevas categorías	US020	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA21-01	Diseñar formulario edición de categoría	US021	Desarrollador	Completado	1
+TA21-02	Implementar actualización de categoría	US021	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA22-01	Diseñar control para eliminar categorías 	US022	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA23-01	Implementar activación/desactivación de categorías	US023	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA24-01	Diseñar vista lista de habitaciones (empleado)	US024	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA25-01	Diseñar vista lista completa de habitaciones (admin)	US025	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA26-01	Diseñar formulario creación de habitación	US026	Desarrollador	Completado	1
+TA26-02	Implementar lógica de registro de habitación	US026	Desarrollador	Completado	2
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA27-01	Diseñar formulario edición de habitación	US027	Desarrollador	Completado	1
+TA27-02	Implementar actualización de habitación	US027	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA28-01	Implementar cambio de estado habitación	US028	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA29-01	Diseñar vista para consultar disponibilidad	US029	Desarrollador	Completado	1
+TA29-02	Implementar búsqueda de habitaciones disponibles	US029	Desarrollador	Completado	1
+					
+					
+💼 SPRINT 3 – Gestión de productos, reservas, ventas y mejoras adicionales					
+					
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA30-01	Diseñar vista lista de productos (admin)	US030	Desarrollador	Completado	1
+TA30-02	Diseñar vista lista de productos (empleado)	US030	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA31-01	Diseñar formulario registro de producto	US031	Desarrollador	Completado	1
+TA31-02	Implementar inserción de producto	US031	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA32-01	Diseñar formulario edición de producto	US032	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA33-01	Diseñar control eliminar productos	US033	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA34-01	Diseñar control activación/desactivación producto	US034	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA35-01	Diseñar formulario registro de reserva (recepción)	US035	Desarrollador	Completado	1
+TA35-02	Implementar lógica para nueva reserva	US035	Desarrollador	Completado	3
+TA35-03	Implementar modalidad reserva por horas (3 horas)	US035	Desarrollador	Completado	2
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA36-01	Diseñar formulario check-in	US036	Desarrollador	Completado	3
+TA36-02	Implementar integración con tarifas y adelanto	US036	Desarrollador	Completado	2
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA37-01	Diseñar formulario check-out (salida)	US037	Desarrollador	Completado	3
+TA37-02	Implementar cálculo de penalidades y totales	US037	Desarrollador	Completado	2
+TA37-03	Cambiar habitación a estado LIMPIEZA al salir	US037	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA38-01	Diseñar vista consulta de reservas activas	US038	Desarrollador	Completado	1
+TA38-02	Implementar vista detalle de recepción	US038	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA39-01	Diseñar formulario venta de productos	US039	Desarrollador	Completado	1
+TA39-02	Implementar lógica de venta y detalle	US039	Desarrollador	Completado	2
+TA39-03	Implementar descuento de stock inmediato al agregar	US039	Desarrollador	Completado	2
+TA39-04	Implementar restauración de stock al eliminar detalle	US039	Desarrollador	Completado	2
+TA39-05	Implementar cancelación de venta borrador	US039	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA40-01	Diseñar vista historial de ventas por recepción	US040	Desarrollador	Completado	1
+TA40-02	Implementar listado de detalles de venta	US040	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA41-01	Diseñar módulo generación de reportes de ventas	US041	Desarrollador	Pendiente	1
+TA41-02	Implementar dashboard estadísticas de ventas	US041	Desarrollador	Pendiente	3
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA42-01	Diseñar módulo generación de reportes de recepciones	US042	Desarrollador	Pendiente	1
+TA42-02	Implementar exportación de reportes en PDF	US042	Desarrollador	Pendiente	3
+TA42-03	Probar generación y descarga de reportes	US042	Tester	Pendiente	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA43-01	Diseñar vista lista de tarifas	US043	Desarrollador	Completado	1
+TA43-02	Implementar consulta de tarifas en BD	US043	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA44-01	Diseñar formulario creación de tarifa	US044	Desarrollador	Completado	1
+TA44-02	Implementar registro de nuevas tarifas	US044	Desarrollador	Completado	2
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA45-01	Diseñar formulario edición de tarifa	US045	Desarrollador	Completado	1
+TA45-02	Implementar actualización de tarifa	US045	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA46-01	Implementar activación/desactivación de tarifas	US046	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA47-01	Diseñar vista lista de clientes	US047	Desarrollador	Completado	1
+TA47-02	Implementar consulta de clientes en BD	US047	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA48-01	Diseñar formulario registro de cliente	US048	Desarrollador	Completado	1
+TA48-02	Implementar inserción de cliente	US048	Desarrollador	Completado	2
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA49-01	Implementar búsqueda de DNI con API RENIEC	US049	Desarrollador	Completado	2
+TA49-02	Implementar autocompletado de datos desde RENIEC	US049	Desarrollador	Completado	2
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA50-01	Diseñar formulario edición de cliente	US050	Desarrollador	Completado	1
+TA50-02	Implementar actualización de cliente	US050	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA51-01	Implementar activación/desactivación de clientes	US051	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA52-01	Diseñar vista lista de estados de habitación	US052	Desarrollador	Completado	1
+TA52-02	Implementar consulta de estados en BD	US052	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA53-01	Diseñar formulario creación de estado	US053	Desarrollador	Completado	1
+TA53-02	Implementar registro de nuevos estados	US053	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA54-01	Diseñar formulario edición de estado	US054	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA55-01	Implementar activación/desactivación de estados	US055	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA56-01	Diseñar estructura de boleta electrónica	US056	Desarrollador	Completado	2
+TA56-02	Implementar generación de boleta con Greenter	US056	Desarrollador	Completado	3
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA57-01	Implementar generación de XML firmado	US057	Desarrollador	Completado	2
+TA57-02	Configurar certificado digital para firma	US057	Desarrollador	Completado	2
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA58-01	Implementar generación de PDF de boleta	US058	Desarrollador	Completado	2
+TA58-02	Diseñar plantilla de ticket/boleta	US058	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA59-01	Configurar conexión con SUNAT Beta	US059	Desarrollador	Completado	2
+TA59-02	Implementar envío y validación de respuesta	US059	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA60-01	Implementar expiración de sesión por inactividad	US060	Desarrollador	Completado	2
+TA60-02	Diseñar mensaje de sesión expirada	US060	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA61-01	Implementar renovación automática de sesión	US061	Desarrollador	Completado	2
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA62-01	Implementar detección de sesiones múltiples	US062	Desarrollador	Completado	2
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA63-01	Implementar descuento de stock al agregar producto	US063	Desarrollador	Completado	2
+TA63-02	Implementar validación de stock en tiempo real	US063	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA64-01	Implementar restauración de stock al eliminar detalle	US064	Desarrollador	Completado	2
+TA64-02	Actualizar vista de stock en tiempo real	US064	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA65-01	Implementar cancelación de venta borrador	US065	Desarrollador	Completado	1
+TA65-02	Restaurar stock de todos los productos al cancelar	US065	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA66-01	Implementar validación de stock antes de agregar	US066	Desarrollador	Completado	1
+TA66-02	Mostrar mensaje de stock insuficiente	US066	Desarrollador	Completado	1
+ID Tarea	Tarea	ID Historia	Responsable	Estado	Estimación (Story Points)
+TA-UI01	Implementar menú dinámico por permisos de rol	US004	Desarrollador	Completado	2
+TA-UI02	Implementar ocultamiento de módulos sin acceso	US004	Desarrollador	Completado	1
+TA-UI03	Implementar iconos de amenidades en habitaciones	US025	Desarrollador	Completado	1
+TA-UI04	Implementar indicadores de stock con colores	US030	Desarrollador	Completado	1
+TA-UI05	Implementar advertencia al salir sin guardar venta	US039	Desarrollador	Completado	1

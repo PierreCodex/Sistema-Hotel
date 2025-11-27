@@ -1,0 +1,88 @@
+CRONOGRAMA DE ACTIVIDADES - SISTEMA DE GESTIÓN HOTELERA
+================================================================
+
+FASES SCRUM                                    | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |10 |11 |12 |13 |14 |15 |16 |
+------------------------------------------------|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+
+FASE DE INICIACIÓN
+Crear visión del proyecto                       | X |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Identificar stakeholders                        | X |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Identificación de roles y formación del        | X |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+equipo Scrum                                    |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo de épicas                            | X |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Product backlog inicial                         | X |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Plan de lanzamiento inicial                     | X |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+
+SPRINT 0
+Diseño de la base de datos                     |   | X |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Definir la arquitectura del Sistema            |   | X |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Configuración del entorno de Desarrollo        |   | X |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Configuración de herramientas y frameworks     |   | X |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Reunión de Sprint Planning                     |   |   | X |   |   |   |   |   |   |   |   |   |   |   |   |   |
+
+SPRINT 1 - GESTIÓN DE USUARIOS, ACCESO Y ROLES
+Fase de Implementación                          |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo de características: US001, US002,   |   |   | X | X | X | X |   |   |   |   |   |   |   |   |   |   |
+US003, US004, US005, US006 y US007            |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo de características: US008, US009,   |   |   |   |   |   | X | X |   |   |   |   |   |   |   |   |   |
+US010, US011, US012 y US013                   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+
+Fase de Revisión y Retrospectiva               |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Demostración y validación del sprint           |   |   |   |   |   |   | X |   |   |   |   |   |   |   |   |   |
+Retrospectiva del sprint                        |   |   |   |   |   |   | X |   |   |   |   |   |   |   |   |   |
+
+Fase de Planificación y Estimación            |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Reunión de Sprint Planning                     |   |   |   |   |   |   |   | X |   |   |   |   |   |   |   |   |
+
+SPRINT 2 - GESTIÓN DE PISOS Y HABITACIONES
+Fase de Implementación                          |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo de características: US014, US015,   |   |   |   |   |   |   |   | X | X | X |   |   |   |   |   |   |
+US016, US017, US018, US019                    |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo de características: US020, US021,   |   |   |   |   |   |   |   |   |   | X | X |   |   |   |   |   |
+US022, US023, US024 y US025                   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+
+Fase de Revisión y Retrospectiva               |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Demostración y validación del sprint           |   |   |   |   |   |   |   |   |   |   | X |   |   |   |   |   |
+Retrospectiva del sprint                        |   |   |   |   |   |   |   |   |   |   | X |   |   |   |   |   |
+
+Fase de Planificación y Estimación            |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Reunión de Sprint Planning                     |   |   |   |   |   |   |   |   |   |   |   | X |   |   |   |   |
+
+SPRINT 3 - PRODUCTOS, RESERVAS Y VENTAS
+Fase de Implementación                          |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo de características: US030, US031,   |   |   |   |   |   |   |   |   |   |   |   | X | X | X |   |   |
+US032, US033, US034, US035                    |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+Desarrollo de características: US036, US037,   |   |   |   |   |   |   |   |   |   |   |   |   |   | X | X |   |
+US038, US039, US040, US041 y US042            |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+
+REVISIÓN Y RETROSPECTIVA FINAL
+Demostración y validación del sprint           |   |   |   |   |   |   |   |   |   |   |   |   |   |   | X |   |
+Retrospectiva del sprint                        |   |   |   |   |   |   |   |   |   |   |   |   |   |   | X |   |
+
+ENTREGA DE ENTREGABLES FINALES
+Envío de entregables finales                   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | X |
+Retrospectiva del Proyecto                      |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | X |
+Cierre del proyecto                             |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | X |
+
+================================================================
+RESUMEN DEL PROYECTO:
+
+DISTRIBUCIÓN DE USER STORIES:
+• Sprint 1 (Semanas 3-7): US001-US013 - Gestión de usuarios, acceso y roles (13 US)
+• Sprint 2 (Semanas 8-11): US014-US025 - Gestión de pisos y habitaciones (12 US)  
+• Sprint 3 (Semanas 12-15): US030-US042 - Productos, reservas y ventas (13 US)
+
+TOTAL: 42 User Stories distribuidas en 3 Sprints
+DURACIÓN TOTAL: 16 semanas
+
+CEREMONIAS SCRUM INCLUIDAS:
+✓ Sprint Planning (inicio de cada sprint)
+✓ Sprint Review (demostración al final de cada sprint)
+✓ Sprint Retrospective (mejora continua)
+✓ Retrospectiva final del proyecto
+
+FASES PRINCIPALES:
+1. Iniciación (Semana 1): Visión, stakeholders, épicas, backlog inicial
+2. Sprint 0 (Semana 2): Configuración técnica y arquitectura
+3. Desarrollo (Semanas 3-15): 3 Sprints de implementación
+4. Cierre (Semana 16): Entregables finales y retrospectiva del proyecto

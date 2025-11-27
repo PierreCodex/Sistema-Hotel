@@ -142,7 +142,7 @@ switch ($_GET["op"]) {
         );
         echo json_encode($results);
         break;
-
+        
     /* TODO: Mostrar información de registro según su ID */
     case "mostrar":
         $datos = $habitacion->get_habitacion_x_hab_id($_POST["hab_id"]);
@@ -266,6 +266,14 @@ switch ($_GET["op"]) {
         $datos = $habitacion->get_habitacion_activa();
         echo json_encode($datos);
         break;
+    
+    /* TODO: Listar habitaciones para empleado (vista simplificada) */
+    case "listar_para_empleado":
+        $datos = $habitacion->get_habitacion_activa();
+        // Devolver en formato DataTables
+        echo json_encode(array("data" => $datos));
+        break;
+    
     /* TODO: Listar habitaciones activas para vista de tienda */
     case "listar_ocupados":
         $datos = $habitacion->get_habitacion_ocupada();

@@ -168,23 +168,53 @@ function eliminar(detv_id,vent_id){
         cancelButtonText: "No",
     }).then((result)=>{
         if (result.value){
+            // Esperar respuesta del servidor antes de actualizar la interfaz
             $.post("../../controller/venta.php?op=eliminardetalle", {detv_id: detv_id}, function(data){
-                // El stock se restaura automáticamente al eliminar el detalle
-            });
+                try { data = (typeof data === 'string') ? JSON.parse(data) : data; } catch(e) { data = {success: false}; }
+                
+                if(data && data.success){
+                    // Recalcular totales
+                    $.post("../../controller/venta.php?op=calculo", {vent_id: vent_id}, function(calcData){
+                        calcData = (typeof calcData === 'string') ? JSON.parse(calcData) : calcData;
+                        $('#txtsubtotal').html(calcData.VENT_SUBTOTAL);
+                        $('#txtigv').html(calcData.VENT_IGV);
+                        $('#txttotal').html(calcData.VENT_TOTAL);
+                    });
 
-            $.post("../../controller/venta.php?op=calculo", {vent_id: vent_id}, function(data){
-                data = (typeof data === 'string') ? JSON.parse(data) : data;
-                $('#txtsubtotal').html(data.VENT_SUBTOTAL);
-                $('#txtigv').html(data.VENT_IGV);
-                $('#txttotal').html(data.VENT_TOTAL);
-            });
+                    // Refrescar tabla de detalles
+                    listar(vent_id);
+                    
+                    // Actualizar stock en tiempo real del producto seleccionado actualmente
+                    var pro_id_actual = $("#pro_id").val();
+                    if(pro_id_actual && pro_id_actual !== ''){
+                        $.post("../../controller/producto.php?op=mostrar", {pro_id: pro_id_actual}, function(prodData){
+                            prodData = (typeof prodData === 'string') ? JSON.parse(prodData) : prodData;
+                            $('#prod_stock').val(prodData.PRO_CANT);
+                            // Actualizar límites de cantidad
+                            var stock = parseInt(prodData.PRO_CANT, 10) || 0;
+                            $('#detv_cant').attr('max', stock);
+                            if (stock <= 0) {
+                                $('#btnagregar').prop('disabled', true);
+                            } else {
+                                $('#btnagregar').prop('disabled', false);
+                            }
+                        });
+                    }
 
-            listar(vent_id);
-
-            swal.fire({
-                title:'Producto Eliminado',
-                text: 'El stock ha sido restaurado al inventario',
-                icon: 'success'
+                    swal.fire({
+                        title:'Producto Eliminado',
+                        text: 'El stock ha sido restaurado al inventario',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    swal.fire({
+                        title:'Error',
+                        text: (data && data.message) ? data.message : 'No se pudo eliminar el detalle',
+                        icon: 'error'
+                    });
+                }
             });
         }
     });
@@ -310,5 +340,59 @@ $(document).on("click","#btnguardar",function(){
 });
 
 $(document).on("click","#btnlimpiar",function(){
-    location.reload();
+    var vent_id = $("#vent_id").val();
+    
+    // Si hay una venta borrador, preguntar si desea cancelarla
+    if(vent_id && vent_id != ''){
+        swal.fire({
+            title: "¿Cancelar Venta?",
+            text: "Esto restaurará el stock de todos los productos agregados. ¿Está seguro?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Sí, Cancelar",
+            cancelButtonText: "No, Continuar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Cancelar venta borrador y restaurar stock
+                $.post("../../controller/venta.php?op=cancelar_borrador", {vent_id: vent_id}, function(data){
+                    try { data = (typeof data === 'string') ? JSON.parse(data) : data; } catch(e) { data = {success: false}; }
+                    if(data && data.success){
+                        swal.fire({
+                            title: 'Venta Cancelada',
+                            text: 'El stock ha sido restaurado al inventario',
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        swal.fire({
+                            title: 'Aviso',
+                            text: data.message || 'No se pudo cancelar la venta',
+                            icon: 'warning'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    }
+                });
+            }
+        });
+    } else {
+        location.reload();
+    }
+});
+
+// Advertir al usuario si intenta salir con venta borrador sin guardar
+window.addEventListener('beforeunload', function(e) {
+    var vent_id = $("#vent_id").val();
+    var hasItems = $('#table_data tbody tr').length > 0 && !$('#table_data tbody').text().includes('No se encontraron');
+    
+    if(vent_id && hasItems) {
+        e.preventDefault();
+        e.returnValue = 'Tiene productos agregados sin guardar. El stock ya fue descontado. ¿Seguro que desea salir?';
+        return e.returnValue;
+    }
 });

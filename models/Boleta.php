@@ -235,70 +235,110 @@ class Boleta extends Conectar {
      * Guardar boleta completa con CDR de SUNAT
      */
     private function guardarBoletaCompleta($rec_id, $invoice, $xml, $cdrZip, $estado, $descripcion, $cliente_data, $totales, $detalles) {
-        $conectar = parent::conexion();
-        parent::set_names();
-        
-        // Insertar boleta
-        $sql = "INSERT INTO boleta (rec_id, bol_tipo, bol_serie, bol_correlativo, 
-                bol_fecha_emision, bol_cliente_tipo_doc, bol_cliente_num_doc, 
-                bol_cliente_razon_social, bol_cliente_direccion,
-                bol_subtotal, bol_igv, bol_total, bol_estado, bol_metodo_pago, bol_xml, bol_cdr, bol_observaciones) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
-        $stmt = $conectar->prepare($sql);
-        $stmt->execute([
-            $rec_id,
-            $invoice->getTipoDoc(),
-            $invoice->getSerie(),
-            $invoice->getCorrelativo(),
-            $invoice->getFechaEmision()->format('Y-m-d H:i:s'),
-            $cliente_data['tipo_doc'] ?? '1',
-            $cliente_data['num_doc'] ?? '',
-            $cliente_data['razon_social'] ?? '',
-            $cliente_data['direccion'] ?? '',
-            $totales['subtotal'] ?? 0,
-            $totales['igv'] ?? 0,
-            $invoice->getMtoImpVenta(),
-            $estado,
-            $this->metodo_pago,
-            $xml,
-            base64_encode($cdrZip),
-            $descripcion
-        ]);
-        
-        // Obtener el ID de la boleta insertada
-        $bol_id = $conectar->lastInsertId();
-        
-        // Insertar detalles de la boleta
-        $sql_detalle = "INSERT INTO boleta_detalle (bol_id, bol_det_orden, bol_det_codigo, 
-                        bol_det_descripcion, bol_det_unidad, bol_det_cantidad, 
-                        bol_det_precio_unitario, bol_det_subtotal, bol_det_igv, bol_det_total) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
-        $stmt_detalle = $conectar->prepare($sql_detalle);
-        
-        $orden = 1;
-        foreach ($detalles as $item) {
-            $cantidad = $item['cantidad'] ?? 1;
-            $precio_unitario = $item['precio_unitario'] ?? 0;
-            $subtotal_item = $cantidad * $precio_unitario;
-            $igv_item = round($subtotal_item * 0.18, 2);
-            $total_item = round($subtotal_item + $igv_item, 2);
+        try {
+            $conectar = parent::conexion();
+            parent::set_names();
             
-            $stmt_detalle->execute([
-                $bol_id,
-                $orden,
-                'P' . str_pad($orden, 3, '0', STR_PAD_LEFT),
-                $item['descripcion'] ?? 'Servicio',
-                'NIU',
-                $cantidad,
-                round($precio_unitario, 2),
-                round($subtotal_item, 2),
-                $igv_item,
-                $total_item
+            // Habilitar excepciones de PDO para capturar errores
+            $conectar->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            
+            // Insertar boleta
+            $sql = "INSERT INTO boleta (rec_id, bol_tipo, bol_serie, bol_correlativo, 
+                    bol_fecha_emision, bol_cliente_tipo_doc, bol_cliente_num_doc, 
+                    bol_cliente_razon_social, bol_cliente_direccion,
+                    bol_subtotal, bol_igv, bol_total, bol_estado, bol_metodo_pago, bol_xml, bol_cdr, bol_observaciones) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            
+            $stmt = $conectar->prepare($sql);
+            $result = $stmt->execute([
+                $rec_id,
+                $invoice->getTipoDoc(),
+                $invoice->getSerie(),
+                $invoice->getCorrelativo(),
+                $invoice->getFechaEmision()->format('Y-m-d H:i:s'),
+                $cliente_data['tipo_doc'] ?? '1',
+                $cliente_data['num_doc'] ?? '',
+                $cliente_data['razon_social'] ?? '',
+                $cliente_data['direccion'] ?? '',
+                $totales['subtotal'] ?? 0,
+                $totales['igv'] ?? 0,
+                $invoice->getMtoImpVenta(),
+                $estado,
+                $this->metodo_pago,
+                $xml,
+                base64_encode($cdrZip),
+                $descripcion
             ]);
             
-            $orden++;
+            if (!$result) {
+                error_log("Error al insertar boleta: " . print_r($stmt->errorInfo(), true));
+                throw new Exception("Error al insertar boleta en BD");
+            }
+            
+            // Obtener el ID de la boleta insertada
+            $bol_id = $conectar->lastInsertId();
+            
+            if (!$bol_id) {
+                error_log("No se pudo obtener lastInsertId para boleta");
+                throw new Exception("No se pudo obtener el ID de la boleta insertada");
+            }
+            
+            error_log("Boleta insertada con ID: " . $bol_id);
+            
+            // Guardar XML firmado en storage (no crítico, puede fallar)
+            try {
+                $this->guardarXMLEnStorage($bol_id, $invoice->getSerie(), $invoice->getCorrelativo(), $xml);
+            } catch (Exception $e) {
+                error_log("Error guardando XML: " . $e->getMessage());
+            }
+            
+            // Guardar CDR (respuesta SUNAT) en storage (no crítico, puede fallar)
+            try {
+                $this->guardarCDREnStorage($bol_id, $invoice->getSerie(), $invoice->getCorrelativo(), $cdrZip);
+            } catch (Exception $e) {
+                error_log("Error guardando CDR: " . $e->getMessage());
+            }
+            
+            // Insertar detalles de la boleta
+            $sql_detalle = "INSERT INTO boleta_detalle (bol_id, bol_det_orden, bol_det_codigo, 
+                            bol_det_descripcion, bol_det_unidad, bol_det_cantidad, 
+                            bol_det_precio_unitario, bol_det_subtotal, bol_det_igv, bol_det_total) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            
+            $stmt_detalle = $conectar->prepare($sql_detalle);
+            
+            $orden = 1;
+            foreach ($detalles as $item) {
+                $cantidad = $item['cantidad'] ?? 1;
+                $precio_unitario = $item['precio_unitario'] ?? 0;
+                $subtotal_item = $cantidad * $precio_unitario;
+                $igv_item = round($subtotal_item * 0.18, 2);
+                $total_item = round($subtotal_item + $igv_item, 2);
+                
+                $stmt_detalle->execute([
+                    $bol_id,
+                    $orden,
+                    'P' . str_pad($orden, 3, '0', STR_PAD_LEFT),
+                    $item['descripcion'] ?? 'Servicio',
+                    'NIU',
+                    $cantidad,
+                    round($precio_unitario, 2),
+                    round($subtotal_item, 2),
+                    $igv_item,
+                    $total_item
+                ]);
+                
+                $orden++;
+            }
+            
+            error_log("Boleta guardada completamente: " . $invoice->getSerie() . "-" . $invoice->getCorrelativo());
+            
+        } catch (PDOException $e) {
+            error_log("Error PDO al guardar boleta: " . $e->getMessage());
+            throw new Exception("Error de base de datos: " . $e->getMessage());
+        } catch (Exception $e) {
+            error_log("Error general al guardar boleta: " . $e->getMessage());
+            throw $e;
         }
     }
     
@@ -491,6 +531,212 @@ class Boleta extends Conectar {
             // Si falla el guardado, no interrumpir el flujo principal
             error_log("Error al guardar PDF en storage: " . $e->getMessage());
             return null;
+        }
+    }
+    
+    /**
+     * Guardar XML firmado en carpeta storage y actualizar ruta en BD
+     */
+    private function guardarXMLEnStorage($bol_id, $serie, $correlativo, $xmlContent) {
+        try {
+            // Crear estructura de carpetas: storage/xml/año/mes
+            $year = date('Y');
+            $month = date('m');
+            $storageDir = __DIR__ . '/../storage/xml/' . $year . '/' . $month;
+            
+            // Crear directorio si no existe
+            if (!is_dir($storageDir)) {
+                mkdir($storageDir, 0755, true);
+            }
+            
+            // Nombre del archivo: RUC-TIPO-SERIE-CORRELATIVO.xml
+            $ruc = '20123456789'; // Tu RUC
+            $filename = $ruc . '-03-' . $serie . '-' . $correlativo . '.xml';
+            $filepath = $storageDir . '/' . $filename;
+            $relativePath = 'storage/xml/' . $year . '/' . $month . '/' . $filename;
+            
+            // Guardar archivo XML
+            file_put_contents($filepath, $xmlContent);
+            
+            // Actualizar ruta en la base de datos
+            $conectar = parent::conexion();
+            $sql = "UPDATE boleta SET bol_xml_ruta = ? WHERE bol_id = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->execute([$relativePath, $bol_id]);
+            
+            return $relativePath;
+            
+        } catch (Exception $e) {
+            error_log("Error al guardar XML en storage: " . $e->getMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * Guardar CDR (respuesta de SUNAT) en storage
+     */
+    private function guardarCDREnStorage($bol_id, $serie, $correlativo, $cdrZip) {
+        try {
+            // Crear estructura de carpetas: storage/cdr/año/mes
+            $year = date('Y');
+            $month = date('m');
+            $storageDir = __DIR__ . '/../storage/cdr/' . $year . '/' . $month;
+            
+            // Crear directorio si no existe
+            if (!is_dir($storageDir)) {
+                mkdir($storageDir, 0755, true);
+            }
+            
+            // Nombre del archivo: R-RUC-TIPO-SERIE-CORRELATIVO.zip
+            $ruc = '20123456789'; // Tu RUC
+            $filename = 'R-' . $ruc . '-03-' . $serie . '-' . $correlativo . '.zip';
+            $filepath = $storageDir . '/' . $filename;
+            $relativePath = 'storage/cdr/' . $year . '/' . $month . '/' . $filename;
+            
+            // Guardar archivo CDR
+            file_put_contents($filepath, $cdrZip);
+            
+            // Actualizar ruta en la base de datos
+            $conectar = parent::conexion();
+            $sql = "UPDATE boleta SET bol_cdr_ruta = ? WHERE bol_id = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->execute([$relativePath, $bol_id]);
+            
+            return $relativePath;
+            
+        } catch (Exception $e) {
+            error_log("Error al guardar CDR en storage: " . $e->getMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * Descargar XML de una boleta
+     */
+    public function descargarXML($bol_id) {
+        try {
+            $conectar = parent::conexion();
+            $sql = "SELECT bol_serie, bol_correlativo, bol_xml, bol_xml_ruta FROM boleta WHERE bol_id = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->execute([$bol_id]);
+            $boleta = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$boleta) {
+                throw new Exception("Boleta no encontrada");
+            }
+            
+            // Intentar obtener XML del archivo guardado
+            if (!empty($boleta['bol_xml_ruta'])) {
+                $filepath = __DIR__ . '/../' . $boleta['bol_xml_ruta'];
+                if (file_exists($filepath)) {
+                    $xml = file_get_contents($filepath);
+                } else {
+                    $xml = $boleta['bol_xml'];
+                }
+            } else {
+                $xml = $boleta['bol_xml'];
+            }
+            
+            if (empty($xml)) {
+                throw new Exception("XML no disponible");
+            }
+            
+            $filename = '20123456789-03-' . $boleta['bol_serie'] . '-' . $boleta['bol_correlativo'] . '.xml';
+            
+            header('Content-Type: application/xml');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header('Content-Length: ' . strlen($xml));
+            
+            echo $xml;
+            exit;
+            
+        } catch (Exception $e) {
+            throw new Exception("Error al descargar XML: " . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Descargar CDR de una boleta
+     */
+    public function descargarCDR($bol_id) {
+        try {
+            $conectar = parent::conexion();
+            $sql = "SELECT bol_serie, bol_correlativo, bol_cdr, bol_cdr_ruta FROM boleta WHERE bol_id = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->execute([$bol_id]);
+            $boleta = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$boleta) {
+                throw new Exception("Boleta no encontrada");
+            }
+            
+            // Intentar obtener CDR del archivo guardado
+            if (!empty($boleta['bol_cdr_ruta'])) {
+                $filepath = __DIR__ . '/../' . $boleta['bol_cdr_ruta'];
+                if (file_exists($filepath)) {
+                    $cdr = file_get_contents($filepath);
+                } else {
+                    $cdr = base64_decode($boleta['bol_cdr']);
+                }
+            } else {
+                $cdr = base64_decode($boleta['bol_cdr']);
+            }
+            
+            if (empty($cdr)) {
+                throw new Exception("CDR no disponible");
+            }
+            
+            $filename = 'R-20123456789-03-' . $boleta['bol_serie'] . '-' . $boleta['bol_correlativo'] . '.zip';
+            
+            header('Content-Type: application/zip');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header('Content-Length: ' . strlen($cdr));
+            
+            echo $cdr;
+            exit;
+            
+        } catch (Exception $e) {
+            throw new Exception("Error al descargar CDR: " . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Descargar PDF guardado de una boleta
+     */
+    public function descargarPDF($bol_id) {
+        try {
+            $conectar = parent::conexion();
+            $sql = "SELECT bol_serie, bol_correlativo, bol_pdf_ruta FROM boleta WHERE bol_id = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->execute([$bol_id]);
+            $boleta = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$boleta) {
+                throw new Exception("Boleta no encontrada");
+            }
+            
+            if (empty($boleta['bol_pdf_ruta'])) {
+                throw new Exception("PDF no disponible. Genere el PDF primero.");
+            }
+            
+            $filepath = __DIR__ . '/../' . $boleta['bol_pdf_ruta'];
+            
+            if (!file_exists($filepath)) {
+                throw new Exception("Archivo PDF no encontrado en el servidor");
+            }
+            
+            $pdf = file_get_contents($filepath);
+            $filename = $boleta['bol_serie'] . '-' . $boleta['bol_correlativo'] . '.pdf';
+            
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header('Content-Length: ' . strlen($pdf));
+            
+            echo $pdf;
+            exit;
+            
+        } catch (Exception $e) {
+            throw new Exception("Error al descargar PDF: " . $e->getMessage());
         }
     }
     

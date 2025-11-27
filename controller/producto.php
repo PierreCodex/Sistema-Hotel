@@ -112,10 +112,6 @@ switch ($_GET["op"]) {
     case "eliminar":
         $producto->delete_producto($_POST["pro_id"]);
         break;
-
-    /* TODO: Activar producto (cambiar estado a 1) */
-
-
     /* TODO: Listar Combo */
     case "combo":
         $datos = $producto->get_producto_activo();
@@ -127,5 +123,12 @@ switch ($_GET["op"]) {
             }
             echo $html;
         }
+        break;
+
+            /* TODO: Listar productos para empleado (vista simplificada) */
+    case "listar_para_empleado":
+        $datos = $producto->get_producto_activo();
+        // Devolver en formato DataTables
+        echo json_encode(array("data" => $datos));
         break;
 }

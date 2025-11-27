@@ -1,7 +1,22 @@
 <?php
 // Ocultar warnings deprecated de bibliotecas de terceros
 error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0); // No mostrar errores en output
+ini_set('log_errors', 1);     // Pero sí logearlos
+
+// Capturar errores fatales para devolver JSON
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error !== null && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error PHP: ' . $error['message'],
+            'file' => $error['file'],
+            'line' => $error['line']
+        ]);
+    }
+});
 
 require_once("../config/conexion.php");
 require_once("../models/Boleta.php");
@@ -20,6 +35,10 @@ switch ($op) {
     
     case "generar_boleta":
         header('Content-Type: application/json');
+        
+        // Debug: registrar que llegó la petición
+        error_log("Boleta Controller: Iniciando generar_boleta - rec_id: " . ($_POST['rec_id'] ?? 'no definido'));
+        
         try {
             $rec_id = isset($_POST['rec_id']) ? intval($_POST['rec_id']) : 0;
             $tipo_doc = isset($_POST['tipo_doc']) ? $_POST['tipo_doc'] : '03'; // 03=Boleta
@@ -27,6 +46,36 @@ switch ($op) {
             
             if ($rec_id <= 0) {
                 echo json_encode(["success" => false, "message" => "ID de recepción inválido"]);
+                break;
+            }
+            
+            // VERIFICAR SI YA EXISTE UNA BOLETA PARA ESTA RECEPCIÓN
+            // Usamos PDO directamente ya que la clase Conectar tiene el método protected
+            try {
+                $pdo = new PDO("mysql:host=localhost;dbname=db-hotel", "root", "");
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                
+                $sqlCheck = "SELECT bol_id, bol_serie, bol_correlativo, bol_estado 
+                             FROM boleta 
+                             WHERE rec_id = ? AND bol_estado = 'ACEPTADA'
+                             ORDER BY bol_id DESC LIMIT 1";
+                $stmtCheck = $pdo->prepare($sqlCheck);
+                $stmtCheck->execute([$rec_id]);
+                $boletaExistente = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+                // Si falla la verificación, continuamos con la generación
+                $boletaExistente = null;
+            }
+            
+            if ($boletaExistente) {
+                echo json_encode([
+                    "success" => true,
+                    "message" => "Ya existe un comprobante para esta recepción",
+                    "ya_existe" => true,
+                    "serie" => $boletaExistente['bol_serie'],
+                    "correlativo" => $boletaExistente['bol_correlativo'],
+                    "estado" => $boletaExistente['bol_estado']
+                ]);
                 break;
             }
             
@@ -177,6 +226,57 @@ switch ($op) {
                 "success" => false,
                 "message" => $e->getMessage()
             ]);
+        }
+        break;
+    
+    case "descargar_xml":
+        // Descargar XML firmado de la boleta
+        try {
+            $bol_id = isset($_GET['bol_id']) ? intval($_GET['bol_id']) : 0;
+            
+            if ($bol_id <= 0) {
+                echo "ID de boleta inválido";
+                exit;
+            }
+            
+            $boleta->descargarXML($bol_id);
+            
+        } catch (Exception $e) {
+            echo "Error al descargar XML: " . $e->getMessage();
+        }
+        break;
+    
+    case "descargar_cdr":
+        // Descargar CDR (respuesta de SUNAT) de la boleta
+        try {
+            $bol_id = isset($_GET['bol_id']) ? intval($_GET['bol_id']) : 0;
+            
+            if ($bol_id <= 0) {
+                echo "ID de boleta inválido";
+                exit;
+            }
+            
+            $boleta->descargarCDR($bol_id);
+            
+        } catch (Exception $e) {
+            echo "Error al descargar CDR: " . $e->getMessage();
+        }
+        break;
+    
+    case "descargar_pdf":
+        // Descargar PDF guardado de la boleta
+        try {
+            $bol_id = isset($_GET['bol_id']) ? intval($_GET['bol_id']) : 0;
+            
+            if ($bol_id <= 0) {
+                echo "ID de boleta inválido";
+                exit;
+            }
+            
+            $boleta->descargarPDF($bol_id);
+            
+        } catch (Exception $e) {
+            echo "Error al descargar PDF: " . $e->getMessage();
         }
         break;
     

@@ -15,9 +15,54 @@ $(function () {
     const estado = String(h.ESTADO_NOM || '').toUpperCase().trim(); const recId = (ocupantesMap && ocupantesMap[h.HAB_ID] && ocupantesMap[h.HAB_ID].REC_ID) ? ocupantesMap[h.HAB_ID].REC_ID : '';
     const num = h.HAB_NUM || '';
     const cat = h.CAT_NOM || '';
+    const amenities = h.CAT_AMENITIES || '';
     
-    const precio = (h.HAB_PRE != null ? Number(h.HAB_PRE) : 0).toFixed(2);
     const ocupante = (ocupantesMap && ocupantesMap[h.HAB_ID]) ? ocupantesMap[h.HAB_ID].CLI_NOMBRE : '';
+
+    // Función para generar HTML de iconos de amenities
+    function renderAmenities(amenitiesStr) {
+      if (!amenitiesStr) return '';
+      const icons = amenitiesStr.split(',').slice(0, 5); // Máximo 5 iconos
+      return icons.map(function(icon) {
+        var title = getAmenityTitle(icon.trim());
+        var color = getAmenityColor(icon.trim());
+        return '<i class="' + icon.trim() + ' fs-5 me-1" style="color:' + color + ';" data-bs-toggle="tooltip" data-bs-placement="top" title="' + title + '"></i>';
+      }).join('');
+    }
+    
+    // Colores para cada tipo de amenity
+    function getAmenityColor(iconClass) {
+      const colors = {
+        'ri-tv-line': '#000000',        // Azul
+        'ri-tv-2-line': '#00000',      // Azul oscuro
+        'ri-windy-line': '#0ab39c',     // Verde agua
+        'ri-snowy-line': '#299cdb',     // Celeste
+        'ri-sofa-line': '#f06548',      // Rojo/Naranja
+        'ri-bubble-chart-line': '#6559cc', // Morado
+        'ri-disc-line': '#f672a7',      // Rosa
+        'ri-speaker-line': '#ffb000',   // Amarillo/Dorado
+        'ri-wifi-line': '#0ab39c',      // Verde
+        'ri-drop-line': '#299cdb'       // Celeste
+      };
+      return colors[iconClass] || '#ffffff';
+    }
+    
+    // Títulos para los iconos
+    function getAmenityTitle(iconClass) {
+      const titles = {
+        'ri-tv-line': 'TV Smart',
+        'ri-tv-2-line': 'TV 60" 4K',
+        'ri-windy-line': 'Ventilador',
+        'ri-snowy-line': 'Aire Acondicionado',
+        'ri-sofa-line': 'Sillón Tántrico',
+        'ri-bubble-chart-line': 'Jacuzzi',
+        'ri-disc-line': 'Pole Dance',
+        'ri-speaker-line': 'Parlante Bluetooth',
+        'ri-wifi-line': 'Wi-Fi',
+        'ri-drop-line': 'Agua Caliente'
+      };
+      return titles[iconClass] || '';
+    }
 
 
 
@@ -76,7 +121,7 @@ $(function () {
               <div class="row align-items-end g-0">\
                 <div class="col-6">\
                   <h6 class="mb-1 mt-1">' + escapeHtml(cat) + '</h6>\
-                  <span class="badge badge-label bg-light text-dark fs-6">S/ ' + escapeHtml(precio) + '</span>\
+                  <span class="text-white-75">' + renderAmenities(amenities) + '</span>\
                 </div>\
                 <div class="col-6 text-center">\
                   <i class="mdi mdi-broom fs-1 text-white-50"></i>\
@@ -105,7 +150,7 @@ $(function () {
             <div class="row align-items-end g-0">\
               <div class="col-6">\
                 <h6 class="mb-1 mt-1">' + escapeHtml(cat) + '</h6>\
-                <span class="badge badge-label bg-light text-dark fs-6">S/ ' + escapeHtml(precio) + '</span>\
+                <span class="text-white-75">' + renderAmenities(amenities) + '</span>\
               </div>\
               <div class="col-6 text-center">\
                 <i class="mdi mdi-bed-empty fs-1 text-white-50"></i>\
@@ -140,6 +185,11 @@ $(function () {
     }
     const html = habs.map(function(h){ return buildCard(h, ocupantesMap); }).join('');
     $container.append(html);
+    
+    // Inicializar tooltips de Bootstrap
+    $container.find('[data-bs-toggle="tooltip"]').each(function() {
+      new bootstrap.Tooltip(this);
+    });
   }
 
   function formatDuration(ms){

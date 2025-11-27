@@ -1,0 +1,68 @@
+EPICAS					HISTORIAS DE USUARIO							
+ID EPICA	Como(Rol)	Deseo	Para	ID Historia de Usuario	Como (Rol)	Deseo	Para	Prioridad	Estimacion (Story Points)	Dependencias	Sprint	Estado
+EP001	Administrador	Gestionar el acceso al sistema	Controlar quién puede ingresar y usar las funcionalidades	US001	Administrador/Empleado	Iniciar sesión con email y contraseña	Acceder al sistema de forma segura	Alta	6	Ninguna	1	Completado
+				US002	Administrador/Empleado	Cerrar sesión	Proteger mi cuenta cuando termine de trabajar	Alta	3	US001	1	Completado
+				US003	Sistema	Validar credenciales de usuario	Garantizar que solo usuarios autorizados accedan	Alta	3	US001	1	Completado
+				US004	Sistema	Controlar acceso por tipo de usuario	Mostrar funcionalidades según el rol del usuario	Media	4	US001 US003	1	Completado
+EP002	Administrador	Gestionar roles del sistema	Definir y administrar los permisos de acceso	US005	Administrador	Ver lista de roles del sistema	Supervisar los tipos de acceso disponibles	Alta	2	EP001	1	Completado
+				US006	Administrador	Crear nuevos roles	Definir nuevos perfiles de acceso al sistema	Alta	3	US005	1	Completado
+				US007	Administrador	Modificar roles existentes	Actualizar permisos y descripciones de roles	Alta	3	US005	1	Completado
+				US008	Administrador	Activar/desactivar roles	Controlar qué roles están disponibles para asignar	Media	3	US005	1	Completado
+				US009	Administrador	Asignar permisos a roles	Definir qué vistas puede acceder cada rol	Alta	5	US005 US006	1	Completado
+EP003	Administrador	Gestionar usuarios del sistema	Administrar empleados y sus permisos de acceso	US010	Administrador	Ver lista de usuarios del sistema	Supervisar quién tiene acceso al sistema	Media	3	EP001 EP002	1	Completado
+				US011	Administrador	Crear nuevos usuarios empleados	Dar acceso al sistema a nuevos empleados	Media	3	US010 EP002	1	Completado
+				US012	Administrador	Modificar datos de usuarios existentes	Actualizar información de empleados	Media	2	US010	1	Completado
+				US013	Administrador	Activar/desactivar usuarios	Controlar su acceso al sistema sin eliminar su historial	Media	3	US010	1	Completado
+EP004	Administrador	Gestionar pisos del hotel	Mantener organizada la estructura física del hotel	US014	Administrador	Ver lista de pisos existentes	Tener una visión general de los niveles del hotel	Media	2	EP001	2	Completado
+				US015	Administrador	Crear nuevos pisos	Agregar niveles cuando el hotel se expanda	Media	2	US017	2	Completado
+				US016	Administrador	Modificar información de pisos	Corregir o actualizar datos de pisos	Media	2	US017	2	Completado
+				US017	Administrador	Eliminar pisos sin habitaciones asignadas	Mantener la estructura actualizada	Media	3	US017	2	Completado
+				US018	Administrador	Activar/desactivar pisos	Controlar su uso sin eliminarlos	Media	2	US017	2	Completado
+EP005	Administrador	Gestionar categorías de habitación	Clasificar habitaciones por tipo y características	US019	Administrador	Ver lista de categorías de habitación	Consultar los tipos de habitaciones disponibles	Alta	2	EP004	2	Completado
+				US020	Administrador	Crear nuevas categorías de habitación	Agregar nuevas clasificaciones (suite, estándar, deluxe)	Alta	2	US022	2	Completado
+				US021	Administrador	Modificar categorías de habitación	Actualizar precios o descripciones de tipos de habitación	Media	2	US022	2	Completado
+				US022	Administrador	Eliminar categorías sin habitaciones asignadas	Mantener consistencia en la base de datos	Baja	1	US022	2	Completado
+				US023	Administrador	Activar/desactivar categorías	Controlar su uso sin eliminarlas	Baja	1	US022	2	Completado
+EP006	Administrador/Empleado	Gestionar habitaciones del hotel	Mantener actualizada la información de disponibilidad y estado	US024	Empleado	Ver lista de habitaciones	Consultar disponibilidad para asignar a huéspedes	Baja	1	EP001	2	Completado
+				US025	Administrador	Ver lista completa de habitaciones	Tener una visión general del inventario hotelero	Baja	1	EP001	2	Completado
+				US026	Administrador	Crear nuevas habitaciones	Expandir la capacidad del hotel	Media	3	US028 EP004 EP005	2	Completado
+				US027	Administrador	Modificar información de habitaciones	Mantener actualizada la información de habitaciones	Media	2	US028 EP004 EP005	2	Completado
+				US028	Empleado	Cambiar estado de habitaciones	Actualizar disponibilidad (ocupada, limpieza, mantenimiento)	Alta	1	EP001 US027	2	Completado
+				US029	Empleado	Consultar disponibilidad de habitaciones	Verificar habitaciones libres para nuevos huéspedes	Media	2	EP001 US027	2	Completado
+EP007	Administrador	Gestionar productos del hotel	Mantener actualizada la lista de productos disponibles en habitaciones	US030	Administrador	Ver lista de productos	Supervisar los productos disponibles en el hotel	Alta	1	EP001	3	Completado
+				US031	Administrador	Registrar nuevos productos	Agregar nuevos artículos o servicios al inventario	Media	2	US030	3	Completado
+				US032	Administrador	Modificar información de productos	Actualizar precios o descripciones de productos	Baja	1	US030	3	Completado
+				US033	Administrador	Eliminar productos sin registros de venta	Mantener consistencia en la base de datos	Baja	1	US030	3	Completado
+				US034	Administrador	Activar/desactivar productos	Controlar su disponibilidad sin eliminarlos	Baja	1	US030	3	Completado
+EP008	Empleado	Gestionar reservas de huéspedes	Procesar check-in, check-out y reservas	US035	Empleado	Registrar nueva reserva	Procesar solicitudes de hospedaje de huéspedes	Alta	4	EP001 EP006	3	Completado
+				US036	Empleado	Realizar check-in de huéspedes	Confirmar llegada y asignar habitación	Media	3	US035	3	Completado
+				US037	Empleado	Realizar check-out de huéspedes	Procesar salida y liberar habitación	Media	3	US035	3	Completado
+				US038	Empleado	Consultar reservas existentes	Verificar información de huéspedes y reservas	Media	1	US035	3	Completado
+EP009	Empleado	Gestionar ventas de productos	Registrar ventas de productos adicionales a huéspedes	US039	Empleado	Registrar venta de productos	Facturar productos adicionales a huéspedes	Media	3	EP001 EP007	3	Completado
+				US040	Empleado	Ver historial de ventas	Consultar ventas realizadas anteriormente	Baja	1	US039	3	Completado
+				US041	Administrador	Generar reportes de ventas	Analizar ingresos por productos adicionales	Baja	1	US039	3	Parcial
+EP010	Administrador	Gestionar reportes de recepciones y productos	Analizar la información de operaciones del hotel	US042	Administrador	Generar reportes de recepciones	Analizar la ocupación y facturación del hotel	Media	5	EP001, EP008, EP009	3	Parcial
+EP011	Administrador	Gestionar tarifas del hotel	Definir precios según categoría y modalidad	US043	Administrador	Ver lista de tarifas	Consultar precios configurados por categoría	Alta	2	EP005	2	Completado
+				US044	Administrador	Crear nuevas tarifas	Definir precios para diferentes modalidades (noche, hora, etc.)	Alta	3	US043	2	Completado
+				US045	Administrador	Modificar tarifas existentes	Actualizar precios según temporada o promociones	Media	2	US043	2	Completado
+				US046	Administrador	Activar/desactivar tarifas	Controlar disponibilidad de precios sin eliminarlos	Baja	1	US043	2	Completado
+EP012	Empleado	Gestionar clientes del hotel	Mantener registro de huéspedes	US047	Empleado	Ver lista de clientes	Consultar información de huéspedes registrados	Alta	2	EP001	2	Completado
+				US048	Empleado	Registrar nuevos clientes	Agregar huéspedes al sistema	Alta	3	US047	2	Completado
+				US049	Empleado	Buscar cliente por DNI con API RENIEC	Autocompletar datos del cliente desde RENIEC	Alta	4	US048	2	Completado
+				US050	Empleado	Modificar datos de clientes	Actualizar información de huéspedes	Media	2	US047	2	Completado
+				US051	Empleado	Activar/desactivar clientes	Controlar registro de huéspedes sin eliminarlos	Baja	1	US047	2	Completado
+EP013	Administrador	Gestionar estados de habitación	Configurar tipos de estado para habitaciones	US052	Administrador	Ver lista de estados de habitación	Consultar estados disponibles (Disponible, Ocupado, Limpieza)	Media	1	EP001	2	Completado
+				US053	Administrador	Crear nuevos estados	Agregar estados personalizados (Mantenimiento, Reservado, etc.)	Baja	2	US052	2	Completado
+				US054	Administrador	Modificar estados existentes	Actualizar nombres o descripciones de estados	Baja	1	US052	2	Completado
+				US055	Administrador	Activar/desactivar estados	Controlar qué estados están disponibles	Baja	1	US052	2	Completado
+EP014	Sistema	Generar comprobantes electrónicos SUNAT	Cumplir con normativa de facturación electrónica	US056	Sistema	Generar boleta electrónica	Emitir comprobante válido ante SUNAT	Alta	5	EP008 EP009	3	Completado
+				US057	Sistema	Generar XML firmado digitalmente	Cumplir con formato requerido por SUNAT	Alta	4	US056	3	Completado
+				US058	Sistema	Generar PDF de comprobante	Entregar documento imprimible al cliente	Media	3	US056	3	Completado
+				US059	Sistema	Enviar comprobante a SUNAT Beta	Validar emisión en ambiente de pruebas	Media	3	US056	3	Completado
+EP015	Sistema	Controlar sesiones de usuario	Garantizar seguridad y rendimiento del sistema	US060	Sistema	Expirar sesión por inactividad	Proteger cuentas de usuarios ausentes	Alta	3	EP001	1	Completado
+				US061	Sistema	Renovar sesión automáticamente	Mantener sesión activa mientras el usuario trabaja	Media	2	US060	1	Completado
+				US062	Sistema	Detectar sesiones múltiples	Alertar sobre accesos simultáneos	Baja	2	US060	1	Completado
+EP016	Sistema	Controlar stock en ventas	Mantener inventario actualizado en tiempo real	US063	Sistema	Descontar stock al agregar producto a venta	Reflejar disponibilidad inmediatamente	Alta	3	EP007 EP009	3	Completado
+				US064	Sistema	Restaurar stock al eliminar detalle de venta	Devolver productos al inventario si se quitan de la venta	Alta	3	US063	3	Completado
+				US065	Sistema	Restaurar stock al cancelar venta borrador	Devolver todo el inventario si se cancela la venta	Alta	2	US063	3	Completado
+				US066	Sistema	Validar stock antes de agregar producto	Prevenir ventas de productos sin stock	Alta	2	US063	3	Completado

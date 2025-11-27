@@ -186,6 +186,25 @@
             }
             break;
 
+        /* Cancelar venta borrador: restaura stock y elimina la venta */
+        case "cancelar_borrador":
+            try {
+                $vent_id = intval($_POST["vent_id"] ?? 0);
+                if ($vent_id <= 0) {
+                    echo json_encode(["success" => false, "message" => "Id de venta inválido"]);
+                    break;
+                }
+                $resultado = $venta->cancelar_venta_borrador($vent_id);
+                if ($resultado) {
+                    echo json_encode(["success" => true, "message" => "Venta cancelada y stock restaurado"]);
+                } else {
+                    echo json_encode(["success" => false, "message" => "La venta no está en estado borrador o ya fue procesada"]);
+                }
+            } catch (Exception $e) {
+                echo json_encode(["success" => false, "message" => $e->getMessage()]);
+            }
+            break;
+
         default:
             echo json_encode(["success" => false, "message" => "Operación no soportada"]);
             break;

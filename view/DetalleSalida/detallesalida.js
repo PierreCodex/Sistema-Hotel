@@ -148,7 +148,7 @@ $(document).ready(function(){
   $('#btn_confirmar_salida').on('click', function(){
     var btn = $(this);
     
-    // Si ya se confirmó la salida, redirigir
+    // Si ya se confirmó, el botón es "Regresar"
     if (btn.data('confirmado')) {
       window.location.href = '../ListRecepcion/index.php';
       return;
@@ -157,106 +157,134 @@ $(document).ready(function(){
     var penal = parseFloat($('#costo_penalidad').val());
     var total = parseFloat($('#total_pagar').val());
     var adelanto = parseFloat($('#Adelanto').val());
+    var metodoPago = $('#metodo_pago').val() || 'EFECTIVO';
+    
     var payload = {
       rec_id: recId,
       costo_penalidad: isNaN(penal) ? 0 : penal,
       total_pagado: (isNaN(adelanto) ? 0 : adelanto) + (isNaN(total) ? 0 : total),
       fecha_confirmacion: new Date().toISOString().slice(0,19).replace('T',' ')
     };
+    
+    // Deshabilitar botón mientras procesa
+    btn.prop('disabled', true).html('<i class="bx bx-loader bx-spin"></i> Procesando...');
+    
     $.post('../../controller/recepcion.php?op=confirmar_salida', payload)
       .done(function(resp){
         try { 
           var r = typeof resp === 'string' ? JSON.parse(resp) : resp; 
           if (r && r.success) { 
-            // Marcar como confirmado y cambiar botón
+            // Marcar como confirmado
             btn.data('confirmado', true);
             btn.removeClass('btn-primary').addClass('btn-secondary');
-            btn.html('<i class="ri-arrow-left-line"></i> Regresar');
+            btn.html('<i class="ri-arrow-left-line"></i> Regresar').prop('disabled', false);
             
             // Deshabilitar campos
             $('#costo_penalidad').prop('readonly', true);
             $('#metodo_pago').prop('disabled', true);
             
-            // Abrir el modal de comprobante
+            // Abrir modal y generar boleta automáticamente
             $('#modal-comprobante').modal('show');
+            generarBoletaAutomatica(metodoPago);
             return; 
           } 
-        } catch(e) {}
-        // Si hay error, mostrar mensaje
+        } catch(e) {
+          console.error('Error parsing response:', e);
+        }
+        // Si hay error
+        btn.html('<i class="ri-check-line"></i> Confirmar Salida').prop('disabled', false);
         alert('Error al confirmar la salida');
       })
       .fail(function(){
+        btn.html('<i class="ri-check-line"></i> Confirmar Salida').prop('disabled', false);
         alert('Error al confirmar la salida');
       });
   });
 
-  // Evento cuando se cierra el modal de comprobante - NO redirigir automáticamente
-  $('#modal-comprobante').on('hidden.bs.modal', function(){
-    // Ya no redirigimos automáticamente, el usuario usa el botón "Regresar"
-  });
-
-  // Generar factura electrónica
-  $(document).on('click', '#btn_generar_factura', function(){
-    var btn = $(this);
-    var originalHtml = btn.html();
-    btn.prop('disabled', true).html('<i class="bx bx-loader bx-spin"></i> Generando...');
-    
-    var tipoDoc = $('#tipo_comprobante').val();
-    var metodoPago = $('#metodo_pago').val();
+  // Función para generar boleta automáticamente
+  function generarBoletaAutomatica(metodoPago) {
+    // Resetear modal a estado inicial
+    $('#generando_contenido').show();
+    $('#generado_contenido').hide();
+    $('#error_contenido').hide();
+    $('#numero_comprobante').text('---');
+    $('#estado_boleta').removeClass('alert-success alert-danger').addClass('alert-info');
+    $('#mensaje_estado').html('<div class="spinner-border spinner-border-sm me-2" role="status"></div> Generando comprobante electrónico...');
     
     $.post('../../controller/boleta.php?op=generar_boleta', {
       rec_id: recId,
-      tipo_doc: tipoDoc,
+      tipo_doc: '03', // Boleta
       metodo_pago: metodoPago
     })
     .done(function(resp){
       try {
         var r = typeof resp === 'string' ? JSON.parse(resp) : resp;
+        
         if (r && r.success) {
-          $('#mensaje_factura')
-            .removeClass('alert-danger')
-            .addClass('alert alert-success')
-            .html('<i class="ri-checkbox-circle-line"></i> Comprobante generado exitosamente. Hash: ' + (r.hash || 'N/A'))
-            .show();
+          // Actualizar número de comprobante
+          var numComprobante = (r.serie || 'B001') + '-' + (r.correlativo || '00000000');
+          $('#numero_comprobante').text(numComprobante);
           
-          // Habilitar descarga del PDF después de 2 segundos
-          setTimeout(function(){
-            btn.html('<i class="ri-download-line"></i> Descargar PDF');
-            btn.prop('disabled', false);
-            btn.off('click').on('click', function(){
-              window.open('../../controller/boleta.php?op=generar_pdf&rec_id=' + recId, '_blank');
-            });
-          }, 2000);
+          // Mensaje según si ya existía o se generó nueva
+          var mensaje = r.ya_existe 
+            ? 'Comprobante recuperado exitosamente' 
+            : (r.descripcion || 'Comprobante generado exitosamente');
+          
+          $('#estado_boleta').removeClass('alert-info alert-danger').addClass('alert-success');
+          $('#mensaje_estado').html('<i class="ri-checkbox-circle-line me-2"></i>' + mensaje);
+          
+          // Mostrar botones de descarga
+          $('#generando_contenido').hide();
+          $('#generado_contenido').show();
+          
         } else {
-          $('#mensaje_factura')
-            .removeClass('alert-success')
-            .addClass('alert alert-danger')
-            .html('<i class="ri-error-warning-line"></i> Error: ' + (r.error || r.message || 'Error desconocido'))
-            .show();
-          btn.html(originalHtml).prop('disabled', false);
+          // Error al generar
+          mostrarErrorBoleta(r.message || r.error || r.error_message || 'Error desconocido');
         }
       } catch(e) {
-        $('#mensaje_factura')
-          .removeClass('alert-success')
-          .addClass('alert alert-danger')
-          .html('<i class="ri-error-warning-line"></i> Error al procesar respuesta')
-          .show();
-        btn.html(originalHtml).prop('disabled', false);
+        mostrarErrorBoleta('Error al procesar respuesta del servidor');
       }
     })
     .fail(function(){
-      $('#mensaje_factura')
-        .removeClass('alert-success')
-        .addClass('alert alert-danger')
-        .html('<i class="ri-error-warning-line"></i> Error de conexión con el servidor')
-        .show();
-      btn.html(originalHtml).prop('disabled', false);
+      mostrarErrorBoleta('Error de conexión con el servidor');
     });
+  }
+  
+  // Función para mostrar error en el modal
+  function mostrarErrorBoleta(mensaje) {
+    $('#estado_boleta').removeClass('alert-info alert-success').addClass('alert-danger');
+    $('#mensaje_estado').html('<i class="ri-error-warning-line me-2"></i> Error al generar comprobante');
+    $('#generando_contenido').hide();
+    $('#error_contenido').show();
+    $('#error_mensaje').text(mensaje);
+  }
+  
+  // Botón reintentar
+  $(document).on('click', '#btn_reintentar', function(){
+    var metodoPago = $('#metodo_pago').val() || 'EFECTIVO';
+    generarBoletaAutomatica(metodoPago);
+  });
+  
+  // Botones de formato de descarga
+  $(document).on('click', '.btn-formato', function(){
+    var formato = $(this).data('formato');
+    window.open('../../controller/boleta.php?op=generar_pdf&rec_id=' + recId + '&tipo=' + formato, '_blank');
+  });
+  
+  // Enviar por WhatsApp (abrir WhatsApp Web con el PDF)
+  $(document).on('click', '#btn_enviar_whatsapp', function(){
+    var numero = $('#whatsapp_numero').val().replace(/\D/g, '');
+    if (!numero || numero.length < 9) {
+      alert('Ingrese un número de WhatsApp válido');
+      return;
+    }
+    // Por ahora solo abrimos WhatsApp, en el futuro podría enviar el PDF
+    var mensaje = 'Gracias por su visita. Adjuntamos su comprobante electrónico.';
+    window.open('https://wa.me/51' + numero + '?text=' + encodeURIComponent(mensaje), '_blank');
   });
 
-  // Descargar PDF con formato seleccionado
-  $(document).on('click', '#btn_descargar_pdf', function(){
-    var formato = $('#formato_impresion').val();
-    window.open('../../controller/boleta.php?op=generar_pdf&rec_id=' + recId + '&tipo=' + formato, '_blank');
+  // Evento cuando se cierra el modal de comprobante - NO redirigir automáticamente
+  $('#modal-comprobante').on('hidden.bs.modal', function(){
+    // El usuario usa el botón "Regresar" para ir a la lista
   });
 });

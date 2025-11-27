@@ -181,7 +181,7 @@ if (isset($_SESSION["IdUsuario"])) {
 
         </div>
 
-        <?php require_once("../MntCliente/mantenimiento.php"); ?>
+        <?php require_once("../Cliente/mantenimiento.php"); ?>
         <?php require_once("../html/js.php"); ?>
 
         <script type="text/javascript" src="detallerecepcion.js"></script>

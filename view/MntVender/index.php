@@ -170,7 +170,7 @@ if (isset($_SESSION["IdUsuario"])) {
 
                                             <div class="hstack gap-2 left-content-end d-print-none mt-4">
                                                 <button type="button" id="btnguardar" class="btn btn-success"><i class="ri-printer-line align-bottom me-1"></i> Guardar</button>
-                                                <a id="btnlimpiar" class="btn btn-warning"><i class="ri-send-plane-fill align-bottom me-1"></i> Limpiar</a>
+                                                <a id="btnlimpiar" class="btn btn-danger"><i class="ri-close-circle-line align-bottom me-1"></i> Cancelar Venta</a>
                                             </div>
                                         </div>
                                     </div>
@@ -183,7 +183,7 @@ if (isset($_SESSION["IdUsuario"])) {
 
                 </div>
 
-                <?php require_once("../MntCliente/mantenimiento.php"); ?>
+                <?php require_once("../Cliente/mantenimiento.php"); ?>
                 <?php require_once("../html/js.php"); ?>
 
                 <script type="text/javascript" src="mntvender.js"></script>

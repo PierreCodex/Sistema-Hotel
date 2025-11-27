@@ -283,26 +283,134 @@ class Venta extends Conectar{
         ];
     }
 
-    // Finaliza la venta y descuenta stock con SQL visible
+    // Finaliza la venta (sin descontar stock porque ya se descontó al agregar cada detalle)
     public function finalizar_venta($id_venta){
         $conectar = parent::Conexion();
         parent::set_names();
-        // Marcar venta activa
+        // Solo marcar venta activa - el stock ya fue descontado en insert_detalle_venta()
         $sqlVenta = "UPDATE venta SET Estado = 'ACTIVO' WHERE IdVenta = ?";
         $stmtVenta = $conectar->prepare($sqlVenta);
         $stmtVenta->bindValue(1, $id_venta, PDO::PARAM_INT);
         $stmtVenta->execute();
 
-        // Descontar stock por cada detalle
-        $sqlStock = "UPDATE producto p
-                     INNER JOIN detalle_venta dv ON p.IdProducto = dv.IdProducto
-                     SET p.Cantidad = GREATEST(p.Cantidad - dv.Cantidad, 0)
-                     WHERE dv.IdVenta = ?";
-        $stmtStock = $conectar->prepare($sqlStock);
-        $stmtStock->bindValue(1, $id_venta, PDO::PARAM_INT);
-        $stmtStock->execute();
+        // NOTA: No descontamos stock aquí porque ya se descontó al agregar cada detalle
+        // Si el usuario elimina un detalle, el stock se restaura automáticamente
 
         return true;
+    }
+
+    /**
+     * Cancela una venta borrador: restaura stock de todos sus detalles y elimina la venta
+     * Útil cuando el usuario cancela/cierra sin guardar
+     */
+    public function cancelar_venta_borrador($id_venta){
+        $conectar = parent::Conexion();
+        parent::set_names();
+        
+        try {
+            $conectar->beginTransaction();
+            
+            // 1. Verificar que la venta esté en estado BORRADOR
+            $sql_check = "SELECT Estado FROM venta WHERE IdVenta = ?";
+            $stmt_check = $conectar->prepare($sql_check);
+            $stmt_check->bindValue(1, $id_venta, PDO::PARAM_INT);
+            $stmt_check->execute();
+            $venta_info = $stmt_check->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$venta_info || $venta_info['Estado'] !== 'BORRADOR') {
+                $conectar->rollBack();
+                return false; // No es borrador, no hacer nada
+            }
+            
+            // 2. Restaurar stock de todos los detalles
+            $sql_restore = "UPDATE producto p
+                           INNER JOIN detalle_venta dv ON p.IdProducto = dv.IdProducto
+                           SET p.Cantidad = p.Cantidad + dv.Cantidad
+                           WHERE dv.IdVenta = ?";
+            $stmt_restore = $conectar->prepare($sql_restore);
+            $stmt_restore->bindValue(1, $id_venta, PDO::PARAM_INT);
+            $stmt_restore->execute();
+            
+            // 3. Eliminar todos los detalles
+            $sql_del_det = "DELETE FROM detalle_venta WHERE IdVenta = ?";
+            $stmt_del_det = $conectar->prepare($sql_del_det);
+            $stmt_del_det->bindValue(1, $id_venta, PDO::PARAM_INT);
+            $stmt_del_det->execute();
+            
+            // 4. Eliminar la venta borrador
+            $sql_del_venta = "DELETE FROM venta WHERE IdVenta = ? AND Estado = 'BORRADOR'";
+            $stmt_del_venta = $conectar->prepare($sql_del_venta);
+            $stmt_del_venta->bindValue(1, $id_venta, PDO::PARAM_INT);
+            $stmt_del_venta->execute();
+            
+            $conectar->commit();
+            return true;
+            
+        } catch (Exception $e) {
+            $conectar->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Limpia ventas borrador antiguas (más de X horas) y restaura su stock
+     * Puede llamarse periódicamente para limpiar ventas abandonadas
+     * NOTA: Requiere que la tabla venta tenga la columna FechaCreacion
+     *       ALTER TABLE venta ADD COLUMN FechaCreacion DATETIME DEFAULT CURRENT_TIMESTAMP;
+     */
+    public function limpiar_borradores_antiguos($horas = 24){
+        $conectar = parent::Conexion();
+        parent::set_names();
+        
+        try {
+            // Verificar si existe la columna FechaCreacion
+            $sql_check = "SHOW COLUMNS FROM venta LIKE 'FechaCreacion'";
+            $stmt_check = $conectar->query($sql_check);
+            $has_fecha = $stmt_check->rowCount() > 0;
+            
+            if (!$has_fecha) {
+                // Si no existe la columna, no podemos limpiar por fecha
+                // Retornar 0 sin hacer nada (el admin debe agregar la columna)
+                return 0;
+            }
+            
+            $conectar->beginTransaction();
+            
+            // 1. Restaurar stock de detalles de ventas borrador antiguas
+            $sql_restore = "UPDATE producto p
+                           INNER JOIN detalle_venta dv ON p.IdProducto = dv.IdProducto
+                           INNER JOIN venta v ON dv.IdVenta = v.IdVenta
+                           SET p.Cantidad = p.Cantidad + dv.Cantidad
+                           WHERE v.Estado = 'BORRADOR'
+                           AND v.FechaCreacion < DATE_SUB(NOW(), INTERVAL ? HOUR)";
+            $stmt_restore = $conectar->prepare($sql_restore);
+            $stmt_restore->bindValue(1, $horas, PDO::PARAM_INT);
+            $stmt_restore->execute();
+            
+            // 2. Eliminar detalles de ventas borrador antiguas
+            $sql_del_det = "DELETE dv FROM detalle_venta dv
+                           INNER JOIN venta v ON dv.IdVenta = v.IdVenta
+                           WHERE v.Estado = 'BORRADOR'
+                           AND v.FechaCreacion < DATE_SUB(NOW(), INTERVAL ? HOUR)";
+            $stmt_del_det = $conectar->prepare($sql_del_det);
+            $stmt_del_det->bindValue(1, $horas, PDO::PARAM_INT);
+            $stmt_del_det->execute();
+            
+            // 3. Eliminar ventas borrador antiguas
+            $sql_del_venta = "DELETE FROM venta 
+                             WHERE Estado = 'BORRADOR'
+                             AND FechaCreacion < DATE_SUB(NOW(), INTERVAL ? HOUR)";
+            $stmt_del_venta = $conectar->prepare($sql_del_venta);
+            $stmt_del_venta->bindValue(1, $horas, PDO::PARAM_INT);
+            $rows_deleted = $stmt_del_venta->execute();
+            
+            $conectar->commit();
+            return $stmt_del_venta->rowCount();
+            
+        } catch (Exception $e) {
+            $conectar->rollBack();
+            throw $e;
+        }
     }
 }
 ?>

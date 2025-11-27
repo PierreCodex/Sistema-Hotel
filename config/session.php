@@ -16,23 +16,26 @@ class SessionManager {
      * Inicializa la configuración de sesión
      */
     public static function init() {
-        // Configurar parámetros de sesión
-        ini_set('session.gc_maxlifetime', self::SESSION_LIFETIME);
-        ini_set('session.cookie_lifetime', self::SESSION_LIFETIME);
-        ini_set('session.gc_probability', 1);
-        ini_set('session.gc_divisor', 100);
-        
-        // Configurar cookie de sesión más segura
-        session_set_cookie_params([
-            'lifetime' => self::SESSION_LIFETIME,
-            'path' => '/',
-            'domain' => '',
-            'secure' => false, // Cambiar a true en HTTPS
-            'httponly' => true,
-            'samesite' => 'Strict'
-        ]);
-        
-        session_start();
+        // Solo configurar si no hay sesión activa
+        if (session_status() === PHP_SESSION_NONE) {
+            // Configurar parámetros de sesión
+            ini_set('session.gc_maxlifetime', self::SESSION_LIFETIME);
+            ini_set('session.cookie_lifetime', self::SESSION_LIFETIME);
+            ini_set('session.gc_probability', 1);
+            ini_set('session.gc_divisor', 100);
+            
+            // Configurar cookie de sesión más segura
+            session_set_cookie_params([
+                'lifetime' => self::SESSION_LIFETIME,
+                'path' => '/',
+                'domain' => '',
+                'secure' => false, // Cambiar a true en HTTPS
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+            
+            session_start();
+        }
         
         // Inicializar timestamps de sesión
         self::initSessionTimestamps();

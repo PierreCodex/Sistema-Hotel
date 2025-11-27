@@ -3,6 +3,16 @@ require_once("../../models/Menu.php");
 $menu = new Menu();
 /* TODO: Obtener listado de acceso por ROL ID del Usuario */
 $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
+
+// Función para verificar si el usuario tiene acceso a al menos un elemento del grupo
+function tieneAccesoGrupo($datos, $grupo) {
+    foreach ($datos as $row) {
+        if ($row["MEN_GRUPO"] == $grupo && $row["MEND_PERMI"] == "Si") {
+            return true;
+        }
+    }
+    return false;
+}
 ?>
 
 <div class="app-menu navbar-menu">
@@ -60,6 +70,7 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
 
                 <li class="menu-title"><span data-key="t-menu">Modulo de Gestion</span></li>
 
+                <?php if (tieneAccesoGrupo($datos, 'Gestion')): ?>
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarGestion" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarGestion">
                         <i class=" ri-hotel-line"></i> <span data-key="t-mantenimiento">Gestion</span>
@@ -82,9 +93,11 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
                         </ul>
                     </div>
                 </li> <!-- end Gestion Menu -->
+                <?php endif; ?>
 
                 <!--  Gestion Tienda -->
           
+                <?php if (tieneAccesoGrupo($datos, 'Tienda')): ?>
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarTienda" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarTienda">
                         <i class="ri-store-2-line"></i> <span data-key="t-mantenimiento">Tienda</span>
@@ -107,8 +120,10 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
                         </ul>
                     </div>
                 </li> <!-- end Gestion Tienda -->
+                <?php endif; ?>
 
                 <!-- Getiona  -->
+                <?php if (tieneAccesoGrupo($datos, 'Mantenimiento')): ?>
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarMantenimiento" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarMantenimiento">
                         <i class="ri-settings-3-line"></i> <span data-key="t-mantenimiento">Mantenimiento</span>
@@ -131,10 +146,41 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
                         </ul>
                     </div>
                 </li> <!-- end Mantenimiento Menu -->
+                <?php endif; ?>
+
+
+
+                <!-- Habitaciones  -->
+                <?php if (tieneAccesoGrupo($datos, 'Habitaciones')): ?>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarHabitaciones" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarHabitaciones">
+                        <i class="ri-settings-3-line"></i> <span data-key="t-habitaciones">Habitaciones</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarHabitaciones">
+                        <ul class="nav nav-sm flex-column">
+                            <?php
+                            foreach ($datos as $row) {
+                                if ($row["MEN_GRUPO"] == "Habitaciones" && $row["MEND_PERMI"] == "Si") {
+                            ?>
+                                    <li class="nav-item">
+                                        <a href="<?php echo $row["MEN_RUTA"]; ?>" class="nav-link" data-key="t-<?php echo strtolower($row["MEN_NOM"]); ?>">
+                                            <?php echo $row["MEN_NOM"]; ?>
+                                        </a>
+                                    </li>
+                            <?php
+                                }
+                            }
+                            ?>
+                        </ul>
+                    </div>
+                </li> <!-- end Habitaciones -->
+                <?php endif; ?>
+
 
                 <!-- Modulo de Reportes -->
 
                
+                <?php if (tieneAccesoGrupo($datos, 'Reportes')): ?>
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarReportes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarReportes">
                         <i class="bx bxs-report"></i> <span data-key="t-mantenimiento">Reportes </span>
@@ -157,9 +203,11 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
                         </ul>
                     </div>
                 </li> <!-- end Mantenimiento Clientes -->
+                <?php endif; ?>
 
 
                 <!-- Mantenimiento Usuarios -->
+                <?php if (tieneAccesoGrupo($datos, 'Usuarios')): ?>
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarUsuarios" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarUsuarios">
                         <i class="bx bx-user-circle"></i> <span data-key="t-mantenimiento">Usuarios </span>
@@ -182,8 +230,10 @@ $datos = $menu->get_menu_x_rol_id($_SESSION["IdRol"]);
                         </ul>
                     </div>
                 </li> <!-- end Mantenimiento Clientes -->
+                <?php endif; ?>
 
                 <!-- Mantenimiento CLientes -->
+                 
                 <?php
                 foreach ($datos as $row) {
                     if ($row["MEN_GRUPO"] == "Clientes" && $row["MEND_PERMI"] == "Si") {
