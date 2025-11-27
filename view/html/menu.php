@@ -177,35 +177,6 @@ function tieneAccesoGrupo($datos, $grupo) {
                 <?php endif; ?>
 
 
-                <!-- Modulo de Reportes -->
-
-               
-                <?php if (tieneAccesoGrupo($datos, 'Reportes')): ?>
-                <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarReportes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarReportes">
-                        <i class="bx bxs-report"></i> <span data-key="t-mantenimiento">Reportes </span>
-                    </a>
-                    <div class="collapse menu-dropdown" id="sidebarReportes">
-                        <ul class="nav nav-sm flex-column">
-                            <?php
-                            foreach ($datos as $row) {
-                                if ($row["MEN_GRUPO"] == "Reportes" && $row["MEND_PERMI"] == "Si") {
-                            ?>
-                                    <li class="nav-item">
-                                        <a href="<?php echo $row["MEN_RUTA"]; ?>" class="nav-link" data-key="t-<?php echo strtolower($row["MEN_NOM"]); ?>">
-                                            <?php echo $row["MEN_NOM"]; ?>
-                                        </a>
-                                    </li>
-                            <?php
-                                }
-                            }
-                            ?>
-                        </ul>
-                    </div>
-                </li> <!-- end Mantenimiento Clientes -->
-                <?php endif; ?>
-
-
                 <!-- Mantenimiento Usuarios -->
                 <?php if (tieneAccesoGrupo($datos, 'Usuarios')): ?>
                 <li class="nav-item">
@@ -249,7 +220,33 @@ function tieneAccesoGrupo($datos, $grupo) {
                 ?>
 
 
+     <!-- Modulo de Reportes -->
 
+               
+                <?php if (tieneAccesoGrupo($datos, 'Reportes')): ?>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarReportes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarReportes">
+                        <i class="bx bxs-report"></i> <span data-key="t-mantenimiento">Reportes </span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarReportes">
+                        <ul class="nav nav-sm flex-column">
+                            <?php
+                            foreach ($datos as $row) {
+                                if ($row["MEN_GRUPO"] == "Reportes" && $row["MEND_PERMI"] == "Si") {
+                            ?>
+                                    <li class="nav-item">
+                                        <a href="<?php echo $row["MEN_RUTA"]; ?>" class="nav-link" data-key="t-<?php echo strtolower($row["MEN_NOM"]); ?>">
+                                            <?php echo $row["MEN_NOM"]; ?>
+                                        </a>
+                                    </li>
+                            <?php
+                                }
+                            }
+                            ?>
+                        </ul>
+                    </div>
+                </li> <!-- end Mantenimiento Clientes -->
+                <?php endif; ?>
 
 
         </div>

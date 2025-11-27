@@ -333,6 +333,9 @@
         <?php if (isset($forma_pago)): ?>
             <div class="payment-info">
                 <div><strong>Pago:</strong> <?php echo $forma_pago; ?></div>
+                <?php if (isset($encargado) && !empty($encargado)): ?>
+                <div><strong>Atendido por:</strong> <?php echo htmlspecialchars($encargado); ?></div>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
 

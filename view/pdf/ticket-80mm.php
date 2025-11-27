@@ -240,6 +240,13 @@
     </div>
     <?php endif; ?>
 
+    <?php if (isset($encargado) && !empty($encargado)): ?>
+    <div class="payment">
+        <strong>Atendido por:</strong> <?php echo htmlspecialchars($encargado); ?>
+    </div>
+    <?php endif; ?>
+
+
     <div class="footer">
         Representación impresa de la <?php echo $tipo_documento == '03' ? 'Boleta' : 'Factura'; ?> Electrónica<br>
         Consulte su comprobante en:<br>

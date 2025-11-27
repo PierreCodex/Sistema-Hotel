@@ -110,6 +110,13 @@
             $stmt->bindValue(4, $rec_id, PDO::PARAM_INT);
             $stmt->execute();
             
+            // Cambiar todas las ventas PENDIENTES a PAGADO
+            $sqlVentas = "UPDATE venta SET Estado = 'PAGADO' 
+                          WHERE IdRecepcion = ? AND Estado = 'PENDIENTE'";
+            $qVentas = $conectar->prepare($sqlVentas);
+            $qVentas->bindValue(1, $rec_id, PDO::PARAM_INT);
+            $qVentas->execute();
+            
             // Cambiar habitación a LIMPIEZA
             $sqlHab = "UPDATE habitacion h 
                        INNER JOIN recepcion r ON h.IdHabitacion = r.IdHabitacion 

@@ -1,5 +1,5 @@
 <?php
-require_once("../config/conexion.php");
+require_once(__DIR__ . "/../config/conexion.php");
 require_once(__DIR__ . '/../vendor/autoload.php');
 
 use Greenter\Model\Client\Client;
@@ -16,12 +16,16 @@ class Boleta extends Conectar {
     
     private $metodo_pago = 'EFECTIVO';
     
+    // Variable para almacenar el ID del usuario que genera la boleta
+    private $usuario_id = null;
+    
     /**
      * Generar Boleta electrónica
      */
-    public function generarBoleta($rec_id, $cliente_data, $detalles, $totales, $tipo_doc = '03', $metodo_pago = 'EFECTIVO') {
+    public function generarBoleta($rec_id, $cliente_data, $detalles, $totales, $tipo_doc = '03', $metodo_pago = 'EFECTIVO', $usuario_id = null) {
         try {
             $this->metodo_pago = $metodo_pago;
+            $this->usuario_id = $usuario_id;
             
             $see = $this->configurarSee();
             
@@ -242,12 +246,12 @@ class Boleta extends Conectar {
             // Habilitar excepciones de PDO para capturar errores
             $conectar->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            // Insertar boleta
+            // Insertar boleta (incluyendo usuario que registra)
             $sql = "INSERT INTO boleta (rec_id, bol_tipo, bol_serie, bol_correlativo, 
                     bol_fecha_emision, bol_cliente_tipo_doc, bol_cliente_num_doc, 
                     bol_cliente_razon_social, bol_cliente_direccion,
-                    bol_subtotal, bol_igv, bol_total, bol_estado, bol_metodo_pago, bol_xml, bol_cdr, bol_observaciones) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    bol_subtotal, bol_igv, bol_total, bol_estado, bol_metodo_pago, bol_xml, bol_cdr, bol_observaciones, bol_usuario_registro) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             
             $stmt = $conectar->prepare($sql);
             $result = $stmt->execute([
@@ -267,7 +271,8 @@ class Boleta extends Conectar {
                 $this->metodo_pago,
                 $xml,
                 base64_encode($cdrZip),
-                $descripcion
+                $descripcion,
+                $this->usuario_id
             ]);
             
             if (!$result) {
@@ -350,9 +355,11 @@ class Boleta extends Conectar {
             // Obtener datos de la boleta desde BD
             $conexion = parent::conexion();
             
-            $sql = "SELECT b.*, r.TotalPagado, r.Adelanto, r.IdCliente, r.IdHabitacion
+            $sql = "SELECT b.*, r.TotalPagado, r.Adelanto, r.IdCliente, r.IdHabitacion,
+                           u.Nombre as usuario_nombre, u.Apellido as usuario_apellido
                     FROM boleta b
                     INNER JOIN recepcion r ON b.rec_id = r.IdRecepcion
+                    LEFT JOIN usuario u ON b.bol_usuario_registro = u.IdUsuario
                     WHERE b.rec_id = ?
                     ORDER BY b.bol_id DESC
                     LIMIT 1";
@@ -445,6 +452,10 @@ class Boleta extends Conectar {
             $metodo_pago = $boleta['bol_metodo_pago'] ?? 'EFECTIVO';
             $url_consulta = 'sunat.gob.pe';
             $hash_cpe = $boleta['bol_hash'] ?? '';
+            
+            // Nombre del encargado que emitió el comprobante
+            $encargado = trim(($boleta['usuario_nombre'] ?? '') . ' ' . ($boleta['usuario_apellido'] ?? ''));
+            $encargado = !empty($encargado) ? $encargado : 'No registrado';
             
             // Generar código QR
             $qr_text = sprintf(
@@ -782,6 +793,164 @@ class Boleta extends Conectar {
         }
         
         return trim($resultado) . " CON $decimales/100 SOLES";
+    }
+    
+    // ==================== MÉTODOS PARA HISTORIAL DE COMPROBANTES ====================
+    
+    /**
+     * Listar comprobantes con filtros
+     */
+    public function listarComprobantes($fecha_inicio, $fecha_fin, $tipo = '', $estado = '') {
+        try {
+            $conectar = parent::Conexion();
+            parent::set_names();
+            
+            $where = "WHERE DATE(b.bol_fecha_emision) BETWEEN ? AND ?";
+            $params = [$fecha_inicio, $fecha_fin];
+            
+            if (!empty($tipo)) {
+                $where .= " AND b.bol_tipo = ?";
+                $params[] = $tipo;
+            }
+            
+            if (!empty($estado)) {
+                $where .= " AND b.bol_estado = ?";
+                $params[] = $estado;
+            }
+            
+            // Obtener lista de comprobantes
+            $sql = "SELECT 
+                        b.bol_id,
+                        b.bol_tipo,
+                        b.bol_serie,
+                        b.bol_correlativo,
+                        b.bol_fecha_emision,
+                        b.bol_cliente_razon_social,
+                        b.bol_cliente_num_doc,
+                        b.bol_subtotal,
+                        b.bol_igv,
+                        b.bol_total,
+                        b.bol_estado,
+                        b.bol_metodo_pago
+                    FROM boleta b
+                    $where
+                    ORDER BY b.bol_fecha_emision DESC";
+            
+            $stmt = $conectar->prepare($sql);
+            foreach ($params as $i => $param) {
+                $stmt->bindValue($i + 1, $param);
+            }
+            $stmt->execute();
+            $lista = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            return $lista;
+            
+        } catch (Exception $e) {
+            throw new Exception('Error al listar comprobantes: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Obtener resumen de comprobantes
+     */
+    public function obtenerResumenComprobantes($fecha_inicio, $fecha_fin, $tipo = '', $estado = '') {
+        try {
+            $conectar = parent::Conexion();
+            parent::set_names();
+            
+            $where = "WHERE DATE(b.bol_fecha_emision) BETWEEN ? AND ?";
+            $params = [$fecha_inicio, $fecha_fin];
+            
+            if (!empty($tipo)) {
+                $where .= " AND b.bol_tipo = ?";
+                $params[] = $tipo;
+            }
+            
+            if (!empty($estado)) {
+                $where .= " AND b.bol_estado = ?";
+                $params[] = $estado;
+            }
+            
+            $sql = "SELECT 
+                        COUNT(*) AS total_emitidos,
+                        SUM(CASE WHEN bol_tipo = '03' THEN 1 ELSE 0 END) AS total_boletas,
+                        COALESCE(SUM(CASE WHEN bol_tipo = '03' THEN bol_total ELSE 0 END), 0) AS monto_boletas,
+                        SUM(CASE WHEN bol_tipo = '01' THEN 1 ELSE 0 END) AS total_facturas,
+                        COALESCE(SUM(CASE WHEN bol_tipo = '01' THEN bol_total ELSE 0 END), 0) AS monto_facturas,
+                        COALESCE(SUM(bol_total), 0) AS total_facturado
+                    FROM boleta b
+                    $where";
+            
+            $stmt = $conectar->prepare($sql);
+            foreach ($params as $i => $param) {
+                $stmt->bindValue($i + 1, $param);
+            }
+            $stmt->execute();
+            
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+            
+        } catch (Exception $e) {
+            throw new Exception('Error al obtener resumen: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Obtener comprobante por ID
+     */
+    public function obtenerComprobantePorId($bol_id) {
+        try {
+            $conectar = parent::Conexion();
+            parent::set_names();
+            
+            $sql = "SELECT * FROM boleta WHERE bol_id = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->execute([$bol_id]);
+            
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+            
+        } catch (Exception $e) {
+            throw new Exception('Error al obtener comprobante: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Obtener detalles de un comprobante
+     */
+    public function obtenerDetallesComprobante($bol_id) {
+        try {
+            $conectar = parent::Conexion();
+            parent::set_names();
+            
+            $sql = "SELECT * FROM boleta_detalle WHERE bol_id = ? ORDER BY bol_det_orden";
+            $stmt = $conectar->prepare($sql);
+            $stmt->execute([$bol_id]);
+            
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+        } catch (Exception $e) {
+            throw new Exception('Error al obtener detalles: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Obtener comprobante con recepción para PDF
+     */
+    public function obtenerComprobanteConRecepcion($bol_id) {
+        try {
+            $conectar = parent::Conexion();
+            parent::set_names();
+            
+            $sql = "SELECT b.*, r.IdRecepcion FROM boleta b 
+                    LEFT JOIN recepcion r ON b.rec_id = r.IdRecepcion 
+                    WHERE b.bol_id = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->execute([$bol_id]);
+            
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+            
+        } catch (Exception $e) {
+            throw new Exception('Error al obtener comprobante: ' . $e->getMessage());
+        }
     }
 }
 ?>

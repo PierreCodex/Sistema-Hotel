@@ -4,6 +4,9 @@ error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
 ini_set('display_errors', 0); // No mostrar errores en output
 ini_set('log_errors', 1);     // Pero sí logearlos
 
+// Iniciar sesión para obtener el ID del usuario
+session_start();
+
 // Capturar errores fatales para devolver JSON
 register_shutdown_function(function() {
     $error = error_get_last();
@@ -28,6 +31,9 @@ $boleta = new Boleta();
 $recepcion = new Recepcion();
 $cliente = new Cliente();
 $venta = new Venta();
+
+// Obtener ID del usuario logueado (usar IdUsuario que es como se guarda en la sesión)
+$usuario_id = isset($_SESSION['IdUsuario']) ? intval($_SESSION['IdUsuario']) : null;
 
 $op = isset($_GET["op"]) ? $_GET["op"] : '';
 
@@ -176,8 +182,8 @@ switch ($op) {
                 'total' => $total
             ];
             
-            // Generar Boleta electrónica
-            $resultado = $boleta->generarBoleta($rec_id, $cliente_boleta, $detalles, $totales, $tipo_doc, $metodo_pago);
+            // Generar Boleta electrónica (incluye ID del usuario que genera)
+            $resultado = $boleta->generarBoleta($rec_id, $cliente_boleta, $detalles, $totales, $tipo_doc, $metodo_pago, $usuario_id);
             
             echo json_encode($resultado);
             

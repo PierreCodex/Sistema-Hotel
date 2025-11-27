@@ -661,6 +661,13 @@
     <script src="../../assets/js/pages/form-advanced.init.js"></script>
      <!-- input spin init -->
     <script src="../../assets/js/pages/form-input-spin.init.js"></script>
+
+        <!-- Dashboard init -->
+    <script src="../../assets/js/pages/dashboard-analytics.init.js"></script>
+
+      <!-- Dashboard init -->
+    <script src="../../assets/js/pages/dashboard-ecommerce.init.js"></script>
+
 <!-- Inicializar Session Manager -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
