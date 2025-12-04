@@ -11,19 +11,19 @@ switch ($_GET["op"]) {
     case "guardaryeditar":
         // Validar que la descripción no esté vacía
         if (empty(trim($_POST["tar_desc"]))) {
-            echo json_encode(array(
+            echo json_encode([
                 'status' => 'error',
                 'message' => 'La descripción de la tarifa es obligatoria'
-            ));
+            ]);
             break;
         }
 
         // Validar que el precio no esté vacío
         if (empty(trim($_POST["tar_precio"]))) {
-            echo json_encode(array(
+            echo json_encode([
                 'status' => 'error',
                 'message' => 'El precio de la tarifa es obligatorio'
-            ));
+            ]);
             break;
         }
 
@@ -34,10 +34,10 @@ switch ($_GET["op"]) {
         );
 
         if ($existe) {
-            echo json_encode(array(
+            echo json_encode([
                 'status' => 'error',
                 'message' => 'Ya existe una tarifa con esta descripción'
-            ));
+            ]);
             break;
         }
 
@@ -64,9 +64,9 @@ switch ($_GET["op"]) {
 
     case "listar":
         $datos = $tarifa->get_tarifa();
-        $data = array();
+        $data = [];
         foreach ($datos as $row) {
-            $sub_array = array();
+            $sub_array = [];
             $sub_array[] = $row["Descripcion"];
             $sub_array[] = $row["Precio"];
             $sub_array[] = $row["Estado"] == 1 ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>';
@@ -87,12 +87,12 @@ switch ($_GET["op"]) {
             $data[] = $sub_array;
         }
 
-        $results = array(
+        $results = [
             "sEcho" => 1,
             "iTotalRecords" => count($data),
             "iTotalDisplayRecords" => count($data),
             "aaData" => $data
-        );
+        ];
         echo json_encode($results);
         break;
 
@@ -102,7 +102,7 @@ switch ($_GET["op"]) {
             $datos = $tarifa->get_tarifas_activas();
             echo json_encode($datos);
         } catch (Exception $e) {
-            echo json_encode(array('status' => 'error', 'message' => $e->getMessage()));
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
         break;
 
@@ -111,14 +111,14 @@ switch ($_GET["op"]) {
     case "listar_asignadas":
         $hab_id = $_POST["hab_id"] ?? null;
         if (!$hab_id) {
-            echo json_encode(array('status' => 'error', 'message' => 'hab_id requerido'));
+            echo json_encode(['status' => 'error', 'message' => 'hab_id requerido']);
             break;
         }
         try {
             $datos = $tarifa->get_tarifas_asignadas_por_habitacion($hab_id);
             echo json_encode($datos);
         } catch (Exception $e) {
-            echo json_encode(array('status' => 'error', 'message' => $e->getMessage()));
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
         break;
 
@@ -129,14 +129,14 @@ switch ($_GET["op"]) {
         $fecha_inicio = $_POST["fecha_inicio"] ?? null;
         $fecha_fin = isset($_POST["fecha_fin"]) && $_POST["fecha_fin"] !== '' ? $_POST["fecha_fin"] : null;
         if (!$hab_id || !$tarifa_id || !$fecha_inicio) {
-            echo json_encode(array('status' => 'error', 'message' => 'hab_id, tarifa_id y fecha_inicio son obligatorios'));
+            echo json_encode(['status' => 'error', 'message' => 'hab_id, tarifa_id y fecha_inicio son obligatorios']);
             break;
         }
         try {
             $tarifa->asignar_tarifa_habitacion($hab_id, $tarifa_id, $fecha_inicio, $fecha_fin);
-            echo json_encode(array('status' => 'success'));
+            echo json_encode(['status' => 'success']);
         } catch (Exception $e) {
-            echo json_encode(array('status' => 'error', 'message' => $e->getMessage()));
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
         break;
 
@@ -146,14 +146,14 @@ switch ($_GET["op"]) {
         $fecha_inicio = $_POST["fecha_inicio"] ?? null;
         $fecha_fin = isset($_POST["fecha_fin"]) && $_POST["fecha_fin"] !== '' ? $_POST["fecha_fin"] : null;
         if (!$habitacion_tarifa_id || !$fecha_inicio) {
-            echo json_encode(array('status' => 'error', 'message' => 'habitacion_tarifa_id y fecha_inicio son obligatorios'));
+            echo json_encode(['status' => 'error', 'message' => 'habitacion_tarifa_id y fecha_inicio son obligatorios']);
             break;
         }
         try {
             $tarifa->actualizar_vigencia_tarifa_habitacion($habitacion_tarifa_id, $fecha_inicio, $fecha_fin);
-            echo json_encode(array('status' => 'success'));
+            echo json_encode(['status' => 'success']);
         } catch (Exception $e) {
-            echo json_encode(array('status' => 'error', 'message' => $e->getMessage()));
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
         break;
 
@@ -161,14 +161,14 @@ switch ($_GET["op"]) {
     case "eliminar_asignada":
         $habitacion_tarifa_id = $_POST["habitacion_tarifa_id"] ?? null;
         if (!$habitacion_tarifa_id) {
-            echo json_encode(array('status' => 'error', 'message' => 'habitacion_tarifa_id requerido'));
+            echo json_encode(['status' => 'error', 'message' => 'habitacion_tarifa_id requerido']);
             break;
         }
         try {
             $tarifa->eliminar_tarifa_habitacion($habitacion_tarifa_id);
-            echo json_encode(array('status' => 'success'));
+            echo json_encode(['status' => 'success']);
         } catch (Exception $e) {
-            echo json_encode(array('status' => 'error', 'message' => $e->getMessage()));
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
         break;
 
@@ -176,7 +176,7 @@ switch ($_GET["op"]) {
     case "mostrar":
         $tar_id = $_POST["tar_id"] ?? null;
         if (!$tar_id) {
-            echo json_encode(array('status' => 'error', 'message' => 'tar_id requerido'));
+            echo json_encode(['status' => 'error', 'message' => 'tar_id requerido']);
             break;
         }
         $datos = $tarifa->get_tarifa_x_tar_id($tar_id);
@@ -196,11 +196,11 @@ switch ($_GET["op"]) {
         $tar_id = $_POST["tar_id"] ?? null;
         $nuevo_estado = isset($_POST["estado"]) && ($_POST["estado"] === 'true' || $_POST["estado"] === true) ? 1 : 0;
         if (!$tar_id) {
-            echo json_encode(array('status' => 'error', 'message' => 'tar_id requerido'));
+            echo json_encode(['status' => 'error', 'message' => 'tar_id requerido']);
             break;
         }
         $tarifa->cambiar_estado_tarifa($tar_id, $nuevo_estado);
-        echo json_encode(array("status" => "success", "message" => "Estado actualizado correctamente"));
+        echo json_encode(["status" => "success", "message" => "Estado actualizado correctamente"]);
         break;
 
     /* Eliminar tarifa (baja lógica / física según SP) */
@@ -209,31 +209,31 @@ switch ($_GET["op"]) {
 
         $tar_id = $_POST["tar_id"] ?? null;
         if (!$tar_id) {
-            echo json_encode(array('status' => 'error', 'message' => 'tar_id requerido'));
+            echo json_encode(['status' => 'error', 'message' => 'tar_id requerido']);
             break;
         }
         try {
             $tarifa->delete_tarifa($tar_id);
-            echo json_encode(array('status' => 'success', 'message' => 'Tarifa eliminada'));
+            echo json_encode(['status' => 'success', 'message' => 'Tarifa eliminada']);
         } catch (PDOException $e) {
             $code = $e->getCode();
             $msg = $e->getMessage();
             if ($code === '23000' || strpos($msg, '1451') !== false || stripos($msg, 'Integrity constraint violation') !== false) {
-                echo json_encode(array(
+                echo json_encode([
                     'status' => 'error',
                     'message' => 'No se puede eliminar la tarifa porque está asociada a una habitación. Desvincule la tarifa antes de eliminar.'
-                ));
+                ]);
             } else {
-                echo json_encode(array(
+                echo json_encode([
                     'status' => 'error',
                     'message' => 'Error al eliminar la tarifa: ' . $msg
-                ));
+                ]);
             }
         } catch (Exception $e) {
-            echo json_encode(array(
+            echo json_encode([
                 'status' => 'error',
                 'message' => 'Error al eliminar la tarifa: ' . $e->getMessage()
-            ));
+            ]);
         }
         break;
     /* TODO: Listar Combo */

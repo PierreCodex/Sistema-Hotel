@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -119,14 +120,23 @@
             width: 100%;
         }
 
-        .items-header > div {
+        .items-header>div {
             display: table-cell;
             text-align: center;
             padding: 1px;
         }
 
-        .header-desc { width: 75%; text-align: left; padding-left: 2px; }
-        .header-precio { width: 25%; text-align: right; padding-right: 2px; }
+        .header-desc {
+            width: 75%;
+            text-align: left;
+            padding-left: 2px;
+        }
+
+        .header-precio {
+            width: 25%;
+            text-align: right;
+            padding-right: 2px;
+        }
 
         .items-section {
             margin: 2px 0;
@@ -141,14 +151,25 @@
             width: 100%;
         }
 
-        .item > div {
+        .item>div {
             display: table-cell;
             text-align: center;
             padding: 1px;
         }
 
-        .item-desc { width: 75%; text-align: left; padding-left: 2px; font-size: 6px; word-wrap: break-word; }
-        .item-precio { width: 25%; text-align: right; padding-right: 2px; }
+        .item-desc {
+            width: 75%;
+            text-align: left;
+            padding-left: 2px;
+            font-size: 6px;
+            word-wrap: break-word;
+        }
+
+        .item-precio {
+            width: 25%;
+            text-align: right;
+            padding-right: 2px;
+        }
 
         /* ================= TOTALS ================= */
         .totals-section {
@@ -250,28 +271,30 @@
             margin: 0;
             size: 50mm auto;
         }
-        
+
         @media print {
-            body { width: 50mm; }
+            body {
+                width: 50mm;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="ticket">
         <!-- HEADER -->
         <div class="header">
             <div class="logo-section-ticket">
-                <?php if (isset($logo_url) && !empty($logo_url)): ?>
-                    <img src="<?php echo $logo_url; ?>" alt="Logo" class="logo-img-ticket">
-                <?php endif; ?>
+                <?php if (isset($logo_url) && !empty($logo_url)) { ?> <img src="<?php echo $logo_url; ?>" alt="Logo" class="logo-img-ticket">
+                <?php } ?>
             </div>
             <div class="company-name"><?php echo $empresa['razon_social']; ?></div>
             <div class="company-ruc">RUC: <?php echo $empresa['ruc']; ?></div>
             <div class="company-details">
                 <?php echo $empresa['direccion']; ?><br>
-                <?php if (isset($empresa['telefono'])): ?>
+                <?php if (isset($empresa['telefono'])) { ?>
                     Tel: <?php echo $empresa['telefono']; ?><br>
-                <?php endif; ?>
+                <?php } ?>
             </div>
         </div>
 
@@ -300,14 +323,14 @@
 
         <!-- ITEMS -->
         <div class="items-section">
-            <?php foreach ($detalles as $item): ?>
+            <?php foreach ($detalles as $item) { ?>
                 <div class="item">
                     <div class="item-desc">
                         <?php echo $item['cantidad']; ?>x <?php echo $item['descripcion']; ?>
                     </div>
                     <div class="item-precio">S/ <?php echo number_format($item['cantidad'] * $item['precio_unitario'], 2); ?></div>
                 </div>
-            <?php endforeach; ?>
+            <?php } ?>
         </div>
 
         <!-- TOTALS -->
@@ -330,33 +353,31 @@
         </div>
 
         <!-- PAYMENT INFO -->
-        <?php if (isset($forma_pago)): ?>
+        <?php if (isset($forma_pago)) { ?>
             <div class="payment-info">
                 <div><strong>Pago:</strong> <?php echo $forma_pago; ?></div>
-                <?php if (isset($encargado) && !empty($encargado)): ?>
-                <div><strong>Atendido por:</strong> <?php echo htmlspecialchars($encargado); ?></div>
-                <?php endif; ?>
+                <?php if (isset($encargado) && !empty($encargado)) { ?> <div><strong>Atendido por:</strong> <?php echo htmlspecialchars($encargado); ?></div>
+                <?php } ?>
             </div>
-        <?php endif; ?>
-
+        <?php } ?>
         <!-- QR CODE -->
-        <?php if (isset($qr_data) && $qr_data): ?>
+        <?php if (isset($qr_data) && $qr_data) { ?>
             <div class="qr-section">
                 <div class="qr-code">
                     <img src="<?php echo $qr_data; ?>" alt="Código QR">
                 </div>
             </div>
-        <?php endif; ?>
-
+        <?php } ?>
         <!-- FOOTER -->
         <div class="footer-text">
             Consulte en: sunat.gob.pe
         </div>
-        <?php if (isset($hash_cpe) && !empty($hash_cpe)): ?>
+        <?php if (isset($hash_cpe) && !empty($hash_cpe)) { ?>
             <div class="footer-auth">
                 Hash: <?php echo substr($hash_cpe, 0, 20); ?>...
             </div>
-        <?php endif; ?>
+        <?php } ?>
     </div>
 </body>
+
 </html>

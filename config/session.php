@@ -7,10 +7,10 @@
 class SessionManager {
     
     // Tiempo de vida de la sesión en segundos (5 minutos para pruebas)
-    const SESSION_LIFETIME = 1200; // 5 minutos
+    public const SESSION_LIFETIME = 1200; // 5 minutos
     
     // Tiempo de advertencia antes de expirar (1 minuto antes)
-    const WARNING_TIME = 60; // 1 minuto
+    public const WARNING_TIME = 60; // 1 minuto
     
     /**
      * Inicializa la configuración de sesión
@@ -114,7 +114,7 @@ class SessionManager {
      */
     public static function destroy() {
         // Limpiar todas las variables de sesión
-        $_SESSION = array();
+        $_SESSION = [];
         
         // Eliminar cookie de sesión
         if (ini_get("session.use_cookies")) {

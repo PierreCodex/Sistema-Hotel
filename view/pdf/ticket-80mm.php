@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Boleta Electrónica</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Helvetica, Arial, sans-serif;
             font-size: 8pt;
@@ -83,11 +88,29 @@
             display: table-cell;
         }
 
-        .col-cant { width: 10%; }
-        .col-um { width: 10%; text-align: center; }
-        .col-cod { width: 15%; text-align: center; }
-        .col-precio { width: 30%; text-align: right; }
-        .col-total { width: 35%; text-align: right; }
+        .col-cant {
+            width: 10%;
+        }
+
+        .col-um {
+            width: 10%;
+            text-align: center;
+        }
+
+        .col-cod {
+            width: 15%;
+            text-align: center;
+        }
+
+        .col-precio {
+            width: 30%;
+            text-align: right;
+        }
+
+        .col-total {
+            width: 35%;
+            text-align: right;
+        }
 
         .descripcion-label {
             font-size: 7pt;
@@ -131,9 +154,19 @@
             display: table-cell;
         }
 
-        .total-label { width: 35%; }
-        .total-dots { width: 30%; color: #aaa; }
-        .total-value { width: 35%; text-align: right; }
+        .total-label {
+            width: 35%;
+        }
+
+        .total-dots {
+            width: 30%;
+            color: #aaa;
+        }
+
+        .total-value {
+            width: 35%;
+            text-align: right;
+        }
 
         .total-final {
             border-top: 1px dashed #aaa;
@@ -167,18 +200,21 @@
             font-weight: bold;
         }
 
-        @page { margin: 0; size: 80mm auto; }
+        @page {
+            margin: 0;
+            size: 80mm auto;
+        }
     </style>
 </head>
+
 <body>
     <div class="header">
         <div class="company-name"><?php echo $empresa['razon_social']; ?></div>
         <div class="company-ruc">RUC: <?php echo $empresa['ruc']; ?></div>
         <div class="company-info">
             <?php echo $empresa['direccion']; ?><br>
-            <?php if (isset($empresa['telefono'])): ?>Tel: <?php echo $empresa['telefono']; ?><br><?php endif; ?>
-            <?php if (isset($empresa['email'])): ?>Email: <?php echo $empresa['email']; ?><?php endif; ?>
-        </div>
+            <?php if (isset($empresa['telefono'])) { ?>Tel: <?php echo $empresa['telefono']; ?><br><?php } ?>
+        <?php if (isset($empresa['email'])) { ?>Email: <?php echo $empresa['email']; ?><?php } ?> </div>
     </div>
 
     <div class="doc-title"><?php echo $tipo_documento == '03' ? 'BOLETA DE VENTA ELECTRÓNICA' : 'FACTURA ELECTRÓNICA'; ?></div>
@@ -187,8 +223,7 @@
     <div class="client-section">
         <div class="client-name"><?php echo strtoupper($cliente['razon_social']); ?></div>
         <?php echo $cliente['tipo_doc'] == '6' ? 'RUC' : 'DNI'; ?>: <?php echo $cliente['num_doc']; ?><br>
-        <?php if (isset($cliente['direccion']) && !empty($cliente['direccion'])): ?>Dirección: <?php echo $cliente['direccion']; ?><br><?php endif; ?>
-        Fecha Emisión: <?php echo $fecha_emision; ?>
+        <?php if (isset($cliente['direccion']) && !empty($cliente['direccion'])) { ?>Dirección: <?php echo $cliente['direccion']; ?><br><?php } ?> Fecha Emisión: <?php echo $fecha_emision; ?>
     </div>
 
     <div class="items-header">
@@ -200,18 +235,18 @@
     </div>
     <div class="descripcion-label">DESCRIPCIÓN</div>
 
-    <?php foreach ($detalles as $item): ?>
-    <div class="item">
-        <div class="item-row">
-            <span class="col-cant"><?php echo $item['cantidad']; ?></span>
-            <span class="col-um"><?php echo isset($item['unidad']) ? $item['unidad'] : 'UND'; ?></span>
-            <span class="col-cod"><?php echo isset($item['codigo']) ? $item['codigo'] : 'P001'; ?></span>
-            <span class="col-precio"><?php echo number_format($item['precio_unitario'], 2); ?></span>
-            <span class="col-total"><?php echo number_format($item['cantidad'] * $item['precio_unitario'], 2); ?></span>
+    <?php foreach ($detalles as $item) { ?>
+        <div class="item">
+            <div class="item-row">
+                <span class="col-cant"><?php echo $item['cantidad']; ?></span>
+                <span class="col-um"><?php echo $item['unidad'] ?? 'UND'; ?></span>
+                <span class="col-cod"><?php echo $item['codigo'] ?? 'P001'; ?></span>
+                <span class="col-precio"><?php echo number_format($item['precio_unitario'], 2); ?></span>
+                <span class="col-total"><?php echo number_format($item['cantidad'] * $item['precio_unitario'], 2); ?></span>
+            </div>
+            <div class="item-desc"><?php echo $item['descripcion']; ?></div>
         </div>
-        <div class="item-desc"><?php echo $item['descripcion']; ?></div>
-    </div>
-    <?php endforeach; ?>
+    <?php } ?>
 
     <div class="totals">
         <div class="total-row">
@@ -233,25 +268,23 @@
 
     <div class="total-letras">SON: <?php echo $total_letras; ?></div>
 
-    <?php if (isset($forma_pago)): ?>
-    <div class="payment">
-        <strong>Forma de Pago:</strong> <?php echo $forma_pago; ?><br>
-        <?php if (isset($metodo_pago)): ?><strong>Método de Pago:</strong> <?php echo $metodo_pago; ?><?php endif; ?>
-    </div>
-    <?php endif; ?>
-
-    <?php if (isset($encargado) && !empty($encargado)): ?>
-    <div class="payment">
-        <strong>Atendido por:</strong> <?php echo htmlspecialchars($encargado); ?>
-    </div>
-    <?php endif; ?>
-
+    <?php if (isset($forma_pago)) { ?>
+        <div class="payment">
+            <strong>Forma de Pago:</strong> <?php echo $forma_pago; ?><br>
+            <?php if (isset($metodo_pago)) { ?><strong>Método de Pago:</strong> <?php echo $metodo_pago; ?><?php } ?>
+        </div>
+    <?php } ?>
+    <?php if (isset($encargado) && !empty($encargado)) { ?> <div class="payment">
+            <strong>Atendido por:</strong> <?php echo htmlspecialchars($encargado); ?>
+        </div>
+    <?php } ?>
 
     <div class="footer">
         Representación impresa de la <?php echo $tipo_documento == '03' ? 'Boleta' : 'Factura'; ?> Electrónica<br>
         Consulte su comprobante en:<br>
         <span class="footer-url">sunat.gob.pe</span><br>
-        <?php if (isset($hash_cpe)): ?>Hash: <?php echo $hash_cpe; ?><?php endif; ?>
+        <?php if (isset($hash_cpe)) { ?>Hash: <?php echo $hash_cpe; ?><?php } ?>
     </div>
 </body>
+
 </html>

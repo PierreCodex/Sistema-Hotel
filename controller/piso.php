@@ -10,10 +10,10 @@ switch ($_GET["op"]) {
     case "guardaryeditar":
         // Validar que el nombre no esté vacío
         if (empty(trim($_POST["piso_nom"]))) {
-            echo json_encode(array(
+            echo json_encode([
                 'status' => 'error',
                 'message' => 'El nombre del piso es obligatorio'
-            ));
+            ]);
             break;
         }
 
@@ -24,10 +24,10 @@ switch ($_GET["op"]) {
         );
 
         if ($existe) {
-            echo json_encode(array(
+            echo json_encode([
                 'status' => 'error',
                 'message' => 'Ya existe un piso con este nombre'
-            ));
+            ]);
             break;
         }
 
@@ -52,9 +52,9 @@ switch ($_GET["op"]) {
     /* TODO: Listado de registros formato JSON para Datatable JS */
     case "listar":
         $datos = $piso->get_piso();
-        $data = array();
+        $data = [];
         foreach ($datos as $row) {
-            $sub_array = array();
+            $sub_array = [];
             $sub_array[] = $row["PISO_NOM"];
             $sub_array[] = $row["EST"] == 1 ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>';
             if ($row["EST"] == 1) {
@@ -74,12 +74,12 @@ switch ($_GET["op"]) {
             $data[] = $sub_array;
         }
 
-        $results = array(
+        $results = [
             "sEcho" => 1,
             "iTotalRecords" => count($data),
             "iTotalDisplayRecords" => count($data),
             "aaData" => $data
-        );
+        ];
         echo json_encode($results);
         break;
 
@@ -99,7 +99,7 @@ switch ($_GET["op"]) {
     case "cambiar_estado":
         $nuevo_estado = $_POST["estado"] == 'true' ? 1 : 0;
         $piso->cambiar_estado_piso($_POST["piso_id"], $nuevo_estado);
-        echo json_encode(array("status" => "success", "message" => "Estado actualizado correctamente"));
+        echo json_encode(["status" => "success", "message" => "Estado actualizado correctamente"]);
         break;
 
     case "eliminar":

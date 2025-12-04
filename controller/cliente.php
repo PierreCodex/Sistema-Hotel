@@ -38,9 +38,9 @@ switch ($_GET["op"]) {
     /* TODO: Listado de registros formato JSON para Datatable JS */
     case "listar":
         $datos = $cliente->get_cliente_activo();
-        $data = array();
+        $data = [];
         foreach ($datos as $row) {
-            $sub_array = array();
+            $sub_array = [];
             $sub_array[] = $row["CLI_TIPO_DOC"];
             $sub_array[] = $row["CLI_DOC"];
             $sub_array[] = $row["CLI_NOM"];
@@ -55,12 +55,12 @@ switch ($_GET["op"]) {
             $data[] = $sub_array;
         }
 
-        $results = array(
+        $results = [
             "sEcho" => 1,
             "iTotalRecords" => count($data),
             "iTotalDisplayRecords" => count($data),
             "aaData" => $data
-        );
+        ];
         echo json_encode($results);
         break;
 
@@ -135,14 +135,15 @@ switch ($_GET["op"]) {
         if ($httpCode >= 200 && $httpCode < 300 && is_array($data)) {
             echo json_encode([
                 "success" => true,
-                "first_name" => isset($data["first_name"]) ? $data["first_name"] : "",
-                "first_last_name" => isset($data["first_last_name"]) ? $data["first_last_name"] : "",
-                "second_last_name" => isset($data["second_last_name"]) ? $data["second_last_name"] : "",
-                "full_name" => isset($data["full_name"]) ? $data["full_name"] : "",
-                "document_number" => isset($data["document_number"]) ? $data["document_number"] : $dni
+                "first_name" => $data["first_name"] ?? "",
+                "first_last_name" => $data["first_last_name"] ?? "",
+                "second_last_name" => $data["second_last_name"] ?? "",
+                "second_last_name" => $data["second_last_name"] ?? "",
+                "full_name" => $data["full_name"] ?? "",
+                "document_number" => $data["document_number"] ?? $dni
             ]);
         } else {
-            $msg = isset($data["message"]) ? $data["message"] : "Respuesta inválida de RENIEC";
+            $msg = $data["message"] ?? "Respuesta inválida de RENIEC";
             echo json_encode(["success" => false, "message" => $msg, "status" => $httpCode]);
         }
         break;

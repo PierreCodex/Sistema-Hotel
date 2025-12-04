@@ -25,10 +25,10 @@ final class RolControllerTest extends TestCase
         
         // Simular respuesta del controller
         if ($esNombreVacio) {
-            $response = array(
+            $response = [
                 'status' => 'error',
                 'message' => 'El nombre del rol es obligatorio'
-            );
+            ];
         }
         
         $this->assertEquals('error', $response['status']);
@@ -50,10 +50,10 @@ final class RolControllerTest extends TestCase
         
         // Simular respuesta del controller
         if (!$esLongitudValida) {
-            $response = array(
+            $response = [
                 'status' => 'error',
                 'message' => 'El nombre del rol debe tener entre 3 y 50 caracteres'
-            );
+            ];
         }
         
         $this->assertEquals('error', $response['status']);
@@ -75,10 +75,10 @@ final class RolControllerTest extends TestCase
         
         // Simular respuesta del controller
         if (!$esLongitudValida) {
-            $response = array(
+            $response = [
                 'status' => 'error',
                 'message' => 'El nombre del rol debe tener entre 3 y 50 caracteres'
-            );
+            ];
         }
         
         $this->assertEquals('error', $response['status']);
@@ -107,10 +107,10 @@ final class RolControllerTest extends TestCase
         
         // Simular respuesta exitosa
         if (!$esNombreVacio && $esLongitudValida && !$existeRol) {
-            $response = array(
+            $response = [
                 'status' => 'success',
                 'message' => 'Rol registrado correctamente'
-            );
+            ];
         }
         
         $this->assertEquals('success', $response['status']);
@@ -139,10 +139,10 @@ final class RolControllerTest extends TestCase
         
         // Simular respuesta exitosa
         if ($esNombreValido && $esLongitudValida && !$existeRol) {
-            $response = array(
+            $response = [
                 'status' => 'success',
                 'message' => 'Rol actualizado correctamente'
-            );
+            ];
         }
         
         $this->assertEquals('success', $response['status']);
@@ -164,10 +164,10 @@ final class RolControllerTest extends TestCase
         
         // Simular respuesta del controller
         if ($existeRol) {
-            $response = array(
+            $response = [
                 'status' => 'error',
                 'message' => 'Ya existe un rol con este nombre'
-            );
+            ];
         }
         
         $this->assertEquals('error', $response['status']);
@@ -188,7 +188,7 @@ final class RolControllerTest extends TestCase
         // Simular procesamiento del controller
         $data = [];
         foreach($datos as $row){
-            $sub_array = array();
+            $sub_array = [];
             $sub_array[] = $row["ROL_NOM"];
             $sub_array[] = $row["FECH_CREA"];
             $sub_array[] = '<button type="button" onClick="editar('.$row["ROL_ID"].')" id="'.$row["ROL_ID"].'" class="btn btn-warning btn-icon waves-effect waves-light"><i class="ri-edit-2-line"></i></button>';
@@ -196,12 +196,12 @@ final class RolControllerTest extends TestCase
             $data[] = $sub_array;
         }
         
-        $results = array(
+        $results = [
             "sEcho" => 1,
             "iTotalRecords" => count($data),
             "iTotalDisplayRecords" => count($data),
             "aaData" => $data
-        );
+        ];
         
         // Verificar estructura DataTables
         $this->assertArrayHasKey('sEcho', $results);

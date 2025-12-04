@@ -415,8 +415,8 @@
                 </tr>
             </thead>
             <tbody>
-                <?php if(isset($items) && count($items) > 0): ?>
-                    <?php $i = 1; foreach($items as $item): ?>
+                <?php if(isset($items) && count($items) > 0) { ?>
+                   <?php $i = 1; foreach($items as $item) { ?>
                     <tr>
                         <td class="text-center"><?php echo $i++; ?></td>
                         <td class="text-center"><?php echo $item['codigo'] ?? '-'; ?></td>
@@ -426,12 +426,12 @@
                         <td class="text-right">S/ <?php echo number_format($item['precio_unitario'], 2); ?></td>
                         <td class="text-right">S/ <?php echo number_format($item['importe'], 2); ?></td>
                     </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
+                   <?php } ?>
+                <?php } else { ?>
                     <tr>
                         <td colspan="7" class="text-center" style="padding: 20px;">Sin items</td>
                     </tr>
-                <?php endif; ?>
+                <?php } ?>
             </tbody>
         </table>
 
@@ -445,13 +445,13 @@
         <!-- ================= TOTALES Y QR ================= -->
         <div class="totals-section clearfix">
             <div class="qr-section">
-                <?php if(isset($comprobante['qr_code'])): ?>
+                <?php if(isset($comprobante['qr_code'])) { ?>
                 <img src="<?php echo $comprobante['qr_code']; ?>" alt="QR Code">
-                <?php else: ?>
+                <?php } else { ?>
                 <div style="width: 100px; height: 100px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
                     <span style="font-size: 10px; color: #999;">QR</span>
                 </div>
-                <?php endif; ?>
+               <?php } ?>
             </div>
             
             <div class="info-footer">
@@ -492,13 +492,11 @@
         </div>
 
         <!-- ================= FOOTER / OBSERVACIONES ================= -->
-        <?php if(isset($comprobante['observaciones']) && !empty($comprobante['observaciones'])): ?>
-        <div class="footer">
+<?php if(isset($comprobante['observaciones']) && !empty($comprobante['observaciones'])) { ?>        <div class="footer">
             <p><strong>Observaciones:</strong></p>
             <p><?php echo $comprobante['observaciones']; ?></p>
         </div>
-        <?php endif; ?>
-
+        <?php } ?>
         <div class="footer" style="margin-top: 15px; text-align: center;">
             <p><strong>¡Gracias por su preferencia!</strong></p>
             <p>Este documento ha sido emitido conforme a las normas de SUNAT.</p>

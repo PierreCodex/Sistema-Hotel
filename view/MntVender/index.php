@@ -55,7 +55,7 @@ if (isset($_SESSION["IdUsuario"])) {
                                         <div class="card-header">
                                             <div class="d-flex align-items-center flex-wrap gap-2">
                                                 <div class="flex-grow-1">
-                                                    <?php $num = isset($_GET['habitacion']) ? $_GET['habitacion'] : (isset($_SESSION['Numero']) ? $_SESSION['Numero'] : null); ?>
+                                                    <?php $num = $_GET['habitacion'] ?? ($_SESSION['Numero'] ?? null); ?>
                                                     <h5 class="mb-0">HABITACIÓN N<?php echo $num ? htmlspecialchars($num, ENT_QUOTES, 'UTF-8') : 'Sin habitación'; ?> - AGREGAR PRODUCTOS</h5>
                                                 </div>
 

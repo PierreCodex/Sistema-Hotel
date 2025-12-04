@@ -10,10 +10,10 @@ switch ($_GET["op"]) {
     case "guardaryeditar":
         // Validar que el nombre no esté vacío
         if (empty(trim($_POST["pro_nom"]))) {
-            echo json_encode(array(
+            echo json_encode([
                 'status' => 'error',
                 'message' => 'El nombre del producto es obligatorio'
-            ));
+            ]);
             break;
         }
 
@@ -24,10 +24,10 @@ switch ($_GET["op"]) {
         );
 
         if ($existe) {
-            echo json_encode(array(
+            echo json_encode([
                 'status' => 'error',
                 'message' => 'Ya existe un producto con este nombre'
-            ));
+            ]);
             break;
         }
 
@@ -52,9 +52,9 @@ switch ($_GET["op"]) {
     /* TODO: Listado de registros formato JSON para Datatable JS */
     case "listar":
         $datos = $producto->get_producto();
-        $data = array();
+        $data = [];
         foreach ($datos as $row) {
-            $sub_array = array();
+            $sub_array = [];
             $sub_array[] = $row["PRO_NOM"];
             $sub_array[] = $row["PRO_DET"];
             $sub_array[] = $row["PRO_PRE"];
@@ -77,12 +77,12 @@ switch ($_GET["op"]) {
             $data[] = $sub_array;
         }
 
-        $results = array(
+        $results = [
             "sEcho" => 1,
             "iTotalRecords" => count($data),
             "iTotalDisplayRecords" => count($data),
             "aaData" => $data
-        );
+        ];
         echo json_encode($results);
         break;
 
@@ -106,7 +106,7 @@ switch ($_GET["op"]) {
     case "cambiar_estado":
         $nuevo_estado = $_POST["estado"] == 'true' ? 1 : 0;
         $producto->cambiar_estado_producto($_POST["pro_id"], $nuevo_estado);
-        echo json_encode(array("status" => "success", "message" => "Estado actualizado correctamente"));
+        echo json_encode(["status" => "success", "message" => "Estado actualizado correctamente"]);
         break;
 
     case "eliminar":
@@ -129,6 +129,6 @@ switch ($_GET["op"]) {
     case "listar_para_empleado":
         $datos = $producto->get_producto_activo();
         // Devolver en formato DataTables
-        echo json_encode(array("data" => $datos));
+        echo json_encode(["data" => $datos]);
         break;
 }

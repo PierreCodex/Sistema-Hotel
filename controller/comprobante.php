@@ -13,8 +13,8 @@ $boleta = new Boleta();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
     
-    $operacion = isset($_POST['operacion']) ? $_POST['operacion'] : '';
-    
+$operacion = $_POST['operacion'] ?? '';
+
     switch ($operacion) {
         case 'listar_comprobantes':
             $fecha_inicio = $_POST['fecha_inicio'] ?? date('Y-m-01');
@@ -74,8 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Manejar peticiones GET (descargas y exportaciones)
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $operacion = isset($_GET['operacion']) ? $_GET['operacion'] : '';
-    
+$operacion = $_GET['operacion'] ?? '';    
     switch ($operacion) {
         case 'descargar_pdf':
             $bol_id = intval($_GET['bol_id'] ?? 0);

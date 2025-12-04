@@ -10,9 +10,9 @@
         /* TODO: Listado de registros formato JSON para Datatable JS */
         case "listar":
             $datos=$menu->get_menu_x_rol_id($_POST["rol_id"]);
-            $data=Array();
+            $data=[];
             foreach($datos as $row){
-                $sub_array = array();
+                $sub_array = [];
                 $sub_array[] = $row["MEN_NOM"];
                 if ($row["MEND_PERMI"]=="Si"){
                     $sub_array[] = '<button type="button"  onClick="deshabilitar('.$row["MEND_ID"].')" id="'.$row["MEND_ID"].'" class="btn btn-success btn-label btn-sm"><i class="ri-check-double-line label-icon align-middle fs-16 me-2"></i>'.$row["MEND_PERMI"].'</button>';
@@ -22,11 +22,12 @@
                 $data[] = $sub_array;
             }
 
-            $results = array(
+            $results = [
                 "sEcho"=>1,
                 "iTotalRecords"=>count($data),
                 "iTotalDisplayRecords"=>count($data),
-                "aaData"=>$data);
+                "aaData"=>$data
+            ];
             echo json_encode($results);
             break;
         /* TODO: habilitar permiso */

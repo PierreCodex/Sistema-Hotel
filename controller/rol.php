@@ -9,7 +9,7 @@
         /* TODO: Guardar y editar, guardar cuando el ID este vacio, y Actualizar cuando se envie el ID */
         case "guardaryeditar":
             // Validaciones del servidor usando funciones del modelo
-            $response = array();
+            $response = [];
             
             // Validar nombre vacío
             if(empty(trim($_POST["rol_nom"]))){
@@ -60,9 +60,9 @@
         /* TODO: Listado de registros formato JSON para Datatable JS */
         case "listar":
             $datos=$rol->get_rol();
-            $data=Array();
+            $data=[];
             foreach($datos as $row){
-                $sub_array = array();
+                $sub_array = [];
                 $sub_array[] = $row["ROL_NOM"];
                 $sub_array[] = $row["EST"] == 1 ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>';
                 // Botón de permisos - siempre habilitado para consulta
@@ -85,11 +85,12 @@
                 $data[] = $sub_array;
             }
 
-            $results = array(
+            $results = [
                 "sEcho"=>1,
                 "iTotalRecords"=>count($data),
                 "iTotalDisplayRecords"=>count($data),
-                "aaData"=>$data);
+                "aaData"=>$data
+            ];
             echo json_encode($results);
             break;
 
@@ -109,7 +110,7 @@
         case "cambiar_estado":
             $nuevo_estado = $_POST["estado"] == 'true' ? 1 : 0;
             $rol->cambiar_estado_rol($_POST["rol_id"], $nuevo_estado);
-            echo json_encode(array("status" => "success", "message" => "Estado actualizado correctamente"));
+            echo json_encode(["status" => "success", "message" => "Estado actualizado correctamente"]);
             break;
         /* TODO: Eliminar Registro */
         case "eliminar":

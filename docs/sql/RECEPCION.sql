@@ -1,4 +1,40 @@
--- Procedimiento de inserción para la tabla recepcion
+CREATE PROCEDURE SP_R_RECEPCIONES_HABITACIONES_TOP(
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE,
+    IN p_estado VARCHAR(10)
+)
+BEGIN
+    SELECT 
+        h.Numero AS NumeroHabitacion,
+        cat.Descripcion AS Categoria,
+        COUNT(r.IdRecepcion) AS TotalRecepciones,
+        COALESCE(SUM(r.TotalPagado), 0) AS Ingresos
+    FROM recepcion r
+    INNER JOIN habitacion h ON r.IdHabitacion = h.IdHabitacion
+    LEFT JOIN categoria cat ON h.IdCategoria = cat.IdCategoria
+    WHERE DATE(r.FechaEntrada) BETWEEN p_fecha_inicio AND p_fecha_fin
+    AND (p_estado = '' OR r.Estado = p_estado)
+    GROUP BY h.IdHabitacion, h.Numero, cat.Descripcion
+    ORDER BY TotalRecepciones DESC
+    LIMIT 10;CREATE PROCEDURE SP_R_RECEPCIONES_HABITACIONES_TOP(
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE,
+    IN p_estado VARCHAR(10)
+)
+BEGIN
+    SELECT 
+        h.Numero AS NumeroHabitacion,
+        cat.Descripcion AS Categoria,
+        COUNT(r.IdRecepcion) AS TotalRecepciones,
+        COALESCE(SUM(r.TotalPagado), 0) AS Ingresos
+    FROM recepcion r
+    INNER JOIN habitacion h ON r.IdHabitacion = h.IdHabitacion
+    LEFT JOIN categoria cat ON h.IdCategoria = cat.IdCategoria
+    WHERE DATE(r.FechaEntrada) BETWEEN p_fecha_inicio AND p_fecha_fin
+    AND (p_estado = '' OR r.Estado = p_estado)
+    GROUP BY h.IdHabitacion, h.Numero, cat.Descripcion
+    ORDER BY TotalRecepciones DESC
+    LIMIT 10;-- Procedimiento de inserción para la tabla recepcion
 -- Usa los campos principales y calcula importes derivados
 DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_I_RECEPCION_01` (

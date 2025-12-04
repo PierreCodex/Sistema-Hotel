@@ -10,8 +10,8 @@
 
         protected function Conexion(){
             try {
-				$conectar = $this->dbh = new PDO("mysql:local=localhost;dbname=db-hotel","root","");
-				return $conectar;	
+				$this->dbh = new PDO("mysql:local=localhost;dbname=db-hotel","root","");
+				return $this->dbh;	
 			} catch (Exception $e) {
 				print "¡Error BD!: " . $e->getMessage() . "<br/>";
 				die();	

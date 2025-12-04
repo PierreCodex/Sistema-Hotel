@@ -1,11 +1,12 @@
 <?php
+
 /**
  * Generador de PDF A4 para Boletas/Facturas
  * Uso: generar-pdf-a4.php?id=123
  */
 
 // Definir ruta base del proyecto
-define('BASE_PATH', dirname(dirname(__DIR__)));
++define('BASE_PATH', dirname(__DIR__, 2));
 
 require_once(BASE_PATH . "/config/conexion.php");
 require_once(BASE_PATH . "/config/session.php");
@@ -58,11 +59,12 @@ $comprobante = [
     'observaciones' => $comp['bol_observaciones'] ?? ''
 ];
 
-// Datos del cliente
+// Datos del cliente (usado en boleta-a4.php template)
+/** @phpstan-ignore-next-line */
 $cliente = [
     'documento' => $comp['bol_cliente_num_doc'] ?? '-',
     'nombre' => $comp['bol_cliente_razon_social'] ?? 'CLIENTE GENERAL',
-    'direccion' => $comp['bol_cliente_direccion'] ?? '-'
+    'direccion' => $comp['bol_cliente_direccion'] ?? '-',
 ];
 
 // Preparar items
@@ -74,21 +76,23 @@ foreach ($detalles as $det) {
         'unidad' => $det['bol_det_unidad'] ?? 'UND',
         'cantidad' => floatval($det['bol_det_cantidad']),
         'precio_unitario' => floatval($det['bol_det_precio_unitario']),
-        'importe' => floatval($det['bol_det_total'] ?? ($det['bol_det_cantidad'] * $det['bol_det_precio_unitario']))
+        'importe' => floatval($det['bol_det_total'] ?? ($det['bol_det_cantidad'] * $det['bol_det_precio_unitario'])),
     ];
 }
 
-// Totales
+// Totales (usado en boleta-a4.php template)
+/** @phpstan-ignore-next-line */
 $totales = [
     'gravadas' => floatval($comp['bol_subtotal']),
     'exoneradas' => 0,
     'inafectas' => 0,
     'descuento' => 0,
     'igv' => floatval($comp['bol_igv']),
-    'total' => floatval($comp['bol_total'])
+    'total' => floatval($comp['bol_total']),
 ];
 
-// Título del documento
+// Título del documento (usado en boleta-a4.php template)
+/** @phpstan-ignore-next-line */
 $titulo = $comprobante['tipo_nombre'] . ' ' . $comprobante['serie'] . '-' . str_pad($comprobante['correlativo'], 8, '0', STR_PAD_LEFT);
 
 // Capturar el HTML del template
@@ -116,27 +120,28 @@ $dompdf->stream($filename, ['Attachment' => false]);
 /**
  * Convierte un número a letras (español)
  */
-function convertirNumeroALetras($numero) {
+function convertirNumeroALetras($numero)
+{
     $numero = number_format($numero, 2, '.', '');
     $partes = explode('.', $numero);
     $entero = intval($partes[0]);
-    $decimal = isset($partes[1]) ? $partes[1] : '00';
-    
+    $decimal = $partes[1] ?? '00';
+
     $unidades = ['', 'UNO', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE'];
     $decenas = ['', 'DIEZ', 'VEINTE', 'TREINTA', 'CUARENTA', 'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA'];
     $especiales = ['ONCE', 'DOCE', 'TRECE', 'CATORCE', 'QUINCE', 'DIECISEIS', 'DIECISIETE', 'DIECIOCHO', 'DIECINUEVE'];
     $centenas = ['', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS', 'QUINIENTOS', 'SEISCIENTOS', 'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS'];
-    
+
     if ($entero == 0) {
-        return "CERO CON $decimal/100 SOLES";
+        return "CERO CON {$decimal}/100 SOLES";
     }
-    
+
     if ($entero == 100) {
-        return "CIEN CON $decimal/100 SOLES";
+        return "CIEN CON {$decimal}/100 SOLES";
     }
-    
+
     $letras = '';
-    
+
     // Miles
     if ($entero >= 1000) {
         $miles = intval($entero / 1000);
@@ -147,7 +152,7 @@ function convertirNumeroALetras($numero) {
         }
         $entero = $entero % 1000;
     }
-    
+
     // Centenas
     if ($entero >= 100) {
         if ($entero == 100) {
@@ -157,7 +162,7 @@ function convertirNumeroALetras($numero) {
         }
         $entero = $entero % 100;
     }
-    
+
     // Decenas y unidades
     if ($entero >= 11 && $entero <= 19) {
         $letras .= $especiales[$entero - 11];
@@ -171,13 +176,15 @@ function convertirNumeroALetras($numero) {
     } elseif ($entero > 0) {
         $letras .= $unidades[$entero];
     }
-    
-    return trim($letras) . " CON $decimal/100 SOLES";
+
+    return trim($letras) . " CON {$decimal}/100 SOLES";
 }
 
-function convertirCentenas($numero, $unidades, $decenas, $especiales, $centenas) {
+
+function convertirCentenas($numero, $unidades, $decenas, $especiales, $centenas)
+{
     $letras = '';
-    
+
     if ($numero >= 100) {
         if ($numero == 100) {
             return 'CIEN';
@@ -185,7 +192,7 @@ function convertirCentenas($numero, $unidades, $decenas, $especiales, $centenas)
         $letras .= $centenas[intval($numero / 100)] . ' ';
         $numero = $numero % 100;
     }
-    
+
     if ($numero >= 11 && $numero <= 19) {
         $letras .= $especiales[$numero - 11];
     } elseif ($numero >= 21 && $numero <= 29) {
@@ -198,6 +205,6 @@ function convertirCentenas($numero, $unidades, $decenas, $especiales, $centenas)
     } elseif ($numero > 0) {
         $letras .= $unidades[$numero];
     }
-    
+
     return trim($letras);
 }

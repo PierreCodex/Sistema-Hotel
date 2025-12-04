@@ -36,7 +36,7 @@ class Boleta extends Conectar {
             $company = $this->crearEmpresa();
             
             // Crear comprobante (Boleta o Factura)
-            $invoice = $this->crearInvoice($rec_id, $company, $client, $totales, $tipo_doc);
+            $invoice = $this->crearInvoice($company, $client, $totales, $tipo_doc);
             
             // Agregar detalles
             $items = $this->crearDetalles($detalles);
@@ -159,7 +159,7 @@ class Boleta extends Conectar {
     /**
      * Crear objeto Invoice (Boleta o Factura)
      */
-    private function crearInvoice($rec_id, $company, $client, $totales, $tipo_doc = '03') {
+    private function crearInvoice($company, $client, $totales, $tipo_doc = '03') {
         // Determinar serie según tipo de documento
         $serie = ($tipo_doc == '01') ? 'F001' : 'B001';
         
@@ -225,12 +225,10 @@ class Boleta extends Conectar {
         $conectar = parent::conexion();
         parent::set_names();
         
-        $sql = "SELECT COALESCE(MAX(bol_correlativo), 0) + 1 as siguiente 
-                FROM boleta 
-                WHERE bol_serie = ?";
-        $stmt = $conectar->prepare($sql);
+        $stmt = $conectar->prepare("CALL SP_BOL_OBTENER_CORRELATIVO(?)");
         $stmt->execute([$serie]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
         
         return str_pad($result['siguiente'], 8, '0', STR_PAD_LEFT);
     }
@@ -246,14 +244,8 @@ class Boleta extends Conectar {
             // Habilitar excepciones de PDO para capturar errores
             $conectar->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            // Insertar boleta (incluyendo usuario que registra)
-            $sql = "INSERT INTO boleta (rec_id, bol_tipo, bol_serie, bol_correlativo, 
-                    bol_fecha_emision, bol_cliente_tipo_doc, bol_cliente_num_doc, 
-                    bol_cliente_razon_social, bol_cliente_direccion,
-                    bol_subtotal, bol_igv, bol_total, bol_estado, bol_metodo_pago, bol_xml, bol_cdr, bol_observaciones, bol_usuario_registro) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            
-            $stmt = $conectar->prepare($sql);
+            // Insertar boleta usando stored procedure
+            $stmt = $conectar->prepare("CALL SP_BOL_INSERTAR(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $result = $stmt->execute([
                 $rec_id,
                 $invoice->getTipoDoc(),
@@ -281,7 +273,9 @@ class Boleta extends Conectar {
             }
             
             // Obtener el ID de la boleta insertada
-            $bol_id = $conectar->lastInsertId();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $bol_id = $row['bol_id'] ?? null;
+            $stmt->closeCursor();
             
             if (!$bol_id) {
                 error_log("No se pudo obtener lastInsertId para boleta");
@@ -304,13 +298,8 @@ class Boleta extends Conectar {
                 error_log("Error guardando CDR: " . $e->getMessage());
             }
             
-            // Insertar detalles de la boleta
-            $sql_detalle = "INSERT INTO boleta_detalle (bol_id, bol_det_orden, bol_det_codigo, 
-                            bol_det_descripcion, bol_det_unidad, bol_det_cantidad, 
-                            bol_det_precio_unitario, bol_det_subtotal, bol_det_igv, bol_det_total) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            
-            $stmt_detalle = $conectar->prepare($sql_detalle);
+            // Insertar detalles de la boleta usando stored procedure
+            $stmt_detalle = $conectar->prepare("CALL SP_BOL_INSERTAR_DETALLE(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
             $orden = 1;
             foreach ($detalles as $item) {
@@ -332,6 +321,7 @@ class Boleta extends Conectar {
                     $igv_item,
                     $total_item
                 ]);
+                $stmt_detalle->closeCursor();
                 
                 $orden++;
             }
@@ -352,32 +342,24 @@ class Boleta extends Conectar {
      */
     public function generarPDF($rec_id, $tipo = 'ticket') {
         try {
-            // Obtener datos de la boleta desde BD
+            // Obtener datos de la boleta desde BD usando SP
             $conexion = parent::conexion();
+            parent::set_names();
             
-            $sql = "SELECT b.*, r.TotalPagado, r.Adelanto, r.IdCliente, r.IdHabitacion,
-                           u.Nombre as usuario_nombre, u.Apellido as usuario_apellido
-                    FROM boleta b
-                    INNER JOIN recepcion r ON b.rec_id = r.IdRecepcion
-                    LEFT JOIN usuario u ON b.bol_usuario_registro = u.IdUsuario
-                    WHERE b.rec_id = ?
-                    ORDER BY b.bol_id DESC
-                    LIMIT 1";
-            
-            $stmt = $conexion->prepare($sql);
+            $stmt = $conexion->prepare("CALL SP_BOL_OBTENER_POR_RECEPCION(?)");
             $stmt->execute([$rec_id]);
             $boleta = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
             
             if (!$boleta) {
                 throw new Exception("No se encontró comprobante para esta recepción");
             }
             
-            // Obtener cliente directamente desde BD
-            $cliente_sql = "SELECT IdCliente, TipoDocumento, Documento, Nombre, Apellido, Direccion 
-                           FROM cliente WHERE IdCliente = ?";
-            $cliente_stmt = $conexion->prepare($cliente_sql);
+            // Obtener cliente directamente desde BD usando SP
+            $cliente_stmt = $conexion->prepare("CALL SP_BOL_OBTENER_CLIENTE(?)");
             $cliente_stmt->execute([$boleta['IdCliente']]);
             $cliente_bd = $cliente_stmt->fetch(PDO::FETCH_ASSOC);
+            $cliente_stmt->closeCursor();
             
             if (!$cliente_bd) {
                 throw new Exception("No se encontró información del cliente");
@@ -404,11 +386,11 @@ class Boleta extends Conectar {
             $subtotal = $boleta['bol_subtotal'];
             $igv = $boleta['bol_igv'];
             
-            // Obtener detalles de la boleta desde la BD
-            $det_sql = "SELECT * FROM boleta_detalle WHERE bol_id = ? ORDER BY bol_det_orden";
-            $det_stmt = $conexion->prepare($det_sql);
+            // Obtener detalles de la boleta desde la BD usando SP
+            $det_stmt = $conexion->prepare("CALL SP_BOL_OBTENER_DETALLES(?)");
             $det_stmt->execute([$boleta['bol_id']]);
             $detalles_bd = $det_stmt->fetchAll(PDO::FETCH_ASSOC);
+            $det_stmt->closeCursor();
             
             // Si hay detalles guardados, usarlos; si no, crear uno genérico
             if (!empty($detalles_bd)) {
@@ -422,11 +404,11 @@ class Boleta extends Conectar {
                     ];
                 }
             } else {
-                // Fallback: obtener número de habitación
-                $hab_sql = "SELECT Numero FROM habitacion WHERE IdHabitacion = ?";
-                $hab_stmt = $conexion->prepare($hab_sql);
+                // Fallback: obtener número de habitación usando SP
+                $hab_stmt = $conexion->prepare("CALL SP_BOL_OBTENER_HABITACION(?)");
                 $hab_stmt->execute([$boleta['IdHabitacion']]);
                 $habitacion = $hab_stmt->fetch(PDO::FETCH_ASSOC);
+                $hab_stmt->closeCursor();
                 
                 $detalles = [[
                     'cantidad' => 1,
@@ -530,11 +512,11 @@ class Boleta extends Conectar {
             // Guardar archivo
             file_put_contents($filepath, $pdfContent);
             
-            // Actualizar ruta en la base de datos
+            // Actualizar ruta en la base de datos usando SP
             $conectar = parent::conexion();
-            $sql = "UPDATE boleta SET bol_pdf_ruta = ? WHERE bol_id = ?";
-            $stmt = $conectar->prepare($sql);
-            $stmt->execute([$relativePath, $bol_id]);
+            $stmt = $conectar->prepare("CALL SP_BOL_ACTUALIZAR_RUTA_PDF(?, ?)");
+            $stmt->execute([$bol_id, $relativePath]);
+            $stmt->closeCursor();
             
             return $relativePath;
             
@@ -569,11 +551,11 @@ class Boleta extends Conectar {
             // Guardar archivo XML
             file_put_contents($filepath, $xmlContent);
             
-            // Actualizar ruta en la base de datos
+            // Actualizar ruta en la base de datos usando SP
             $conectar = parent::conexion();
-            $sql = "UPDATE boleta SET bol_xml_ruta = ? WHERE bol_id = ?";
-            $stmt = $conectar->prepare($sql);
-            $stmt->execute([$relativePath, $bol_id]);
+            $stmt = $conectar->prepare("CALL SP_BOL_ACTUALIZAR_RUTA_XML(?, ?)");
+            $stmt->execute([$bol_id, $relativePath]);
+            $stmt->closeCursor();
             
             return $relativePath;
             
@@ -607,11 +589,11 @@ class Boleta extends Conectar {
             // Guardar archivo CDR
             file_put_contents($filepath, $cdrZip);
             
-            // Actualizar ruta en la base de datos
+            // Actualizar ruta en la base de datos usando SP
             $conectar = parent::conexion();
-            $sql = "UPDATE boleta SET bol_cdr_ruta = ? WHERE bol_id = ?";
-            $stmt = $conectar->prepare($sql);
-            $stmt->execute([$relativePath, $bol_id]);
+            $stmt = $conectar->prepare("CALL SP_BOL_ACTUALIZAR_RUTA_CDR(?, ?)");
+            $stmt->execute([$bol_id, $relativePath]);
+            $stmt->closeCursor();
             
             return $relativePath;
             
@@ -627,10 +609,12 @@ class Boleta extends Conectar {
     public function descargarXML($bol_id) {
         try {
             $conectar = parent::conexion();
-            $sql = "SELECT bol_serie, bol_correlativo, bol_xml, bol_xml_ruta FROM boleta WHERE bol_id = ?";
-            $stmt = $conectar->prepare($sql);
+            parent::set_names();
+            
+            $stmt = $conectar->prepare("CALL SP_BOL_OBTENER_XML(?)");
             $stmt->execute([$bol_id]);
             $boleta = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
             
             if (!$boleta) {
                 throw new Exception("Boleta no encontrada");
@@ -672,10 +656,12 @@ class Boleta extends Conectar {
     public function descargarCDR($bol_id) {
         try {
             $conectar = parent::conexion();
-            $sql = "SELECT bol_serie, bol_correlativo, bol_cdr, bol_cdr_ruta FROM boleta WHERE bol_id = ?";
-            $stmt = $conectar->prepare($sql);
+            parent::set_names();
+            
+            $stmt = $conectar->prepare("CALL SP_BOL_OBTENER_CDR(?)");
             $stmt->execute([$bol_id]);
             $boleta = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
             
             if (!$boleta) {
                 throw new Exception("Boleta no encontrada");
@@ -717,10 +703,12 @@ class Boleta extends Conectar {
     public function descargarPDF($bol_id) {
         try {
             $conectar = parent::conexion();
-            $sql = "SELECT bol_serie, bol_correlativo, bol_pdf_ruta FROM boleta WHERE bol_id = ?";
-            $stmt = $conectar->prepare($sql);
+            parent::set_names();
+            
+            $stmt = $conectar->prepare("CALL SP_BOL_OBTENER_PDF(?)");
             $stmt->execute([$bol_id]);
             $boleta = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
             
             if (!$boleta) {
                 throw new Exception("Boleta no encontrada");
@@ -763,8 +751,8 @@ class Boleta extends Conectar {
         $especiales = ['DIEZ', 'ONCE', 'DOCE', 'TRECE', 'CATORCE', 'QUINCE', 'DIECISÉIS', 'DIECISIETE', 'DIECIOCHO', 'DIECINUEVE'];
         $centenas = ['', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS', 'QUINIENTOS', 'SEISCIENTOS', 'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS'];
         
-        if ($entero == 0) return "CERO CON $decimales/100 SOLES";
-        if ($entero == 100) return "CIEN CON $decimales/100 SOLES";
+        if ($entero == 0) return "CERO CON {$decimales}/100 SOLES";
+        if ($entero == 100) return "CIEN CON {$decimales}/100 SOLES";
         
         $resultado = '';
         
@@ -792,7 +780,7 @@ class Boleta extends Conectar {
             }
         }
         
-        return trim($resultado) . " CON $decimales/100 SOLES";
+        return trim($resultado) . " CON {$decimales}/100 SOLES";
     }
     
     // ==================== MÉTODOS PARA HISTORIAL DE COMPROBANTES ====================
@@ -805,45 +793,12 @@ class Boleta extends Conectar {
             $conectar = parent::Conexion();
             parent::set_names();
             
-            $where = "WHERE DATE(b.bol_fecha_emision) BETWEEN ? AND ?";
-            $params = [$fecha_inicio, $fecha_fin];
+            $stmt = $conectar->prepare("CALL SP_BOL_LISTAR(?, ?, ?, ?)");
+            $stmt->execute([$fecha_inicio, $fecha_fin, $tipo, $estado]);
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
             
-            if (!empty($tipo)) {
-                $where .= " AND b.bol_tipo = ?";
-                $params[] = $tipo;
-            }
-            
-            if (!empty($estado)) {
-                $where .= " AND b.bol_estado = ?";
-                $params[] = $estado;
-            }
-            
-            // Obtener lista de comprobantes
-            $sql = "SELECT 
-                        b.bol_id,
-                        b.bol_tipo,
-                        b.bol_serie,
-                        b.bol_correlativo,
-                        b.bol_fecha_emision,
-                        b.bol_cliente_razon_social,
-                        b.bol_cliente_num_doc,
-                        b.bol_subtotal,
-                        b.bol_igv,
-                        b.bol_total,
-                        b.bol_estado,
-                        b.bol_metodo_pago
-                    FROM boleta b
-                    $where
-                    ORDER BY b.bol_fecha_emision DESC";
-            
-            $stmt = $conectar->prepare($sql);
-            foreach ($params as $i => $param) {
-                $stmt->bindValue($i + 1, $param);
-            }
-            $stmt->execute();
-            $lista = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            return $lista;
+            return $result;
             
         } catch (Exception $e) {
             throw new Exception('Error al listar comprobantes: ' . $e->getMessage());
@@ -858,36 +813,12 @@ class Boleta extends Conectar {
             $conectar = parent::Conexion();
             parent::set_names();
             
-            $where = "WHERE DATE(b.bol_fecha_emision) BETWEEN ? AND ?";
-            $params = [$fecha_inicio, $fecha_fin];
+            $stmt = $conectar->prepare("CALL SP_BOL_RESUMEN(?, ?, ?, ?)");
+            $stmt->execute([$fecha_inicio, $fecha_fin, $tipo, $estado]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
             
-            if (!empty($tipo)) {
-                $where .= " AND b.bol_tipo = ?";
-                $params[] = $tipo;
-            }
-            
-            if (!empty($estado)) {
-                $where .= " AND b.bol_estado = ?";
-                $params[] = $estado;
-            }
-            
-            $sql = "SELECT 
-                        COUNT(*) AS total_emitidos,
-                        SUM(CASE WHEN bol_tipo = '03' THEN 1 ELSE 0 END) AS total_boletas,
-                        COALESCE(SUM(CASE WHEN bol_tipo = '03' THEN bol_total ELSE 0 END), 0) AS monto_boletas,
-                        SUM(CASE WHEN bol_tipo = '01' THEN 1 ELSE 0 END) AS total_facturas,
-                        COALESCE(SUM(CASE WHEN bol_tipo = '01' THEN bol_total ELSE 0 END), 0) AS monto_facturas,
-                        COALESCE(SUM(bol_total), 0) AS total_facturado
-                    FROM boleta b
-                    $where";
-            
-            $stmt = $conectar->prepare($sql);
-            foreach ($params as $i => $param) {
-                $stmt->bindValue($i + 1, $param);
-            }
-            $stmt->execute();
-            
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result;
             
         } catch (Exception $e) {
             throw new Exception('Error al obtener resumen: ' . $e->getMessage());
@@ -902,11 +833,12 @@ class Boleta extends Conectar {
             $conectar = parent::Conexion();
             parent::set_names();
             
-            $sql = "SELECT * FROM boleta WHERE bol_id = ?";
-            $stmt = $conectar->prepare($sql);
+            $stmt = $conectar->prepare("CALL SP_BOL_OBTENER_POR_ID(?)");
             $stmt->execute([$bol_id]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
             
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result;
             
         } catch (Exception $e) {
             throw new Exception('Error al obtener comprobante: ' . $e->getMessage());
@@ -921,11 +853,12 @@ class Boleta extends Conectar {
             $conectar = parent::Conexion();
             parent::set_names();
             
-            $sql = "SELECT * FROM boleta_detalle WHERE bol_id = ? ORDER BY bol_det_orden";
-            $stmt = $conectar->prepare($sql);
+            $stmt = $conectar->prepare("CALL SP_BOL_OBTENER_DETALLES(?)");
             $stmt->execute([$bol_id]);
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
             
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $result;
             
         } catch (Exception $e) {
             throw new Exception('Error al obtener detalles: ' . $e->getMessage());
@@ -940,17 +873,15 @@ class Boleta extends Conectar {
             $conectar = parent::Conexion();
             parent::set_names();
             
-            $sql = "SELECT b.*, r.IdRecepcion FROM boleta b 
-                    LEFT JOIN recepcion r ON b.rec_id = r.IdRecepcion 
-                    WHERE b.bol_id = ?";
-            $stmt = $conectar->prepare($sql);
+            $stmt = $conectar->prepare("CALL SP_BOL_OBTENER_CON_RECEPCION(?)");
             $stmt->execute([$bol_id]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
             
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result;
             
         } catch (Exception $e) {
             throw new Exception('Error al obtener comprobante: ' . $e->getMessage());
         }
     }
 }
-?>

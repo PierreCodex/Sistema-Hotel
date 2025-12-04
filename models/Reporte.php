@@ -1,44 +1,28 @@
 <?php
 /**
  * Modelo para Reportes
- * Maneja todas las consultas de reportes del sistema
- * Usa FechaCreacion de la tabla venta como fecha de venta
+ * Maneja todas las consultas de reportes del sistema usando Stored Procedures
+ * Refactorizado: 29/11/2025
  */
 class Reporte extends Conectar {
     
+    // =====================================================
+    // REPORTES DE VENTAS
+    // =====================================================
+    
     /**
      * Obtiene el reporte completo de ventas
-     * @param string $fecha_inicio Fecha de inicio (Y-m-d)
-     * @param string $fecha_fin Fecha de fin (Y-m-d)
-     * @param string $estado Estado de la venta (opcional)
-     * @return array Datos del reporte
      */
     public function obtenerReporteVentas($fecha_inicio, $fecha_fin, $estado = '') {
         try {
-            // Obtener resumen
-            $resumen = $this->obtenerResumenVentas($fecha_inicio, $fecha_fin, $estado);
-            
-            // Obtener lista de ventas
-            $ventas = $this->obtenerListaVentas($fecha_inicio, $fecha_fin, $estado);
-            
-            // Obtener datos para gráfico
-            $grafico = $this->obtenerDatosGrafico($fecha_inicio, $fecha_fin, $estado, 'mensual');
-            
-            // Obtener top productos
-            $top_productos = $this->obtenerTopProductos($fecha_inicio, $fecha_fin, $estado);
-            
-            // Obtener ventas por empleado
-            $ventas_empleado = $this->obtenerVentasPorEmpleado($fecha_inicio, $fecha_fin, $estado);
-            
             return [
                 'success' => true,
-                'resumen' => $resumen,
-                'ventas' => $ventas,
-                'grafico' => $grafico,
-                'top_productos' => $top_productos,
-                'ventas_empleado' => $ventas_empleado
+                'resumen' => $this->obtenerResumenVentas($fecha_inicio, $fecha_fin, $estado),
+                'ventas' => $this->obtenerListaVentas($fecha_inicio, $fecha_fin, $estado),
+                'grafico' => $this->obtenerDatosGrafico($fecha_inicio, $fecha_fin, $estado, 'mensual'),
+                'top_productos' => $this->obtenerTopProductos($fecha_inicio, $fecha_fin, $estado),
+                'ventas_empleado' => $this->obtenerVentasPorEmpleado($fecha_inicio, $fecha_fin, $estado)
             ];
-            
         } catch (Exception $e) {
             return [
                 'success' => false,
@@ -54,59 +38,28 @@ class Reporte extends Conectar {
         $conectar = parent::Conexion();
         parent::set_names();
         
-        $where = "WHERE DATE(v.FechaCreacion) BETWEEN ? AND ? AND v.Estado != 'BORRADOR' AND v.Estado != 'ANULADO'";
-        $params = [$fecha_inicio, $fecha_fin];
-        
-        if (!empty($estado)) {
-            $where .= " AND v.Estado = ?";
-            $params[] = $estado;
-        }
-        
-        // Total de ventas y cantidad
-        $sql = "SELECT 
-                    COALESCE(SUM(v.Total), 0) AS total_ventas,
-                    COUNT(v.IdVenta) AS cantidad_ventas,
-                    COALESCE(AVG(v.Total), 0) AS ticket_promedio
-                FROM venta v
-                $where";
-        
+        // Obtener resumen principal
+        $sql = "CALL SP_R_VENTAS_RESUMEN(?, ?, ?)";
         $stmt = $conectar->prepare($sql);
-        foreach ($params as $i => $param) {
-            $stmt->bindValue($i + 1, $param);
-        }
+        $stmt->bindValue(1, $fecha_inicio);
+        $stmt->bindValue(2, $fecha_fin);
+        $stmt->bindValue(3, $estado);
         $stmt->execute();
         $resumen = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
         
-        // Productos vendidos
-        $sql_productos = "SELECT COALESCE(SUM(dv.Cantidad), 0) AS productos_vendidos
-                          FROM detalle_venta dv
-                          INNER JOIN venta v ON dv.IdVenta = v.IdVenta
-                          $where";
-        
-        $stmt2 = $conectar->prepare($sql_productos);
-        foreach ($params as $i => $param) {
-            $stmt2->bindValue($i + 1, $param);
-        }
-        $stmt2->execute();
-        $productos = $stmt2->fetch(PDO::FETCH_ASSOC);
-        
-        $resumen['productos_vendidos'] = $productos['productos_vendidos'];
-        
-        // Calcular variación (comparar con período anterior)
+        // Calcular variación con período anterior
         $dias = (strtotime($fecha_fin) - strtotime($fecha_inicio)) / 86400 + 1;
         $fecha_inicio_ant = date('Y-m-d', strtotime($fecha_inicio . ' - ' . $dias . ' days'));
         $fecha_fin_ant = date('Y-m-d', strtotime($fecha_fin . ' - ' . $dias . ' days'));
         
-        $sql_ant = "SELECT COALESCE(SUM(v.Total), 0) AS total_anterior
-                    FROM venta v
-                    WHERE DATE(v.FechaCreacion) BETWEEN ? AND ? 
-                    AND v.Estado != 'BORRADOR' AND v.Estado != 'ANULADO'";
-        
-        $stmt3 = $conectar->prepare($sql_ant);
-        $stmt3->bindValue(1, $fecha_inicio_ant);
-        $stmt3->bindValue(2, $fecha_fin_ant);
-        $stmt3->execute();
-        $anterior = $stmt3->fetch(PDO::FETCH_ASSOC);
+        $sql2 = "CALL SP_R_VENTAS_VARIACION(?, ?)";
+        $stmt2 = $conectar->prepare($sql2);
+        $stmt2->bindValue(1, $fecha_inicio_ant);
+        $stmt2->bindValue(2, $fecha_fin_ant);
+        $stmt2->execute();
+        $anterior = $stmt2->fetch(PDO::FETCH_ASSOC);
+        $stmt2->closeCursor();
         
         $total_anterior = floatval($anterior['total_anterior']);
         $total_actual = floatval($resumen['total_ventas']);
@@ -127,90 +80,48 @@ class Reporte extends Conectar {
         $conectar = parent::Conexion();
         parent::set_names();
         
-        $where = "WHERE DATE(v.FechaCreacion) BETWEEN ? AND ? AND v.Estado != 'BORRADOR'";
-        $params = [$fecha_inicio, $fecha_fin];
-        
-        if (!empty($estado)) {
-            $where .= " AND v.Estado = ?";
-            $params[] = $estado;
-        }
-        
-        $sql = "SELECT 
-                    v.IdVenta,
-                    v.FechaCreacion AS FechaVenta,
-                    v.Total,
-                    v.Estado,
-                    h.Numero AS NumeroHabitacion,
-                    CONCAT(c.Nombre, ' ', c.Apellido) AS NombreCliente,
-                    CONCAT(u.Nombre, ' ', u.Apellido) AS NombreEmpleado,
-                    (SELECT COUNT(*) FROM detalle_venta WHERE IdVenta = v.IdVenta) AS CantidadProductos
-                FROM venta v
-                INNER JOIN recepcion r ON v.IdRecepcion = r.IdRecepcion
-                INNER JOIN habitacion h ON r.IdHabitacion = h.IdHabitacion
-                LEFT JOIN cliente c ON r.IdCliente = c.IdCliente
-                LEFT JOIN boleta b ON r.IdRecepcion = b.rec_id
-                LEFT JOIN usuario u ON b.bol_usuario_registro = u.IdUsuario
-                $where
-                ORDER BY v.FechaCreacion DESC";
-        
+        $sql = "CALL SP_R_VENTAS_LISTA(?, ?, ?)";
         $stmt = $conectar->prepare($sql);
-        foreach ($params as $i => $param) {
-            $stmt->bindValue($i + 1, $param);
-        }
+        $stmt->bindValue(1, $fecha_inicio);
+        $stmt->bindValue(2, $fecha_fin);
+        $stmt->bindValue(3, $estado);
         $stmt->execute();
+        $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
         
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $resultado;
     }
     
     /**
      * Obtiene datos para el gráfico de ventas
-     * @param string $vista diario, semanal o mensual
      */
     public function obtenerDatosGrafico($fecha_inicio, $fecha_fin, $estado = '', $vista = 'mensual') {
         $conectar = parent::Conexion();
         parent::set_names();
         
-        $where = "WHERE DATE(v.FechaCreacion) BETWEEN ? AND ? AND v.Estado != 'BORRADOR' AND v.Estado != 'ANULADO'";
-        $params = [$fecha_inicio, $fecha_fin];
-        
-        if (!empty($estado)) {
-            $where .= " AND v.Estado = ?";
-            $params[] = $estado;
-        }
-        
-        // Definir agrupación según vista
+        // Seleccionar SP según la vista
         switch ($vista) {
             case 'diario':
-                $groupBy = "DATE(v.FechaCreacion)";
-                $selectPeriodo = "DATE_FORMAT(v.FechaCreacion, '%d/%m') AS periodo";
+                $sp = "CALL SP_R_VENTAS_GRAFICO_DIARIO(?, ?, ?)";
                 break;
             case 'semanal':
-                $groupBy = "YEARWEEK(v.FechaCreacion, 1)";
-                $selectPeriodo = "CONCAT('Sem ', WEEK(v.FechaCreacion, 1)) AS periodo";
+                $sp = "CALL SP_R_VENTAS_GRAFICO_SEMANAL(?, ?, ?)";
                 break;
             case 'mensual':
             default:
-                $groupBy = "DATE_FORMAT(v.FechaCreacion, '%Y-%m')";
-                $selectPeriodo = "DATE_FORMAT(v.FechaCreacion, '%b %Y') AS periodo";
+                $sp = "CALL SP_R_VENTAS_GRAFICO_MENSUAL(?, ?, ?)";
                 break;
         }
         
-        $sql = "SELECT 
-                    $selectPeriodo,
-                    COALESCE(SUM(v.Total), 0) AS total,
-                    COUNT(v.IdVenta) AS cantidad
-                FROM venta v
-                $where
-                GROUP BY $groupBy
-                ORDER BY MIN(v.FechaCreacion) ASC";
-        
-        $stmt = $conectar->prepare($sql);
-        foreach ($params as $i => $param) {
-            $stmt->bindValue($i + 1, $param);
-        }
+        $stmt = $conectar->prepare($sp);
+        $stmt->bindValue(1, $fecha_inicio);
+        $stmt->bindValue(2, $fecha_fin);
+        $stmt->bindValue(3, $estado);
         $stmt->execute();
+        $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
         
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $resultado;
     }
     
     /**
@@ -220,33 +131,16 @@ class Reporte extends Conectar {
         $conectar = parent::Conexion();
         parent::set_names();
         
-        $where = "WHERE DATE(v.FechaCreacion) BETWEEN ? AND ? AND v.Estado != 'BORRADOR' AND v.Estado != 'ANULADO'";
-        $params = [$fecha_inicio, $fecha_fin];
-        
-        if (!empty($estado)) {
-            $where .= " AND v.Estado = ?";
-            $params[] = $estado;
-        }
-        
-        $sql = "SELECT 
-                    p.Nombre AS NombreProducto,
-                    SUM(dv.Cantidad) AS CantidadTotal,
-                    SUM(dv.SubTotal) AS TotalVendido
-                FROM detalle_venta dv
-                INNER JOIN producto p ON dv.IdProducto = p.IdProducto
-                INNER JOIN venta v ON dv.IdVenta = v.IdVenta
-                $where
-                GROUP BY p.IdProducto, p.Nombre
-                ORDER BY CantidadTotal DESC
-                LIMIT 10";
-        
+        $sql = "CALL SP_R_VENTAS_TOP_PRODUCTOS(?, ?, ?)";
         $stmt = $conectar->prepare($sql);
-        foreach ($params as $i => $param) {
-            $stmt->bindValue($i + 1, $param);
-        }
+        $stmt->bindValue(1, $fecha_inicio);
+        $stmt->bindValue(2, $fecha_fin);
+        $stmt->bindValue(3, $estado);
         $stmt->execute();
+        $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
         
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $resultado;
     }
     
     /**
@@ -256,33 +150,16 @@ class Reporte extends Conectar {
         $conectar = parent::Conexion();
         parent::set_names();
         
-        $where = "WHERE DATE(v.FechaCreacion) BETWEEN ? AND ? AND v.Estado != 'BORRADOR' AND v.Estado != 'ANULADO'";
-        $params = [$fecha_inicio, $fecha_fin];
-        
-        if (!empty($estado)) {
-            $where .= " AND v.Estado = ?";
-            $params[] = $estado;
-        }
-        
-        $sql = "SELECT 
-                    COALESCE(CONCAT(u.Nombre, ' ', u.Apellido), 'No registrado') AS NombreEmpleado,
-                    COUNT(v.IdVenta) AS CantidadVentas,
-                    COALESCE(SUM(v.Total), 0) AS TotalVentas
-                FROM venta v
-                INNER JOIN recepcion r ON v.IdRecepcion = r.IdRecepcion
-                LEFT JOIN boleta b ON r.IdRecepcion = b.rec_id
-                LEFT JOIN usuario u ON b.bol_usuario_registro = u.IdUsuario
-                $where
-                GROUP BY u.IdUsuario
-                ORDER BY TotalVentas DESC";
-        
+        $sql = "CALL SP_R_VENTAS_POR_EMPLEADO(?, ?, ?)";
         $stmt = $conectar->prepare($sql);
-        foreach ($params as $i => $param) {
-            $stmt->bindValue($i + 1, $param);
-        }
+        $stmt->bindValue(1, $fecha_inicio);
+        $stmt->bindValue(2, $fecha_fin);
+        $stmt->bindValue(3, $estado);
         $stmt->execute();
+        $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
         
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $resultado;
     }
     
     /**
@@ -476,57 +353,31 @@ class Reporte extends Conectar {
     /**
      * Obtiene el resumen estadístico de recepciones
      */
-    private function obtenerResumenRecepciones($fecha_inicio, $fecha_fin, $estado = '') {
+    public function obtenerResumenRecepciones($fecha_inicio, $fecha_fin, $estado = '') {
         $conectar = parent::Conexion();
         parent::set_names();
         
-        $where = "WHERE DATE(r.FechaEntrada) BETWEEN ? AND ?";
-        $params = [$fecha_inicio, $fecha_fin];
-        
-        if ($estado !== '') {
-            $where .= " AND r.Estado = ?";
-            $params[] = $estado;
-        }
-        
-        // Total de recepciones
-        $sql = "SELECT 
-                    COUNT(r.IdRecepcion) AS total_recepciones,
-                    SUM(CASE WHEN r.Estado = 1 THEN 1 ELSE 0 END) AS recepciones_activas,
-                    COALESCE(SUM(r.TotalPagado), 0) AS ingresos_hospedaje
-                FROM recepcion r
-                $where";
-        
+        $sql = "CALL SP_R_RECEPCIONES_RESUMEN(?, ?, ?)";
         $stmt = $conectar->prepare($sql);
-        foreach ($params as $i => $param) {
-            $stmt->bindValue($i + 1, $param);
-        }
+        $stmt->bindValue(1, $fecha_inicio);
+        $stmt->bindValue(2, $fecha_fin);
+        $stmt->bindValue(3, $estado);
         $stmt->execute();
         $resumen = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
         
-        // Estancia promedio en horas (solo de recepciones finalizadas)
-        $sql_estancia = "SELECT 
-                            AVG(TIMESTAMPDIFF(HOUR, r.FechaEntrada, COALESCE(r.FechaSalidaConfirmacion, r.FechaSalida, NOW()))) AS estancia_promedio
-                         FROM recepcion r
-                         WHERE DATE(r.FechaEntrada) BETWEEN ? AND ?";
-        
-        $stmt2 = $conectar->prepare($sql_estancia);
-        $stmt2->bindValue(1, $fecha_inicio);
-        $stmt2->bindValue(2, $fecha_fin);
-        $stmt2->execute();
-        $estancia = $stmt2->fetch(PDO::FETCH_ASSOC);
-        $resumen['estancia_promedio'] = round($estancia['estancia_promedio'] ?? 0, 1);
-        
-        // Calcular variación con período anterior
+        // Calcular variación
         $dias = (strtotime($fecha_fin) - strtotime($fecha_inicio)) / 86400 + 1;
         $fecha_inicio_ant = date('Y-m-d', strtotime($fecha_inicio . ' - ' . $dias . ' days'));
         $fecha_fin_ant = date('Y-m-d', strtotime($fecha_fin . ' - ' . $dias . ' days'));
         
-        $sql_ant = "SELECT COUNT(*) AS total_anterior FROM recepcion WHERE DATE(FechaEntrada) BETWEEN ? AND ?";
-        $stmt3 = $conectar->prepare($sql_ant);
-        $stmt3->bindValue(1, $fecha_inicio_ant);
-        $stmt3->bindValue(2, $fecha_fin_ant);
-        $stmt3->execute();
-        $anterior = $stmt3->fetch(PDO::FETCH_ASSOC);
+        $sql2 = "CALL SP_R_RECEPCIONES_VARIACION(?, ?)";
+        $stmt2 = $conectar->prepare($sql2);
+        $stmt2->bindValue(1, $fecha_inicio_ant);
+        $stmt2->bindValue(2, $fecha_fin_ant);
+        $stmt2->execute();
+        $anterior = $stmt2->fetch(PDO::FETCH_ASSOC);
+        $stmt2->closeCursor();
         
         $total_anterior = intval($anterior['total_anterior']);
         $total_actual = intval($resumen['total_recepciones']);
@@ -547,40 +398,16 @@ class Reporte extends Conectar {
         $conectar = parent::Conexion();
         parent::set_names();
         
-        $where = "WHERE DATE(r.FechaEntrada) BETWEEN ? AND ?";
-        $params = [$fecha_inicio, $fecha_fin];
-        
-        if ($estado !== '') {
-            $where .= " AND r.Estado = ?";
-            $params[] = $estado;
-        }
-        
-        $sql = "SELECT 
-                    r.IdRecepcion,
-                    CONCAT(c.Nombre, ' ', c.Apellido) AS NombreCliente,
-                    h.Numero AS NumeroHabitacion,
-                    p.Descripcion AS NombrePiso,
-                    r.FechaEntrada,
-                    r.FechaSalida,
-                    r.FechaSalidaConfirmacion,
-                    COALESCE(t.Descripcion, 'Sin tarifa') AS NombreTarifa,
-                    r.TotalPagado,
-                    r.Estado
-                FROM recepcion r
-                INNER JOIN cliente c ON r.IdCliente = c.IdCliente
-                INNER JOIN habitacion h ON r.IdHabitacion = h.IdHabitacion
-                INNER JOIN piso p ON h.IdPiso = p.IdPiso
-                LEFT JOIN tarifa t ON r.IdTarifa = t.IdTarifa
-                $where
-                ORDER BY r.FechaEntrada DESC";
-        
+        $sql = "CALL SP_R_RECEPCIONES_LISTA(?, ?, ?)";
         $stmt = $conectar->prepare($sql);
-        foreach ($params as $i => $param) {
-            $stmt->bindValue($i + 1, $param);
-        }
+        $stmt->bindValue(1, $fecha_inicio);
+        $stmt->bindValue(2, $fecha_fin);
+        $stmt->bindValue(3, $estado);
         $stmt->execute();
+        $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
         
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $resultado;
     }
     
     /**
@@ -590,46 +417,26 @@ class Reporte extends Conectar {
         $conectar = parent::Conexion();
         parent::set_names();
         
-        $where = "WHERE DATE(r.FechaEntrada) BETWEEN ? AND ?";
-        $params = [$fecha_inicio, $fecha_fin];
-        
-        if ($estado !== '') {
-            $where .= " AND r.Estado = ?";
-            $params[] = $estado;
-        }
-        
-        // Definir agrupación según vista
         switch ($vista) {
             case 'diario':
-                $groupBy = "DATE(r.FechaEntrada)";
-                $selectPeriodo = "DATE_FORMAT(r.FechaEntrada, '%d/%m') AS periodo";
+                $sp = "CALL SP_R_RECEPCIONES_GRAFICO_DIARIO(?, ?, ?)";
                 break;
             case 'semanal':
-                $groupBy = "YEARWEEK(r.FechaEntrada, 1)";
-                $selectPeriodo = "CONCAT('Sem ', WEEK(r.FechaEntrada, 1)) AS periodo";
+                $sp = "CALL SP_R_RECEPCIONES_GRAFICO_SEMANAL(?, ?, ?)";
                 break;
             case 'mensual':
             default:
-                $groupBy = "DATE_FORMAT(r.FechaEntrada, '%Y-%m')";
-                $selectPeriodo = "DATE_FORMAT(r.FechaEntrada, '%b %Y') AS periodo";
+                $sp = "CALL SP_R_RECEPCIONES_GRAFICO_MENSUAL(?, ?, ?)";
                 break;
         }
         
-        $sql = "SELECT 
-                    $selectPeriodo,
-                    COUNT(r.IdRecepcion) AS recepciones,
-                    COALESCE(SUM(r.TotalPagado), 0) AS ingresos
-                FROM recepcion r
-                $where
-                GROUP BY $groupBy
-                ORDER BY MIN(r.FechaEntrada) ASC";
-        
-        $stmt = $conectar->prepare($sql);
-        foreach ($params as $i => $param) {
-            $stmt->bindValue($i + 1, $param);
-        }
+        $stmt = $conectar->prepare($sp);
+        $stmt->bindValue(1, $fecha_inicio);
+        $stmt->bindValue(2, $fecha_fin);
+        $stmt->bindValue(3, $estado);
         $stmt->execute();
         $datos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
         
         return [
             'etiquetas' => array_column($datos, 'periodo'),
@@ -645,30 +452,14 @@ class Reporte extends Conectar {
         $conectar = parent::Conexion();
         parent::set_names();
         
-        $where = "WHERE DATE(r.FechaEntrada) BETWEEN ? AND ?";
-        $params = [$fecha_inicio, $fecha_fin];
-        
-        if ($estado !== '') {
-            $where .= " AND r.Estado = ?";
-            $params[] = $estado;
-        }
-        
-        $sql = "SELECT 
-                    p.Descripcion AS piso,
-                    COUNT(r.IdRecepcion) AS cantidad
-                FROM recepcion r
-                INNER JOIN habitacion h ON r.IdHabitacion = h.IdHabitacion
-                INNER JOIN piso p ON h.IdPiso = p.IdPiso
-                $where
-                GROUP BY p.IdPiso, p.Descripcion
-                ORDER BY cantidad DESC";
-        
+        $sql = "CALL SP_R_RECEPCIONES_GRAFICO_PISOS(?, ?, ?)";
         $stmt = $conectar->prepare($sql);
-        foreach ($params as $i => $param) {
-            $stmt->bindValue($i + 1, $param);
-        }
+        $stmt->bindValue(1, $fecha_inicio);
+        $stmt->bindValue(2, $fecha_fin);
+        $stmt->bindValue(3, $estado);
         $stmt->execute();
         $datos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
         
         return [
             'etiquetas' => array_column($datos, 'piso'),
@@ -683,34 +474,16 @@ class Reporte extends Conectar {
         $conectar = parent::Conexion();
         parent::set_names();
         
-        $where = "WHERE DATE(r.FechaEntrada) BETWEEN ? AND ?";
-        $params = [$fecha_inicio, $fecha_fin];
-        
-        if ($estado !== '') {
-            $where .= " AND r.Estado = ?";
-            $params[] = $estado;
-        }
-        
-        $sql = "SELECT 
-                    h.Numero AS NumeroHabitacion,
-                    cat.Descripcion AS Categoria,
-                    COUNT(r.IdRecepcion) AS TotalRecepciones,
-                    COALESCE(SUM(r.TotalPagado), 0) AS Ingresos
-                FROM recepcion r
-                INNER JOIN habitacion h ON r.IdHabitacion = h.IdHabitacion
-                LEFT JOIN categoria cat ON h.IdCategoria = cat.IdCategoria
-                $where
-                GROUP BY h.IdHabitacion, h.Numero, cat.Descripcion
-                ORDER BY TotalRecepciones DESC
-                LIMIT 10";
-        
+        $sql = "CALL SP_R_RECEPCIONES_HABITACIONES_TOP(?, ?, ?)";
         $stmt = $conectar->prepare($sql);
-        foreach ($params as $i => $param) {
-            $stmt->bindValue($i + 1, $param);
-        }
+        $stmt->bindValue(1, $fecha_inicio);
+        $stmt->bindValue(2, $fecha_fin);
+        $stmt->bindValue(3, $estado);
         $stmt->execute();
+        $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
         
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $resultado;
     }
     
     /**
@@ -720,31 +493,16 @@ class Reporte extends Conectar {
         $conectar = parent::Conexion();
         parent::set_names();
         
-        $where = "WHERE DATE(r.FechaEntrada) BETWEEN ? AND ?";
-        $params = [$fecha_inicio, $fecha_fin];
-        
-        if ($estado !== '') {
-            $where .= " AND r.Estado = ?";
-            $params[] = $estado;
-        }
-        
-        $sql = "SELECT 
-                    COALESCE(t.Descripcion, 'Sin tarifa') AS NombreTarifa,
-                    COUNT(r.IdRecepcion) AS TotalRecepciones,
-                    COALESCE(SUM(r.TotalPagado), 0) AS Total
-                FROM recepcion r
-                LEFT JOIN tarifa t ON r.IdTarifa = t.IdTarifa
-                $where
-                GROUP BY r.IdTarifa, t.Descripcion
-                ORDER BY Total DESC";
-        
+        $sql = "CALL SP_R_RECEPCIONES_POR_TARIFA(?, ?, ?)";
         $stmt = $conectar->prepare($sql);
-        foreach ($params as $i => $param) {
-            $stmt->bindValue($i + 1, $param);
-        }
+        $stmt->bindValue(1, $fecha_inicio);
+        $stmt->bindValue(2, $fecha_fin);
+        $stmt->bindValue(3, $estado);
         $stmt->execute();
+        $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
         
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $resultado;
     }
     
     /**
@@ -754,25 +512,15 @@ class Reporte extends Conectar {
         $conectar = parent::Conexion();
         parent::set_names();
         
-        $sql = "SELECT 
-                    CONCAT(c.Nombre, ' ', c.Apellido) AS NombreCliente,
-                    c.Documento,
-                    COUNT(r.IdRecepcion) AS Visitas,
-                    COALESCE(SUM(r.TotalPagado), 0) AS TotalGastado
-                FROM recepcion r
-                INNER JOIN cliente c ON r.IdCliente = c.IdCliente
-                WHERE DATE(r.FechaEntrada) BETWEEN ? AND ?
-                GROUP BY c.IdCliente, c.Nombre, c.Apellido, c.Documento
-                HAVING COUNT(r.IdRecepcion) >= 1
-                ORDER BY Visitas DESC, TotalGastado DESC
-                LIMIT 10";
-        
+        $sql = "CALL SP_R_RECEPCIONES_CLIENTES_FRECUENTES(?, ?)";
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $fecha_inicio);
         $stmt->bindValue(2, $fecha_fin);
         $stmt->execute();
+        $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
         
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $resultado;
     }
     
     /**
@@ -782,37 +530,16 @@ class Reporte extends Conectar {
         $conectar = parent::Conexion();
         parent::set_names();
         
-        $where = "WHERE DATE(r.FechaEntrada) BETWEEN ? AND ?";
-        $params = [$fecha_inicio, $fecha_fin];
-        
-        if ($estado !== '') {
-            $where .= " AND r.Estado = ?";
-            $params[] = $estado;
-        }
-        
-        $sql = "SELECT 
-                    p.Descripcion AS NombrePiso,
-                    (SELECT COUNT(*) FROM habitacion WHERE IdPiso = p.IdPiso AND Estado = 1) AS TotalHabitaciones,
-                    COUNT(r.IdRecepcion) AS TotalRecepciones,
-                    COALESCE(SUM(r.TotalPagado), 0) AS Ingresos
-                FROM piso p
-                LEFT JOIN habitacion h ON p.IdPiso = h.IdPiso AND h.Estado = 1
-                LEFT JOIN recepcion r ON h.IdHabitacion = r.IdHabitacion 
-                    AND DATE(r.FechaEntrada) BETWEEN ? AND ?
-                " . ($estado !== '' ? " AND r.Estado = ?" : "") . "
-                WHERE p.Estado = 1
-                GROUP BY p.IdPiso, p.Descripcion
-                ORDER BY TotalRecepciones DESC";
-        
+        $sql = "CALL SP_R_RECEPCIONES_POR_PISO(?, ?, ?)";
         $stmt = $conectar->prepare($sql);
         $stmt->bindValue(1, $fecha_inicio);
         $stmt->bindValue(2, $fecha_fin);
-        if ($estado !== '') {
-            $stmt->bindValue(3, $estado);
-        }
+        $stmt->bindValue(3, $estado);
         $stmt->execute();
+        $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
         
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $resultado;
     }
     
     /**

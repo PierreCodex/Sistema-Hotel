@@ -8,7 +8,8 @@
         "endroid/qr-code": "^6.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "10.0"
+        "phpunit/phpunit": "10.0",
+        "nunomaduro/phpinsights": "^2.13"
     },
     "repositories": [
         {
@@ -17,6 +18,9 @@
         }
     ],
     "config": {
-        "secure-http": false
+        "secure-http": false,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }

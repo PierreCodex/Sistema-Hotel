@@ -117,9 +117,9 @@
             try {
                 $vent_id = intval($_POST["vent_id"] ?? 0);
                 $datos = $venta->get_detalle_venta_x_id_venta($vent_id);
-                $data = Array();
+                $data = [];
                 foreach($datos as $row){
-                    $sub_array = array();
+                    $sub_array = [];
                     $sub_array[] = $row["DETV_ID"];
                     $sub_array[] = htmlspecialchars($row["PRO_NOM"], ENT_QUOTES, 'UTF-8');
                     $sub_array[] = intval($row["DETV_CANT"]);
@@ -130,11 +130,12 @@
                     $data[] = $sub_array;
                 }
 
-                $results = array(
+                $results = [
                     "sEcho"=>1,
                     "iTotalRecords"=>count($data),
                     "iTotalDisplayRecords"=>count($data),
-                    "aaData"=>$data);
+                    "aaData"=>$data
+                ];
                 echo json_encode($results);
             } catch (Exception $e) {
                 echo json_encode(["success" => false, "message" => $e->getMessage()]);

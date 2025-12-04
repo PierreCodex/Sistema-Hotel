@@ -9,7 +9,7 @@ $usuario = new Usuario();
 
 switch ($_GET["op"]) {
     case "guardaryeditar":
-        
+
         // Validar email duplicado antes de guardar
         $datos = $usuario->existe_usuario_correo($_POST["usu_correo"]);
         $existe_duplicado_email = false;
@@ -50,16 +50,16 @@ switch ($_GET["op"]) {
 
         if ($existe_duplicado_email) {
             // Retornar error si el email ya existe
-            echo json_encode(array(
-                "status" => "error", 
+            echo json_encode([
+                "status" => "error",
                 "message" => "El email ya existe en el sistema. Por favor, use otro email."
-            ));
+            ]);
         } elseif ($existe_duplicado_dni) {
             // Retornar error si el DNI ya existe
-            echo json_encode(array(
-                "status" => "error", 
+            echo json_encode([
+                "status" => "error",
                 "message" => "El DNI ya existe en el sistema. Por favor, use otro DNI."
-            ));
+            ]);
         } else {
             // Proceder con el guardado si no hay duplicados
             if (empty($_POST["usu_id"])) {
@@ -71,11 +71,11 @@ switch ($_GET["op"]) {
                     $_POST["usu_pass"],
                     $_POST["rol_id"]
                 );
-                echo json_encode(array("status" => "success", "message" => "Usuario creado correctamente"));
+                echo json_encode(["status" => "success", "message" => "Usuario creado correctamente"]);
             } else {
                 // Modo edición - verificar si mantener contraseña actual
                 $password_a_usar = $_POST["usu_pass"];
-                
+
                 // Si viene el flag mantener_password, no hashear la contraseña (ya está hasheada)
                 if (isset($_POST["mantener_password"]) && $_POST["mantener_password"] === 'true') {
                     // Usar la contraseña tal como viene (ya encriptada)
@@ -84,7 +84,7 @@ switch ($_GET["op"]) {
                     // Nueva contraseña ingresada - se hasheará en el modelo
                     $password_a_usar = $_POST["usu_pass"];
                 }
-                
+
                 $usuario->update_usuario(
                     $_POST["usu_id"],
                     $_POST["usu_nom"],
@@ -93,9 +93,9 @@ switch ($_GET["op"]) {
                     $_POST["usu_correo"],
                     $password_a_usar,
                     $_POST["rol_id"],
-                    isset($_POST["mantener_password"]) ? $_POST["mantener_password"] : 'false'
+                    $_POST["mantener_password"] ?? 'false'
                 );
-                echo json_encode(array("status" => "success", "message" => "Usuario actualizado correctamente"));
+                echo json_encode(["status" => "success", "message" => "Usuario actualizado correctamente"]);
             }
         }
         break;
@@ -105,11 +105,11 @@ switch ($_GET["op"]) {
         try {
             $current_user_id = $_SESSION["IdUsuario"];
             $datos = $usuario->get_usuario($current_user_id);
-            $data = array();
+            $data = [];
 
             if (is_array($datos) && count($datos) > 0) {
                 foreach ($datos as $row) {
-                    $sub_array = array();
+                    $sub_array = [];
                     $sub_array[] = $row["USU_NOM"];
                     $sub_array[] = $row["USU_APE"];
                     $sub_array[] = $row["USU_DNI"];
@@ -128,15 +128,15 @@ switch ($_GET["op"]) {
                 }
             }
 
-            $results = array(
+            $results = [
                 "sEcho" => 1,
                 "iTotalRecords" => count($data),
                 "iTotalDisplayRecords" => count($data),
                 "aaData" => $data
-            );
+            ];
             echo json_encode($results);
         } catch (Exception $e) {
-            echo json_encode(array("error" => $e->getMessage()));
+            echo json_encode(["error" => $e->getMessage()]);
         }
         break;
 
@@ -158,11 +158,11 @@ switch ($_GET["op"]) {
         break;
 
     /* TODO: Cambiar Estado del Registro */
-        case "cambiar_estado":
-            $nuevo_estado = $_POST["estado"] == 'true' ? 1 : 0;
-            $usuario->cambiar_estado_usuario($_POST["usu_id"], $nuevo_estado);          
-            echo json_encode(array("status" => "success", "message" => "Estado actualizado correctamente"));
-            break;
+    case "cambiar_estado":
+        $nuevo_estado = $_POST["estado"] == 'true' ? 1 : 0;
+        $usuario->cambiar_estado_usuario($_POST["usu_id"], $nuevo_estado);
+        echo json_encode(["status" => "success", "message" => "Estado actualizado correctamente"]);
+        break;
     /* TODO: Eliminar Usuario */
     case "eliminar":
         $usuario->delete_usuario($_POST["usu_id"]);
@@ -194,9 +194,9 @@ switch ($_GET["op"]) {
         }
 
         if ($existe_duplicado) {
-            echo json_encode(array("existe" => true, "mensaje" => "Email ya existente"));
+            echo json_encode(["existe" => true, "mensaje" => "Email ya existente"]);
         } else {
-            echo json_encode(array("existe" => false, "mensaje" => "Email disponible"));
+            echo json_encode(["existe" => false, "mensaje" => "Email disponible"]);
         }
         break;
 
@@ -221,9 +221,9 @@ switch ($_GET["op"]) {
         }
 
         if ($existe_duplicado) {
-            echo json_encode(array("existe" => true, "mensaje" => "DNI ya existente"));
+            echo json_encode(["existe" => true, "mensaje" => "DNI ya existente"]);
         } else {
-            echo json_encode(array("existe" => false, "mensaje" => "DNI disponible"));
+            echo json_encode(["existe" => false, "mensaje" => "DNI disponible"]);
         }
         break;
 }
