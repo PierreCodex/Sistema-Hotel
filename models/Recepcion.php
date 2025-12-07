@@ -2,12 +2,12 @@
     class Recepcion extends Conectar{
 
         // Inserta una recepción y retorna el Id generado
-        public function insert_recepcion($cli_id, $hab_id, $precio_inicial, $adelanto, $observacion, $fecha_salida = null, $tar_id = null){
+        public function insert_recepcion($cli_id, $hab_id, $precio_inicial, $adelanto, $observacion, $fecha_salida = null, $tar_id = null, $tipo_comprobante = '03'){
             $conectar = parent::Conexion();
             parent::set_names();
 
-            // Llamada al stored procedure con variable de salida (incluyendo tarifa)
-            $sql = "CALL SP_I_RECEPCION_02(?,?,?,?,?,?,?,@p_id_recepcion)";
+            // Llamada al stored procedure con variable de salida (incluyendo tarifa y tipo de comprobante)
+            $sql = "CALL SP_I_RECEPCION_03(?,?,?,?,?,?,?,?,@p_id_recepcion)";
             $query = $conectar->prepare($sql);
             $query->bindValue(1, $cli_id);
             $query->bindValue(2, $hab_id);
@@ -16,6 +16,7 @@
             $query->bindValue(5, $adelanto);
             $query->bindValue(6, $observacion);
             $query->bindValue(7, $fecha_salida);
+            $query->bindValue(8, $tipo_comprobante);
             $query->execute();
 
             // Obtener el ID de la recepción insertada
@@ -83,6 +84,7 @@
                         r.TotalPagado,
                         r.CostoPenalidad,
                         r.Observacion,
+                        r.TipoComprobante,
                         r.Estado
                     FROM recepcion r
                     INNER JOIN habitacion h ON r.IdHabitacion = h.IdHabitacion

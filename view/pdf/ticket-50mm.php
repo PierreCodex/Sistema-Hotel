@@ -323,12 +323,16 @@
 
         <!-- ITEMS -->
         <div class="items-section">
-            <?php foreach ($detalles as $item) { ?>
+            <?php foreach ($detalles as $item) { 
+                // Calcular precio con IGV incluido (el que se cobró)
+                $precioConIgv = isset($item['precio_original']) ? $item['precio_original'] : round($item['precio_unitario'] * 1.18, 2);
+                $totalItem = $item['cantidad'] * $precioConIgv;
+            ?>
                 <div class="item">
                     <div class="item-desc">
                         <?php echo $item['cantidad']; ?>x <?php echo $item['descripcion']; ?>
                     </div>
-                    <div class="item-precio">S/ <?php echo number_format($item['cantidad'] * $item['precio_unitario'], 2); ?></div>
+                    <div class="item-precio">S/ <?php echo number_format($totalItem, 2); ?></div>
                 </div>
             <?php } ?>
         </div>
@@ -355,7 +359,7 @@
         <!-- PAYMENT INFO -->
         <?php if (isset($forma_pago)) { ?>
             <div class="payment-info">
-                <div><strong>Pago:</strong> <?php echo $forma_pago; ?></div>
+               <?php if (isset($metodo_pago)) { ?><strong>Método de Pago:</strong> <?php echo $metodo_pago; ?><?php } ?>
                 <?php if (isset($encargado) && !empty($encargado)) { ?> <div><strong>Atendido por:</strong> <?php echo htmlspecialchars($encargado); ?></div>
                 <?php } ?>
             </div>

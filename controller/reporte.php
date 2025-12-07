@@ -6,7 +6,7 @@ $reporte = new Reporte();
 
 // Manejar peticiones POST (AJAX)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $operacion = $_GET['operacion'] ?? '';
+    $operacion = $_POST['operacion'] ?? $_GET['operacion'] ?? '';
     switch ($operacion) {
         case 'reporte_ventas':
             $fecha_inicio = $_POST['fecha_inicio'] ?? date('Y-m-01');
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Manejar peticiones GET (exportación)
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $operacion = $_POST['operacion'] ?? '';
+    $operacion = $_GET['operacion'] ?? '';
     switch ($operacion) {
         case 'exportar_excel':
             $fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-01');

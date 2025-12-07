@@ -58,11 +58,89 @@ $(document).ready(function(){
             cli_id = $(this).val();
             $.post("../../controller/cliente.php?op=mostrar",{cli_id:cli_id},function(data){
                 data=JSON.parse(data);
-                $('#cli_tipo_doc').val(data.CLI_TIPO_DOC || 'No especificado');
-                $('#cli_doc').val(data.CLI_DOC || 'No especificado');
+                var tipoDoc = (data.CLI_TIPO_DOC || '').toString().trim().toUpperCase();
+                var numDoc = (data.CLI_DOC || '').toString().trim();
+                
+                // Si no hay tipo de doc pero el número tiene 11 dígitos, es RUC
+                if (!tipoDoc || tipoDoc === '' || tipoDoc === 'NO ESPECIFICADO') {
+                    if (numDoc.length === 11) {
+                        tipoDoc = 'RUC';
+                    } else if (numDoc.length === 8) {
+                        tipoDoc = 'DNI';
+                    }
+                }
+                
+                console.log('Tipo Doc detectado:', tipoDoc, 'Número:', numDoc);
+                
+                $('#cli_tipo_doc').val(tipoDoc);
+                $('#cli_doc').val(numDoc);
                 $('#cli_direcc').val(data.CLI_DIR || 'No especificada');
+                
+                // Auto-seleccionar tipo de comprobante según tipo de documento
+                seleccionarTipoComprobante(tipoDoc);
             });
         });
+    });
+    
+    // Función para auto-seleccionar tipo de comprobante
+    function seleccionarTipoComprobante(tipoDoc) {
+        var $combo = $('#tipo_comprobante');
+        var $info = $('#info_comprobante');
+        
+        if (tipoDoc === 'RUC') {
+            // RUC = Factura (01)
+            $combo.val('01');
+            $info.html('<span class="text-success"><i class="ri-checkbox-circle-line"></i> Factura seleccionada automáticamente (RUC)</span>');
+        } else {
+            // DNI u otro = Boleta (03)
+            $combo.val('03');
+            $info.html('<span class="text-info"><i class="ri-checkbox-circle-line"></i> Boleta seleccionada automáticamente (DNI)</span>');
+        }
+    }
+    
+    // Validación al cambiar manualmente el tipo de comprobante
+    $('#tipo_comprobante').on('change', function() {
+        var tipoComprobanteSeleccionado = $(this).val();
+        var tipoDocCliente = $('#cli_tipo_doc').val() || '';
+        var $info = $('#info_comprobante');
+        
+        // Si selecciona Factura (01) pero el cliente tiene DNI (no RUC)
+        if (tipoComprobanteSeleccionado === '01' && tipoDocCliente !== 'RUC') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No se puede emitir Factura',
+                html: '<p>El cliente tiene <strong>' + tipoDocCliente + '</strong>, no RUC.</p>' +
+                      '<p>Para emitir <strong>Factura</strong> el cliente debe tener <strong>RUC</strong>.</p>' +
+                      '<p>Se seleccionará <strong>Boleta</strong> automáticamente.</p>',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#3085d6'
+            });
+            // Revertir a Boleta
+            $(this).val('03');
+            $info.html('<span class="text-warning"><i class="ri-alert-line"></i> Solo Boleta disponible para DNI</span>');
+        } 
+        // Si selecciona Boleta (03) pero el cliente tiene RUC - esto sí es permitido pero se puede advertir
+        else if (tipoComprobanteSeleccionado === '03' && tipoDocCliente === 'RUC') {
+            Swal.fire({
+                icon: 'info',
+                title: 'Boleta seleccionada',
+                html: '<p>El cliente tiene <strong>RUC</strong>, puede emitir <strong>Factura</strong>.</p>' +
+                      '<p>¿Está seguro que desea emitir <strong>Boleta</strong>?</p>',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, emitir Boleta',
+                cancelButtonText: 'Cambiar a Factura',
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#28a745'
+            }).then((result) => {
+                if (result.isDismissed || result.dismiss === Swal.DismissReason.cancel) {
+                    // Cambiar a Factura
+                    $('#tipo_comprobante').val('01');
+                    $info.html('<span class="text-success"><i class="ri-checkbox-circle-line"></i> Factura seleccionada (RUC)</span>');
+                } else {
+                    $info.html('<span class="text-info"><i class="ri-information-line"></i> Boleta seleccionada manualmente</span>');
+                }
+            });
+        }
     });
 
     // Cargar combo de tarifas según hab_id ya seteado
@@ -201,6 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Calcular con valores iniciales
     try { recalcularSalidaYPrecio(); } catch(e) {}
 });
+
 /* TODO: Obtener parametro de URL */
 var getUrlParameter = function getUrlParameter(sParam) {
     var sPageURL = decodeURIComponent(window.location.search.substring(1)),
@@ -217,299 +296,28 @@ var getUrlParameter = function getUrlParameter(sParam) {
     }
 };
 
-// Evento para guardar el cliente desde el modal
-$(document).on("submit","#mantenimiento_form",function(e){
-    e.preventDefault();
-    
-    // Validación de DNI/RUC antes de enviar
-    var $modal = $('#modalmantenimiento');
-    var tipoDocSel = $modal.find('#cli_tipo_doc').val();
-    var $docInput = $modal.find('#cli_doc');
-    var docVal = ($docInput.val() || '').trim();
-    var $docFeedback = $modal.find('#cli_doc_feedback');
-    
-    // Normalizar a solo dígitos
-    docVal = docVal.replace(/\D/g, '');
-    $docInput.val(docVal);
-    
-    // Reglas de validación
-    var dniOk = /^\d{8}$/.test(docVal);
-    var rucOk = /^\d{11}$/.test(docVal);
-    
-    // Solo validar longitudes si el tipo seleccionado es DNI o RUC
-    if (tipoDocSel === 'DNI') {
-        if (!dniOk) {
-            $docInput.removeClass('is-valid').addClass('is-invalid');
-            if ($docFeedback.length) {
-                $docFeedback.text('DNI debe ser exactamente 8 dígitos');
-            }
-            Swal.fire('Validación', 'El DNI debe tener exactamente 8 dígitos', 'error');
-            return;
-        }
-        $docInput.removeClass('is-invalid').addClass('is-valid');
-    } else if (tipoDocSel === 'RUC') {
-        if (!rucOk) {
-            $docInput.removeClass('is-valid').addClass('is-invalid');
-            if ($docFeedback.length) {
-                $docFeedback.text('RUC debe ser exactamente 11 dígitos');
-            }
-            Swal.fire('Validación', 'El RUC debe tener exactamente 11 dígitos', 'error');
-            return;
-        }
-        $docInput.removeClass('is-invalid').addClass('is-valid');
-    } else {
-        // Si no hay tipo seleccionado, no bloquear el envío
-        if ($docFeedback.length) {
-            $docFeedback.text('');
-        }
-        $docInput.removeClass('is-invalid is-valid');
-    }
-    
-    var formData = new FormData($("#mantenimiento_form")[0]);
-    
-    $.ajax({
-        url: "../../controller/cliente.php?op=guardaryeditar",
-        type: "POST",
-        data: formData,
-        contentType: false,
-        processData: false,
-        dataType: 'json',
-        success: function(response) {
-            // Cerrar el modal
-            $("#modalmantenimiento").modal('hide');
-
-            // Recargar el combo de clientes
-            $.post("../../controller/cliente.php?op=combo", function(data) {
-                $('#cli_id').html(data);
-
-                // Si es un nuevo cliente, seleccionarlo automáticamente
-                if (response && response.cli_id) {
-                    $('#cli_id').val(response.cli_id).trigger('change');
-                }
-            });
-
-            // Mostrar mensaje de éxito
-            Swal.fire({
-                title: 'Correcto!',
-                text: 'Cliente registrado correctamente',
-                icon: 'success',
-                confirmButtonText: 'Aceptar'
-            });
-        },
-        error: function(xhr, status, error) {
-            var msg = 'No se pudo guardar el cliente';
-            if (xhr && xhr.responseText) {
-                msg += '\n' + xhr.responseText.substring(0, 200);
-            }
-            Swal.fire({
-                title: 'Error!',
-                text: msg,
-                icon: 'error',
-                confirmButtonText: 'Aceptar'
-            });
-        }
-    });
-});
-
+// Botón nuevo cliente - solo abre el modal (la lógica de guardado está en mntcliente.js)
 $(document).on("click","#btnnuevo",function(e){
     e.preventDefault();
     
     // Limpiar el formulario
-    $("#cli_id").val("");
-    $("#cli_nom").val("");
-    $("#cli_ape").val("");
-    $("#cli_tipo_doc").val("");
-    $("#cli_doc").val("");
-    $("#cli_direcc").val("");
+    var $modal = $('#modalmantenimiento');
+    $modal.find('#cli_id').val("");
+    $modal.find('#cli_nom').val("");
+    $modal.find('#cli_ape').val("");
+    $modal.find('#cli_tipo_doc').val("");
+    $modal.find('#cli_doc').val("");
+    $modal.find('#cli_direcc').val("");
+    $modal.find('#cli_razon_social').val("");
     
     // Cambiar el título del modal
-    $('#lbltitulo').html('Nuevo Cliente');
+    $modal.find('#lbltitulo').html('Nuevo Cliente');
     
     // Limpiar el formulario completo
-    $("#mantenimiento_form")[0].reset();
+    $modal.find("#mantenimiento_form")[0].reset();
     
     // Abrir el modal
-    $("#modalmantenimiento").modal('show');
-    
-    // Actualizar el texto del botón después de abrir el modal
-    setTimeout(function() {
-        actualizarTextoBotonBuscar();
-        aplicarRestriccionesDocumento();
-    }, 200);
-});
-
-// Función para actualizar el texto del botón Buscar según el tipo de documento
-function actualizarTextoBotonBuscar() {
-    // Usar setTimeout para asegurar que el DOM esté actualizado
-    setTimeout(function() {
-        var $modal = $('#modalmantenimiento');
-        var tipoDoc = $modal.find('#cli_tipo_doc').val();
-        var boton = $modal.find('#btnBuscarDoc');
-        
-        if (tipoDoc === 'DNI') {
-            boton.text('RENIEC');
-        } else if (tipoDoc === 'RUC') {
-            boton.text('SUNAT');
-        } else {
-            boton.text('Buscar');
-        }
-    }, 100);
-}
-
-// Evento cuando cambia el tipo de documento en el modal
-$(document).on('change', '#modalmantenimiento #cli_tipo_doc', function() {
-    actualizarTextoBotonBuscar();
-    aplicarRestriccionesDocumento(true);
-});
-
-// Actualizar el texto cuando se abre el modal
-$(document).on('shown.bs.modal', '#modalmantenimiento', function () {
-    actualizarTextoBotonBuscar();
-    aplicarRestriccionesDocumento();
-});
-
-// Evento click del botón buscar
-$(document).on('click', '#btnBuscarDoc', function(e) {
-    e.preventDefault();
-    
-    var $modal = $('#modalmantenimiento');
-    var tipoDoc = $modal.find('#cli_tipo_doc').val();
-    var numDoc = $modal.find('#cli_doc').val();
-    
-    if (!tipoDoc) {
-        Swal.fire('Atención!', 'Por favor seleccione un tipo de documento', 'warning');
-        return;
-    }
-    
-    if (!numDoc) {
-        Swal.fire('Atención!', 'Por favor ingrese un número de documento', 'warning');
-        return;
-    }
-    
-    // Búsqueda en RENIEC (DNI)
-    if (tipoDoc === 'DNI') {
-        var dni = (numDoc || '').replace(/\D/g, '');
-        if (!/^\d{8}$/.test(dni)) {
-            Swal.fire('Validación', 'El DNI debe tener exactamente 8 dígitos', 'error');
-            return;
-        }
-
-        var $btn = $modal.find('#btnBuscarDoc');
-        $btn.prop('disabled', true);
-
-        Swal.fire({
-            title: 'Consultando RENIEC…',
-            allowOutsideClick: false,
-            didOpen: () => { Swal.showLoading(); }
-        });
-
-        $.ajax({
-            url: "../../controller/cliente.php?op=consultar_reniec",
-            type: "GET",
-            dataType: "json",
-            data: { numero: dni },
-            success: function(resp) {
-                if (resp && resp.success) {
-                    var nombres = resp.first_name || '';
-                    var apellidos = [resp.first_last_name || '', resp.second_last_name || ''].filter(Boolean).join(' ').trim();
-                    if (resp.document_number && resp.document_number !== dni) {
-                        $modal.find('#cli_doc').val(resp.document_number);
-                    }
-                    $modal.find('#cli_nom').val(nombres);
-                    $modal.find('#cli_ape').val(apellidos);
-
-                    Swal.fire({
-                        title: 'Datos encontrados',
-                        text: resp.full_name ? resp.full_name : 'Se llenaron nombres y apellidos',
-                        icon: 'success',
-                        confirmButtonText: 'Aceptar'
-                    });
-                } else {
-                    var msg = (resp && resp.message) ? resp.message : 'No se encontraron datos en RENIEC';
-                    Swal.fire({ title: 'Sin resultados', text: msg, icon: 'warning', confirmButtonText: 'Aceptar' });
-                }
-            },
-            error: function(xhr) {
-                var msg = 'Error al consultar RENIEC';
-                try { var j = JSON.parse(xhr.responseText); if (j.message) msg = j.message; } catch(e) {}
-                Swal.fire({ title: 'Error', text: msg, icon: 'error', confirmButtonText: 'Aceptar' });
-            },
-            complete: function() {
-                $btn.prop('disabled', false);
-            }
-        });
-        return;
-    }
-
-    // Búsqueda en SUNAT (RUC) - pendiente de integración
-    if (tipoDoc === 'RUC') {
-        Swal.fire('Información', 'Integración con SUNAT pendiente', 'info');
-        return;
-    }
-
-    Swal.fire('Información', 'Buscando…', 'info');
-});
-
-// Aplicar restricciones de longitud y formato según tipo de documento
-function aplicarRestriccionesDocumento(clearValue) {
-    var $modal = $('#modalmantenimiento');
-    var tipoDoc = $modal.find('#cli_tipo_doc').val();
-    var $docInput = $modal.find('#cli_doc');
-    var $docFeedback = $modal.find('#cli_doc_feedback');
-    
-    if (clearValue) {
-        $docInput.val('');
-        $docInput.removeClass('is-valid is-invalid');
-        if ($docFeedback.length) $docFeedback.text('');
-    }
-    
-    if (tipoDoc === 'DNI') {
-        $docInput.attr('maxlength', '8');
-        $docInput.attr('pattern', '^\\d{8}$');
-        $docInput.attr('placeholder', '8 dígitos');
-    } else if (tipoDoc === 'RUC') {
-        $docInput.attr('maxlength', '11');
-        $docInput.attr('pattern', '^\\d{11}$');
-        $docInput.attr('placeholder', '11 dígitos');
-    } else {
-        $docInput.removeAttr('maxlength');
-        $docInput.removeAttr('pattern');
-        $docInput.attr('placeholder', '');
-    }
-}
-
-// Validación en tiempo real del número de documento
-$(document).on('input', '#modalmantenimiento #cli_doc', function() {
-    var $modal = $('#modalmantenimiento');
-    var tipoDoc = $modal.find('#cli_tipo_doc').val();
-    var $docInput = $(this);
-    var $docFeedback = $modal.find('#cli_doc_feedback');
-    
-    // Forzar solo dígitos
-    var digits = ($docInput.val() || '').replace(/\D/g, '');
-    $docInput.val(digits);
-    
-    if (tipoDoc === 'DNI') {
-        if (/^\d{8}$/.test(digits)) {
-            $docInput.removeClass('is-invalid').addClass('is-valid');
-            if ($docFeedback.length) $docFeedback.text('');
-        } else {
-            $docInput.removeClass('is-valid').addClass('is-invalid');
-            if ($docFeedback.length) $docFeedback.text('DNI debe ser exactamente 8 dígitos');
-        }
-    } else if (tipoDoc === 'RUC') {
-        if (/^\d{11}$/.test(digits)) {
-            $docInput.removeClass('is-invalid').addClass('is-valid');
-            if ($docFeedback.length) $docFeedback.text('');
-        } else {
-            $docInput.removeClass('is-valid').addClass('is-invalid');
-            if ($docFeedback.length) $docFeedback.text('RUC debe ser exactamente 11 dígitos');
-        }
-    } else {
-        // Sin tipo seleccionado, no marcar inválido y limpiar feedback
-        $docInput.removeClass('is-valid is-invalid');
-        if ($docFeedback.length) $docFeedback.text('');
-    }
+    $modal.modal('show');
 });
 
 // Guardar recepción (inserción)
@@ -552,6 +360,10 @@ $(document).on('submit', '#recepcion_form', function(e) {
     fd.set('precio_inicial', precioNum);
     fd.set('adelanto', adelantoNum);
     fd.set('observacion', observacion);
+    
+    // Tipo de comprobante (Boleta=03, Factura=01)
+    var tipoComprobante = $('#tipo_comprobante').val() || '03';
+    fd.set('tipo_comprobante', tipoComprobante);
     
     // Tarifa seleccionada
     var tarId = parseInt($('#tar_id').val() || '0', 10);

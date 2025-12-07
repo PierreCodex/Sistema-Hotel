@@ -165,7 +165,7 @@ class Reporte extends Conectar {
     /**
      * Exporta el reporte a Excel (CSV)
      */
-    public function exportarExcel($fecha_inicio, $fecha_fin, $estado = '') {
+   public function exportarExcel($fecha_inicio, $fecha_fin, $estado = ''): void {
         $ventas = $this->obtenerListaVentas($fecha_inicio, $fecha_fin, $estado);
         
         // Configurar headers para descarga
@@ -202,7 +202,7 @@ class Reporte extends Conectar {
     /**
      * Exporta el reporte a PDF
      */
-    public function exportarPDF($fecha_inicio, $fecha_fin, $estado = '') {
+    public function exportarPDF($fecha_inicio, $fecha_fin, $estado = ''): void {
         require_once(__DIR__ . '/../vendor/autoload.php');
         
         $ventas = $this->obtenerListaVentas($fecha_inicio, $fecha_fin, $estado);
@@ -580,7 +580,7 @@ class Reporte extends Conectar {
     /**
      * Exporta reporte de recepciones a PDF
      */
-    public function exportarPDFRecepciones($fecha_inicio, $fecha_fin, $estado = '') {
+        public function exportarPDFRecepciones($fecha_inicio, $fecha_fin, $estado = ''): void {
         require_once(__DIR__ . '/../vendor/autoload.php');
         
         $recepciones = $this->obtenerListaRecepciones($fecha_inicio, $fecha_fin, $estado);

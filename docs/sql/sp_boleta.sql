@@ -24,7 +24,7 @@ BEGIN
 END//
 
 -- =====================================================
--- 2. INSERTAR BOLETA/FACTURA
+-- 2. INSERTAR BOLETA/FACTURA (con hash)
 -- =====================================================
 DROP PROCEDURE IF EXISTS SP_BOL_INSERTAR//
 CREATE PROCEDURE SP_BOL_INSERTAR(
@@ -45,7 +45,8 @@ CREATE PROCEDURE SP_BOL_INSERTAR(
     IN p_xml LONGTEXT,
     IN p_cdr LONGTEXT,
     IN p_observaciones TEXT,
-    IN p_usuario_registro INT
+    IN p_usuario_registro INT,
+    IN p_hash VARCHAR(100)
 )
 BEGIN
     INSERT INTO boleta (
@@ -53,13 +54,13 @@ BEGIN
         bol_fecha_emision, bol_cliente_tipo_doc, bol_cliente_num_doc, 
         bol_cliente_razon_social, bol_cliente_direccion,
         bol_subtotal, bol_igv, bol_total, bol_estado, 
-        bol_metodo_pago, bol_xml, bol_cdr, bol_observaciones, bol_usuario_registro
+        bol_metodo_pago, bol_xml, bol_cdr, bol_observaciones, bol_usuario_registro, bol_hash
     ) VALUES (
         p_rec_id, p_tipo, p_serie, p_correlativo,
         p_fecha_emision, p_cliente_tipo_doc, p_cliente_num_doc,
         p_cliente_razon_social, p_cliente_direccion,
         p_subtotal, p_igv, p_total, p_estado,
-        p_metodo_pago, p_xml, p_cdr, p_observaciones, p_usuario_registro
+        p_metodo_pago, p_xml, p_cdr, p_observaciones, p_usuario_registro, p_hash
     );
     
     SELECT LAST_INSERT_ID() AS bol_id;

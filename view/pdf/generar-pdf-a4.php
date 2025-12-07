@@ -18,6 +18,7 @@ use Dompdf\Options;
 
 // Validar parámetros
 $bol_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$origen = isset($_GET['origen']) ? $_GET['origen'] : 'boleta';
 
 if ($bol_id <= 0) {
     die("ID de comprobante no válido");
@@ -25,13 +26,13 @@ if ($bol_id <= 0) {
 
 // Obtener datos del comprobante
 $boletaModel = new Boleta();
-$comp = $boletaModel->obtenerComprobantePorId($bol_id);
+$comp = $boletaModel->obtenerComprobantePorId($bol_id, $origen);
 
 if (!$comp) {
     die("Comprobante no encontrado");
 }
 
-$detalles = $boletaModel->obtenerDetallesComprobante($bol_id);
+$detalles = $boletaModel->obtenerDetallesComprobante($bol_id, $origen);
 
 // Configurar datos de la empresa
 $empresa = [
@@ -44,51 +45,51 @@ $empresa = [
     'logo' => '../../assets/images/logo-dark.png'
 ];
 
-// Configurar datos del comprobante
+// Configurar datos del comprobante (usando campos comp_* del SP unificado)
 $comprobante = [
-    'tipo' => $comp['bol_tipo'],
-    'tipo_nombre' => ($comp['bol_tipo'] == '01') ? 'FACTURA' : 'BOLETA DE VENTA',
-    'serie' => $comp['bol_serie'],
-    'correlativo' => $comp['bol_correlativo'],
-    'fecha_emision' => date('d/m/Y', strtotime($comp['bol_fecha_emision'])),
-    'hora_emision' => date('H:i:s', strtotime($comp['bol_fecha_emision'])),
+    'tipo' => $comp['comp_tipo'],
+    'tipo_nombre' => ($comp['comp_tipo'] == '01') ? 'FACTURA' : 'BOLETA DE VENTA',
+    'serie' => $comp['comp_serie'],
+    'correlativo' => $comp['comp_correlativo'],
+    'fecha_emision' => date('d/m/Y', strtotime($comp['comp_fecha_emision'])),
+    'hora_emision' => date('H:i:s', strtotime($comp['comp_fecha_emision'])),
     'moneda' => 'SOLES',
-    'hash' => $comp['bol_hash'] ?? '-',
+    'hash' => $comp['comp_hash'] ?? '-',
     'qr_code' => null,
-    'monto_letras' => convertirNumeroALetras($comp['bol_total']),
-    'observaciones' => $comp['bol_observaciones'] ?? ''
+    'monto_letras' => convertirNumeroALetras($comp['comp_total']),
+    'observaciones' => $comp['comp_descripcion_cdr'] ?? ''
 ];
 
 // Datos del cliente (usado en boleta-a4.php template)
 /** @phpstan-ignore-next-line */
 $cliente = [
-    'documento' => $comp['bol_cliente_num_doc'] ?? '-',
-    'nombre' => $comp['bol_cliente_razon_social'] ?? 'CLIENTE GENERAL',
-    'direccion' => $comp['bol_cliente_direccion'] ?? '-',
+    'documento' => $comp['comp_cliente_num_doc'] ?? '-',
+    'nombre' => $comp['comp_cliente_razon_social'] ?? 'CLIENTE GENERAL',
+    'direccion' => $comp['comp_cliente_direccion'] ?? '-',
 ];
 
-// Preparar items
+// Preparar items (usando campos det_* del SP unificado)
 $items = [];
 foreach ($detalles as $det) {
     $items[] = [
-        'codigo' => $det['bol_det_codigo'] ?? '-',
-        'descripcion' => $det['bol_det_descripcion'],
-        'unidad' => $det['bol_det_unidad'] ?? 'UND',
-        'cantidad' => floatval($det['bol_det_cantidad']),
-        'precio_unitario' => floatval($det['bol_det_precio_unitario']),
-        'importe' => floatval($det['bol_det_total'] ?? ($det['bol_det_cantidad'] * $det['bol_det_precio_unitario'])),
+        'codigo' => $det['det_codigo'] ?? '-',
+        'descripcion' => $det['det_descripcion'],
+        'unidad' => $det['det_unidad'] ?? 'UND',
+        'cantidad' => floatval($det['det_cantidad']),
+        'precio_unitario' => floatval($det['det_precio_unitario']),
+        'importe' => floatval($det['det_total'] ?? ($det['det_cantidad'] * $det['det_precio_unitario'])),
     ];
 }
 
-// Totales (usado en boleta-a4.php template)
+// Totales (usando campos comp_* del SP unificado)
 /** @phpstan-ignore-next-line */
 $totales = [
-    'gravadas' => floatval($comp['bol_subtotal']),
+    'gravadas' => floatval($comp['comp_subtotal']),
     'exoneradas' => 0,
     'inafectas' => 0,
     'descuento' => 0,
-    'igv' => floatval($comp['bol_igv']),
-    'total' => floatval($comp['bol_total']),
+    'igv' => floatval($comp['comp_igv']),
+    'total' => floatval($comp['comp_total']),
 ];
 
 // Título del documento (usado en boleta-a4.php template)

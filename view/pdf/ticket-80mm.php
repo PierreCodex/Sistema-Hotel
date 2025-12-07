@@ -235,14 +235,18 @@
     </div>
     <div class="descripcion-label">DESCRIPCIÓN</div>
 
-    <?php foreach ($detalles as $item) { ?>
+    <?php foreach ($detalles as $item) { 
+        // Calcular precio con IGV incluido (el que se cobró)
+        $precioConIgv = isset($item['precio_original']) ? $item['precio_original'] : round($item['precio_unitario'] * 1.18, 2);
+        $totalItem = $item['cantidad'] * $precioConIgv;
+    ?>
         <div class="item">
             <div class="item-row">
-                <span class="col-cant"><?php echo $item['cantidad']; ?></span>
+                <span class="col-cant"><?php echo number_format($item['cantidad'], 2); ?></span>
                 <span class="col-um"><?php echo $item['unidad'] ?? 'UND'; ?></span>
                 <span class="col-cod"><?php echo $item['codigo'] ?? 'P001'; ?></span>
-                <span class="col-precio"><?php echo number_format($item['precio_unitario'], 2); ?></span>
-                <span class="col-total"><?php echo number_format($item['cantidad'] * $item['precio_unitario'], 2); ?></span>
+                <span class="col-precio"><?php echo number_format($precioConIgv, 2); ?></span>
+                <span class="col-total"><?php echo number_format($totalItem, 2); ?></span>
             </div>
             <div class="item-desc"><?php echo $item['descripcion']; ?></div>
         </div>
@@ -270,7 +274,7 @@
 
     <?php if (isset($forma_pago)) { ?>
         <div class="payment">
-            <strong>Forma de Pago:</strong> <?php echo $forma_pago; ?><br>
+        
             <?php if (isset($metodo_pago)) { ?><strong>Método de Pago:</strong> <?php echo $metodo_pago; ?><?php } ?>
         </div>
     <?php } ?>

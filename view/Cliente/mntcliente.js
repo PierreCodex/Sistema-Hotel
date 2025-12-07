@@ -3,7 +3,7 @@ function init(){
   
 }
 
-// Función para listar todos los usuarios
+// Función para listar todos los clientes
 $(document).ready(function(){
 
     $('#table_data').DataTable({
@@ -51,397 +51,497 @@ $(document).ready(function(){
     });
 
 });
-// Función para editar un usuario
-function editar(usu_id){
-    // Limpiar clases de validación antes de cargar datos
-    const form = document.getElementById('mantenimiento_form');
-    form.classList.remove('was-validated');
-    clearValidationClasses();
-    
-    // Resetear indicador de fortaleza de contraseña
-    resetPasswordStrengthIndicator();
-    
-    $.post("../../controller/usuario.php?op=mostrar",{usu_id:usu_id},function(data){
-        data=JSON.parse(data);
-        $('#usu_id').val(data.USU_ID);
-        $('#usu_nom').val(data.USU_NOM);
-        $('#usu_ape').val(data.USU_APE);
-        $('#usu_dni').val(data.USU_DNI);
-        $('#usu_correo').val(data.USU_CORREO);
-        $('#rol_id').val(data.ROL_ID);
-        
-        // Configurar campos editables según las reglas de negocio
-        // Solo permitir editar: Nombre, Apellido, DNI, Correo, Rol, Contraseña
-        
-        // Cargar la contraseña real pero mostrarla como tipo password (con puntos)
-        $('#usu_pass').val(data.USU_PASS || '');
-        
-        // Marcar que estamos en modo edición y guardar la contraseña original
-        $('#usu_pass').attr('data-editing', 'true');
-        $('#usu_pass').attr('data-original-password', data.USU_PASS || '');
-        $('#usu_pass').prop('readonly', false);
-        $('#usu_pass').removeClass('bg-light');
-        $('#usu_pass').attr('title', 'Puede modificar la contraseña o mantener la actual');
-        $('#usu_pass').attr('placeholder', 'Modifique la contraseña si desea cambiarla');
-        
-        console.log('Modo edición activado: Contraseña protegida');
-        
-        // Validar campos cargados para mostrar estado válido
-        setTimeout(() => {
-            validateTextField(document.getElementById('usu_nom'), 2, 50);
-            validateTextField(document.getElementById('usu_ape'), 2, 50);
-            validateDNI(document.getElementById('usu_dni'));
-            validateEmail(document.getElementById('usu_correo'));
-            validateSelect(document.getElementById('rol_id'));
-        }, 100);
-    });
-    $('#lbltitulo').html('Editar Registro');
-    $('#modalmantenimiento').modal('show');
-}
-// Función para eliminar un usuario
-function eliminar(usu_id){
-    Swal.fire({
-        title:"Eliminar!",
-        text:"Desea Eliminar el Registro?",
-        icon: "error",
-        confirmButtonText : "Si",
-        showCancelButton : true,
-        cancelButtonText: "No",
-    }).then((result)=>{
-        if (result.value){
-            $.post("../../controller/usuario.php?op=eliminar",{usu_id:usu_id},function(data){
-                console.log(data);
-            });
 
-            $('#table_data').DataTable().ajax.reload();
+// ==========================================
+// VALIDACIONES DEL FORMULARIO DE CLIENTE
+// ==========================================
 
-            Swal.fire({
-                title:'Usuario',
-                text: 'Registro Eliminado',
-                icon: 'success'
-            });
-        }
-    });
-}
-
-// Función para cambiar el estado del usuario via checkbox
-function cambiarEstado(usu_id, estado) {
-    var accion = estado ? 'activar' : 'desactivar';
-    var titulo = estado ? 'Activar Usuario' : 'Desactivar Usuario';
-    var texto = '¿Está seguro que desea ' + accion + ' este usuario?';
+// Evento para guardar el cliente desde el modal
+$(document).on("submit", "#mantenimiento_form", function(e) {
+    e.preventDefault();
     
-    Swal.fire({
-        title: titulo,
-        text: texto,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, ' + accion,
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.post("../../controller/usuario.php?op=cambiar_estado", {
-                usu_id: usu_id,
-                estado: estado
-            }, function(data) {
-                var response = JSON.parse(data);
-                if(response.status === 'success') {
-                    $('#table_data').DataTable().ajax.reload();
-                    Swal.fire({
-                        title: 'Usuario',
-                        text: response.message,
-                        icon: 'success',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                }
-            }).fail(function() {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'No se pudo actualizar el estado',
-                    icon: 'error'
-                });
-                // Revertir el checkbox en caso de error
-                $('#switch' + usu_id).prop('checked', !estado);
-            });
-        } else {
-            // Si el usuario cancela, revertir el checkbox
-            $('#switch' + usu_id).prop('checked', !estado);
-        }
-    });
-}
-
-  // Función para limpiar el formulario y resetear el modal
-$(document).on("click","#btnnuevo",function(){
-    $('#usu_id').val('');
-    $('#usu_nom').val('');
-    $('#usu_ape').val('');
-    $('#usu_dni').val('');
-    $('#usu_correo').val('');
-    $('#usu_pass').val('');
-    $('#rol_id').val('');
-    $('#lbltitulo').html('Nuevo Registro');
-    $("#mantenimiento_form")[0].reset();
+    var $modal = $('#modalmantenimiento');
+    var tipoDocSel = $modal.find('#cli_tipo_doc').val();
+    var $docInput = $modal.find('#cli_doc');
+    var docVal = ($docInput.val() || '').trim();
+    var $docFeedback = $modal.find('#cli_doc_feedback');
+    var cliId = $modal.find('#cli_id').val() || '';
     
-    // Limpiar atributos de edición de contraseña y habilitar el campo
-    $('#usu_pass').removeAttr('data-editing');
-    $('#usu_pass').removeAttr('data-original-password');
-    $('#usu_pass').removeAttr('title');
-    $('#usu_pass').removeAttr('placeholder');
-    $('#usu_pass').prop('readonly', false);
-    $('#usu_pass').removeClass('bg-light');
-    
-    console.log('Modo nuevo registro: Campo contraseña habilitado para edición');
-    
-    // Limpiar clases de validación
-    const form = document.getElementById('mantenimiento_form');
-    form.classList.remove('was-validated');
-    clearValidationClasses();
-    
-    // Resetear indicador de fortaleza de contraseña
-    resetPasswordStrengthIndicator();
-    
-    combo_rol();
-    $('#modalmantenimiento').modal('show');
-});
-
-
-// Funciones para validación de contraseña en tiempo real
-function initPasswordStrengthValidator() {
-    const passwordInput = document.getElementById('usu_pass');
-    const toggleButton = document.getElementById('togglePassword');
-    const strengthContainer = document.getElementById('passwordStrengthContainer');
-    
-    if (passwordInput) {
-        // Mostrar contenedor cuando el usuario haga foco en el campo
-        passwordInput.addEventListener('focus', function() {
-            // Solo limpiar si no estamos en modo edición
-            const isEditing = this.getAttribute('data-editing') === 'true';
-            
-            if (!isEditing && /^\*+$/.test(this.value)) {
-                this.value = '';
-                resetPasswordStrengthIndicator();
-            }
-            
-            // Solo mostrar el contenedor si no estamos en modo edición
-            if (!isEditing && strengthContainer) {
-                strengthContainer.style.display = 'block';
-            }
+    // Validar que se haya seleccionado un tipo de documento
+    if (!tipoDocSel || tipoDocSel === '') {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Tipo de documento requerido',
+            text: 'Debe seleccionar un tipo de documento (DNI o RUC)',
+            confirmButtonText: 'Entendido'
         });
+        $modal.find('#cli_tipo_doc').focus();
+        return;
+    }
+    
+    // Normalizar a solo dígitos
+    docVal = docVal.replace(/\D/g, '');
+    $docInput.val(docVal);
+    
+    // Validar que se haya ingresado un número de documento
+    if (!docVal || docVal === '') {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Número de documento requerido',
+            text: 'Debe ingresar el número de documento',
+            confirmButtonText: 'Entendido'
+        });
+        $docInput.focus();
+        return;
+    }
+    
+    // Reglas de validación según tipo
+    var dniOk = /^\d{8}$/.test(docVal);
+    var rucOk = /^\d{11}$/.test(docVal);
+    
+    if (tipoDocSel === 'DNI') {
+        if (!dniOk) {
+            $docInput.removeClass('is-valid').addClass('is-invalid');
+            if ($docFeedback.length) {
+                $docFeedback.text('DNI debe ser exactamente 8 dígitos');
+            }
+            Swal.fire('Validación', 'El DNI debe tener exactamente 8 dígitos', 'error');
+            return;
+        }
+        $docInput.removeClass('is-invalid').addClass('is-valid');
+    } else if (tipoDocSel === 'RUC') {
+        if (!rucOk) {
+            $docInput.removeClass('is-valid').addClass('is-invalid');
+            if ($docFeedback.length) {
+                $docFeedback.text('RUC debe ser exactamente 11 dígitos');
+            }
+            Swal.fire('Validación', 'El RUC debe tener exactamente 11 dígitos', 'error');
+            return;
+        }
+        $docInput.removeClass('is-invalid').addClass('is-valid');
+    }
+    
+    // Validar nombre/apellido o razón social según tipo de documento
+    var $cliNom = $modal.find('#cli_nom');
+    var $cliApe = $modal.find('#cli_ape');
+    var $cliRazonSocial = $modal.find('#cli_razon_social');
+    
+    if (tipoDocSel === 'DNI') {
+        var nombre = ($cliNom.val() || '').trim();
+        var apellido = ($cliApe.val() || '').trim();
         
-        // Evento para validación en tiempo real
-        passwordInput.addEventListener('input', function() {
-            // Si el campo contiene solo asteriscos, no mostrar indicador de fortaleza
-            if (/^\*+$/.test(this.value)) {
-                if (strengthContainer) {
-                    strengthContainer.style.display = 'none';
+        if (!nombre) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Nombre requerido',
+                text: 'Debe ingresar el nombre del cliente',
+                confirmButtonText: 'Entendido'
+            });
+            $cliNom.focus();
+            return;
+        }
+        
+        if (!apellido) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Apellido requerido',
+                text: 'Debe ingresar el apellido del cliente',
+                confirmButtonText: 'Entendido'
+            });
+            $cliApe.focus();
+            return;
+        }
+    } else if (tipoDocSel === 'RUC') {
+        var razonSocial = ($cliRazonSocial.val() || '').trim();
+        
+        if (!razonSocial) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Razón Social requerida',
+                text: 'Debe ingresar la razón social de la empresa',
+                confirmButtonText: 'Entendido'
+            });
+            $cliRazonSocial.focus();
+            return;
+        }
+        
+        // Para RUC, copiar razón social a nombre y apellido para compatibilidad con BD
+        $cliNom.val(razonSocial);
+        $cliApe.val('-');
+    }
+    
+    // Verificar si el documento ya existe antes de guardar
+    $.ajax({
+        url: "../../controller/cliente.php?op=verificar_documento",
+        type: "POST",
+        data: { cli_doc: docVal, cli_id: cliId },
+        dataType: 'json',
+        success: function(resp) {
+            if (resp.success && resp.data && resp.data.existe) {
+                var clienteExistente = resp.data.cliente;
+                var nombreCompleto = (clienteExistente.Nombre || '') + ' ' + (clienteExistente.Apellido || '');
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Documento ya registrado',
+                    html: '<p>El <strong>' + tipoDocSel + '</strong> <strong>' + docVal + '</strong> ya está registrado.</p>' +
+                          '<p>Cliente: <strong>' + nombreCompleto.trim() + '</strong></p>' +
+                          '<p>Por favor, seleccione el cliente existente o use otro documento.</p>',
+                    confirmButtonText: 'Entendido'
+                });
+                
+                $docInput.removeClass('is-valid').addClass('is-invalid');
+                if ($docFeedback.length) {
+                    $docFeedback.text('Este documento ya está registrado');
                 }
                 return;
             }
             
-            if (strengthContainer) {
-                strengthContainer.style.display = 'block';
+            // Si no existe duplicado, proceder a guardar
+            guardarClienteForm($modal);
+        },
+        error: function() {
+            // En caso de error en la verificación, intentar guardar
+            guardarClienteForm($modal);
+        }
+    });
+});
+
+// Función para guardar el cliente
+function guardarClienteForm($modal) {
+    var formData = new FormData(document.getElementById("mantenimiento_form"));
+    
+    $.ajax({
+        url: "../../controller/cliente.php?op=guardaryeditar",
+        type: "POST",
+        data: formData,
+        contentType: false,
+        processData: false,
+        dataType: 'json',
+        success: function(response) {
+            // Cerrar el modal
+            $modal.modal('hide');
+
+            // Recargar combo de clientes si existe (en recepción)
+            if ($('#cli_id').length) {
+                $.post("../../controller/cliente.php?op=combo", function(data) {
+                    $('#cli_id').html(data);
+                    if (response && response.cli_id) {
+                        $('#cli_id').val(response.cli_id).trigger('change');
+                    }
+                });
             }
-            validatePasswordStrength(this.value);
-        });
-        
-        // Evento para mostrar/ocultar contraseña
-        if (toggleButton) {
-            toggleButton.addEventListener('click', function() {
-                togglePasswordVisibility();
+            
+            // Recargar tabla si existe (en mantenimiento de clientes)
+            if ($('#table_data').length && $.fn.DataTable.isDataTable('#table_data')) {
+                $('#table_data').DataTable().ajax.reload();
+            }
+
+            Swal.fire({
+                title: 'Correcto!',
+                text: 'Cliente registrado correctamente',
+                icon: 'success',
+                confirmButtonText: 'Aceptar'
             });
-        }
-    }
-}
-
-function validatePasswordStrength(password) {
-    const requirements = {
-        length: password.length >= 8 && password.length <= 20,
-        uppercase: /[A-Z]/.test(password),
-        lowercase: /[a-z]/.test(password),
-        number: /\d/.test(password),
-        special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
-    };
-    
-    // Actualizar indicadores visuales de requisitos
-    updateRequirement('req-length', requirements.length);
-    updateRequirement('req-uppercase', requirements.uppercase);
-    updateRequirement('req-lowercase', requirements.lowercase);
-    updateRequirement('req-number', requirements.number);
-    updateRequirement('req-special', requirements.special);
-    
-    // Calcular fortaleza
-    const strength = calculatePasswordStrength(requirements);
-    updateStrengthBar(strength);
-    updateStrengthText(strength);
-    
-    return strength;
-}
-
-function updateRequirement(elementId, isValid) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        const icon = element.querySelector('i');
-        
-        if (isValid) {
-            element.classList.remove('invalid');
-            element.classList.add('valid');
-            icon.className = 'fas fa-check-circle';
-        } else {
-            element.classList.remove('valid');
-            element.classList.add('invalid');
-            icon.className = 'fas fa-times-circle';
-        }
-    }
-}
-
-function calculatePasswordStrength(requirements) {
-    const validCount = Object.values(requirements).filter(Boolean).length;
-    
-    if (validCount === 0) return 0;
-    if (validCount === 1) return 1;
-    if (validCount === 2) return 2;
-    if (validCount === 3) return 3;
-    if (validCount === 4) return 4;
-    if (validCount === 5) return 5;
-    
-    return 0;
-}
-
-function updateStrengthBar(strength) {
-    const strengthBar = document.querySelector('.strength-bar');
-    if (strengthBar) {
-        // Remover clases anteriores
-        strengthBar.className = 'strength-bar';
-        
-        // Agregar nueva clase según fortaleza
-        switch (strength) {
-            case 0:
-                strengthBar.style.width = '0%';
-                break;
-            case 1:
-                strengthBar.classList.add('strength-very-weak');
-                break;
-            case 2:
-                strengthBar.classList.add('strength-weak');
-                break;
-            case 3:
-                strengthBar.classList.add('strength-fair');
-                break;
-            case 4:
-                strengthBar.classList.add('strength-good');
-                break;
-            case 5:
-                strengthBar.classList.add('strength-strong');
-                break;
-        }
-    }
-}
-
-function updateStrengthText(strength) {
-    const strengthLevel = document.getElementById('strengthLevel');
-    if (strengthLevel) {
-        // Remover clases anteriores
-        strengthLevel.className = '';
-        
-        switch (strength) {
-            case 0:
-                strengthLevel.textContent = '';
-                break;
-            case 1:
-                strengthLevel.textContent = 'Muy Débil';
-                strengthLevel.classList.add('strength-very-weak-text');
-                break;
-            case 2:
-                strengthLevel.textContent = 'Débil';
-                strengthLevel.classList.add('strength-weak-text');
-                break;
-            case 3:
-                strengthLevel.textContent = 'Regular';
-                strengthLevel.classList.add('strength-fair-text');
-                break;
-            case 4:
-                strengthLevel.textContent = 'Buena';
-                strengthLevel.classList.add('strength-good-text');
-                break;
-            case 5:
-                strengthLevel.textContent = 'Fuerte';
-                strengthLevel.classList.add('strength-strong-text');
-                break;
-        }
-    }
-}
-
-function togglePasswordVisibility() {
-    const passwordInput = document.getElementById('usu_pass');
-    const toggleIcon = document.querySelector('#togglePassword i');
-    
-    if (passwordInput && toggleIcon) {
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            toggleIcon.className = 'fas fa-eye-slash';
-        } else {
-            passwordInput.type = 'password';
-            toggleIcon.className = 'fas fa-eye';
-        }
-    }
-}
-
-// Función para validar contraseña en el formulario
-function validatePasswordField() {
-    const passwordInput = document.getElementById('usu_pass');
-    if (passwordInput && passwordInput.value.trim() !== '') {
-        const strength = validatePasswordStrength(passwordInput.value);
-        return strength >= 3; // Requiere al menos fortaleza "Regular"
-    }
-    return passwordInput && passwordInput.value.trim() !== '';
-}
-
-// Función para resetear el indicador de fortaleza de contraseña
-function resetPasswordStrengthIndicator() {
-    const strengthContainer = document.getElementById('passwordStrengthContainer');
-    const passwordInput = document.getElementById('usu_pass');
-    const strengthBar = document.querySelector('.strength-bar');
-    const strengthLevel = document.getElementById('strengthLevel');
-    
-    // Ocultar el contenedor
-    if (strengthContainer) {
-        strengthContainer.style.display = 'none';
-    }
-    
-    // Limpiar el campo de contraseña
-    if (passwordInput) {
-        passwordInput.value = '';
-        passwordInput.classList.remove('is-valid', 'is-invalid');
-    }
-    
-    // Resetear la barra de fortaleza
-    if (strengthBar) {
-        strengthBar.className = 'strength-bar';
-        strengthBar.style.width = '0%';
-    }
-    
-    // Resetear el texto de fortaleza
-    if (strengthLevel) {
-        strengthLevel.textContent = '';
-        strengthLevel.className = '';
-    }
-    
-    // Resetear todos los requisitos a estado inválido
-    const requirements = ['req-length', 'req-uppercase', 'req-lowercase', 'req-number', 'req-special'];
-    requirements.forEach(reqId => {
-        const element = document.getElementById(reqId);
-        if (element) {
-            const icon = element.querySelector('i');
-            element.classList.remove('valid');
-            element.classList.add('invalid');
-            if (icon) {
-                icon.className = 'fas fa-times-circle';
+        },
+        error: function(xhr) {
+            var msg = 'No se pudo guardar el cliente';
+            if (xhr && xhr.responseText) {
+                msg += '\n' + xhr.responseText.substring(0, 200);
             }
+            Swal.fire({
+                title: 'Error!',
+                text: msg,
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
         }
     });
 }
+
+// Validación en tiempo real del documento (al salir del campo)
+$(document).on('blur', '#modalmantenimiento #cli_doc', function() {
+    var $modal = $('#modalmantenimiento');
+    var tipoDocSel = $modal.find('#cli_tipo_doc').val();
+    var $docInput = $(this);
+    var docVal = ($docInput.val() || '').trim().replace(/\D/g, '');
+    var $docFeedback = $modal.find('#cli_doc_feedback');
+    var cliId = $modal.find('#cli_id').val() || '';
+    
+    // Validar longitud según tipo
+    if (tipoDocSel === 'DNI' && docVal.length !== 8) return;
+    if (tipoDocSel === 'RUC' && docVal.length !== 11) return;
+    if (!docVal) return;
+    
+    // Verificar si el documento ya existe
+    $.ajax({
+        url: "../../controller/cliente.php?op=verificar_documento",
+        type: "POST",
+        data: { cli_doc: docVal, cli_id: cliId },
+        dataType: 'json',
+        success: function(resp) {
+            if (resp.success && resp.data && resp.data.existe) {
+                var clienteExistente = resp.data.cliente;
+                var nombreCompleto = (clienteExistente.Nombre || '') + ' ' + (clienteExistente.Apellido || '');
+                
+                $docInput.removeClass('is-valid').addClass('is-invalid');
+                if ($docFeedback.length) {
+                    $docFeedback.text('Ya registrado: ' + nombreCompleto.trim());
+                }
+                
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Cliente ya existe',
+                    html: '<p>El <strong>' + tipoDocSel + '</strong> <strong>' + docVal + '</strong> ya está registrado.</p>' +
+                          '<p>Cliente: <strong>' + nombreCompleto.trim() + '</strong></p>' +
+                          '<p>Puede seleccionar este cliente desde el combo o usar otro documento.</p>',
+                    confirmButtonText: 'Entendido'
+                });
+            } else {
+                $docInput.removeClass('is-invalid').addClass('is-valid');
+                if ($docFeedback.length) {
+                    $docFeedback.text('');
+                }
+            }
+        }
+    });
+});
+
+// Validación en tiempo real del número de documento (al escribir)
+$(document).on('input', '#modalmantenimiento #cli_doc', function() {
+    var $modal = $('#modalmantenimiento');
+    var tipoDoc = $modal.find('#cli_tipo_doc').val();
+    var $docInput = $(this);
+    var $docFeedback = $modal.find('#cli_doc_feedback');
+    
+    // Forzar solo dígitos
+    var digits = ($docInput.val() || '').replace(/\D/g, '');
+    $docInput.val(digits);
+    
+    if (tipoDoc === 'DNI') {
+        if (/^\d{8}$/.test(digits)) {
+            $docInput.removeClass('is-invalid').addClass('is-valid');
+            if ($docFeedback.length) $docFeedback.text('');
+        } else {
+            $docInput.removeClass('is-valid').addClass('is-invalid');
+            if ($docFeedback.length) $docFeedback.text('DNI debe ser exactamente 8 dígitos');
+        }
+    } else if (tipoDoc === 'RUC') {
+        if (/^\d{11}$/.test(digits)) {
+            $docInput.removeClass('is-invalid').addClass('is-valid');
+            if ($docFeedback.length) $docFeedback.text('');
+        } else {
+            $docInput.removeClass('is-valid').addClass('is-invalid');
+            if ($docFeedback.length) $docFeedback.text('RUC debe ser exactamente 11 dígitos');
+        }
+    } else {
+        $docInput.removeClass('is-valid is-invalid');
+        if ($docFeedback.length) $docFeedback.text('');
+    }
+});
+
+// Actualizar texto del botón y restricciones al cambiar tipo de documento
+$(document).on('change', '#modalmantenimiento #cli_tipo_doc', function() {
+    actualizarTextoBotonBuscar();
+    aplicarRestriccionesDocumento(true);
+    alternarCamposSegunTipoDoc();
+});
+
+// Función para actualizar el texto del botón Buscar según el tipo de documento
+function actualizarTextoBotonBuscar() {
+    var $modal = $('#modalmantenimiento');
+    var tipoDoc = $modal.find('#cli_tipo_doc').val();
+    var boton = $modal.find('#btnBuscarDoc');
+    
+    if (tipoDoc === 'DNI') {
+        boton.text('RENIEC');
+    } else if (tipoDoc === 'RUC') {
+        boton.text('SUNAT');
+    } else {
+        boton.text('Buscar');
+    }
+}
+
+// Alternar campos Nombre/Apellido vs Razón Social según tipo de documento
+function alternarCamposSegunTipoDoc() {
+    var $modal = $('#modalmantenimiento');
+    var tipoDoc = $modal.find('#cli_tipo_doc').val();
+    
+    if (tipoDoc === 'RUC') {
+        $modal.find('#row_nombre_apellido').hide();
+        $modal.find('#row_razon_social').show();
+        $modal.find('#cli_nom').val('');
+        $modal.find('#cli_ape').val('');
+    } else {
+        $modal.find('#row_nombre_apellido').show();
+        $modal.find('#row_razon_social').hide();
+        $modal.find('#cli_razon_social').val('');
+    }
+}
+
+// Aplicar restricciones de longitud según tipo de documento
+function aplicarRestriccionesDocumento(clearValue) {
+    var $modal = $('#modalmantenimiento');
+    var tipoDoc = $modal.find('#cli_tipo_doc').val();
+    var $docInput = $modal.find('#cli_doc');
+    var $docFeedback = $modal.find('#cli_doc_feedback');
+    
+    if (clearValue) {
+        $docInput.val('');
+        $docInput.removeClass('is-valid is-invalid');
+        if ($docFeedback.length) $docFeedback.text('');
+    }
+    
+    if (tipoDoc === 'DNI') {
+        $docInput.attr('maxlength', '8');
+        $docInput.attr('placeholder', '8 dígitos');
+    } else if (tipoDoc === 'RUC') {
+        $docInput.attr('maxlength', '11');
+        $docInput.attr('placeholder', '11 dígitos');
+    } else {
+        $docInput.removeAttr('maxlength');
+        $docInput.attr('placeholder', '');
+    }
+}
+
+// Actualizar cuando se abre el modal
+$(document).on('shown.bs.modal', '#modalmantenimiento', function () {
+    actualizarTextoBotonBuscar();
+    aplicarRestriccionesDocumento();
+    alternarCamposSegunTipoDoc();
+});
+
+// Evento click del botón buscar (RENIEC/SUNAT)
+$(document).on('click', '#btnBuscarDoc', function(e) {
+    e.preventDefault();
+    
+    var $modal = $('#modalmantenimiento');
+    var tipoDoc = $modal.find('#cli_tipo_doc').val();
+    var numDoc = $modal.find('#cli_doc').val();
+    
+    if (!tipoDoc) {
+        Swal.fire('Atención!', 'Por favor seleccione un tipo de documento', 'warning');
+        return;
+    }
+    
+    if (!numDoc) {
+        Swal.fire('Atención!', 'Por favor ingrese un número de documento', 'warning');
+        return;
+    }
+    
+    // Búsqueda en RENIEC (DNI)
+    if (tipoDoc === 'DNI') {
+        var dni = (numDoc || '').replace(/\D/g, '');
+        if (!/^\d{8}$/.test(dni)) {
+            Swal.fire('Validación', 'El DNI debe tener exactamente 8 dígitos', 'error');
+            return;
+        }
+
+        var $btn = $modal.find('#btnBuscarDoc');
+        $btn.prop('disabled', true);
+
+        Swal.fire({
+            title: 'Consultando RENIEC…',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        $.ajax({
+            url: "../../controller/cliente.php?op=consultar_reniec",
+            type: "GET",
+            dataType: "json",
+            data: { numero: dni },
+            success: function(resp) {
+                if (resp && resp.success) {
+                    var nombres = resp.first_name || '';
+                    var apellidos = [resp.first_last_name || '', resp.second_last_name || ''].filter(Boolean).join(' ').trim();
+                    if (resp.document_number && resp.document_number !== dni) {
+                        $modal.find('#cli_doc').val(resp.document_number);
+                    }
+                    $modal.find('#cli_nom').val(nombres);
+                    $modal.find('#cli_ape').val(apellidos);
+
+                    Swal.fire({
+                        title: 'Datos encontrados',
+                        text: resp.full_name ? resp.full_name : 'Se llenaron nombres y apellidos',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    });
+                } else {
+                    var msg = (resp && resp.message) ? resp.message : 'No se encontraron datos en RENIEC';
+                    Swal.fire({ title: 'Sin resultados', text: msg, icon: 'warning', confirmButtonText: 'Aceptar' });
+                }
+            },
+            error: function(xhr) {
+                var msg = 'Error al consultar RENIEC';
+                try { var j = JSON.parse(xhr.responseText); if (j.message) msg = j.message; } catch(e) {}
+                Swal.fire({ title: 'Error', text: msg, icon: 'error', confirmButtonText: 'Aceptar' });
+            },
+            complete: function() {
+                $btn.prop('disabled', false);
+            }
+        });
+        return;
+    }
+
+    // Búsqueda en SUNAT (RUC)
+    if (tipoDoc === 'RUC') {
+        var ruc = (numDoc || '').replace(/\D/g, '');
+        if (!/^\d{11}$/.test(ruc)) {
+            Swal.fire('Validación', 'El RUC debe tener exactamente 11 dígitos', 'error');
+            return;
+        }
+
+        var $btn = $modal.find('#btnBuscarDoc');
+        $btn.prop('disabled', true);
+
+        Swal.fire({
+            title: 'Consultando SUNAT…',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        $.ajax({
+            url: "../../controller/cliente.php?op=consultar_ruc",
+            type: "GET",
+            dataType: "json",
+            data: { numero: ruc },
+            success: function(resp) {
+                if (resp && resp.success) {
+                    $modal.find('#cli_razon_social').val(resp.razon_social || '');
+                    $modal.find('#cli_nom').val(resp.razon_social || '');
+                    $modal.find('#cli_ape').val('');
+                    $modal.find('#cli_direcc').val(resp.direccion || '');
+
+                    var estadoInfo = '';
+                    if (resp.estado) estadoInfo += 'Estado: ' + resp.estado;
+                    if (resp.condicion) estadoInfo += ' | Condición: ' + resp.condicion;
+
+                    Swal.fire({
+                        title: 'Datos encontrados',
+                        html: '<strong>' + (resp.razon_social || '') + '</strong><br>' + 
+                              '<small>' + estadoInfo + '</small><br>' +
+                              '<small>' + (resp.direccion || '') + '</small>',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    });
+                } else {
+                    var msg = (resp && resp.message) ? resp.message : 'No se encontraron datos en SUNAT';
+                    Swal.fire({ title: 'Sin resultados', text: msg, icon: 'warning', confirmButtonText: 'Aceptar' });
+                }
+            },
+            error: function(xhr) {
+                var msg = 'Error al consultar SUNAT';
+                try { var j = JSON.parse(xhr.responseText); if (j.message) msg = j.message; } catch(e) {}
+                Swal.fire({ title: 'Error', text: msg, icon: 'error', confirmButtonText: 'Aceptar' });
+            },
+            complete: function() {
+                $btn.prop('disabled', false);
+            }
+        });
+        return;
+    }
+});
 
 // Inicializar cuando el documento esté listo
 $(document).ready(function(){

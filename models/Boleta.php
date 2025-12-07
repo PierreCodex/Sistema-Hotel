@@ -54,6 +54,9 @@ class Boleta extends Conectar {
             // Guardar XML firmado digitalmente
             $xml = $see->getFactory()->getLastXml();
             
+            // Extraer hash (DigestValue) del XML firmado
+            $hash_cpe = $this->extraerHashDelXML($xml);
+            
             // Verificamos que la conexión con SUNAT fue exitosa
             if (!$result->isSuccess()) {
                 // Error al conectarse a SUNAT
@@ -65,8 +68,14 @@ class Boleta extends Conectar {
                 ];
             }
             
-            // Obtener CDR
+            // Obtener CDR (Constancia de Recepción)
+            // Los métodos getCdrResponse() y getCdrZip() existen en BillResult después de isSuccess()
+            /** 
+             * @var \Greenter\Model\Response\CdrResponse $cdr 
+             * @noinspection PhpUndefinedMethodInspection
+             */
             $cdr = $result->getCdrResponse();
+            /** @var string $cdrZip */
             $cdrZip = $result->getCdrZip();
             
             // Verificar el estado del comprobante
@@ -86,8 +95,8 @@ class Boleta extends Conectar {
                 $observaciones = null;
             }
             
-            // Guardar en base de datos
-            $this->guardarBoletaCompleta($rec_id, $invoice, $xml, $cdrZip, $estado, $cdr->getDescription(), $cliente_data, $totales, $detalles);
+            // Guardar en base de datos (incluyendo hash)
+            $this->guardarBoletaCompleta($rec_id, $invoice, $xml, $cdrZip, $estado, $cdr->getDescription(), $cliente_data, $totales, $detalles, $hash_cpe);
             
             return [
                 'success' => true,
@@ -97,7 +106,8 @@ class Boleta extends Conectar {
                 'observaciones' => $observaciones,
                 'serie' => $invoice->getSerie(),
                 'correlativo' => $invoice->getCorrelativo(),
-                'xml' => $xml
+                'xml' => $xml,
+                'hash' => $hash_cpe
             ];
             
         } catch (Exception $e) {
@@ -234,9 +244,38 @@ class Boleta extends Conectar {
     }
     
     /**
+     * Extraer el hash (DigestValue) del XML firmado
+     * El hash está en el elemento ds:DigestValue dentro de ds:Reference
+     */
+    private function extraerHashDelXML($xml) {
+        try {
+            // Buscar DigestValue usando expresión regular
+            // El hash está en: <ds:DigestValue>HASH_AQUI</ds:DigestValue>
+            if (preg_match('/<ds:DigestValue>([^<]+)<\/ds:DigestValue>/', $xml, $matches)) {
+                $hash = $matches[1];
+                error_log("Hash extraído del XML: " . $hash);
+                return $hash;
+            }
+            
+            // Alternativa: buscar sin namespace ds:
+            if (preg_match('/<DigestValue>([^<]+)<\/DigestValue>/', $xml, $matches)) {
+                $hash = $matches[1];
+                error_log("Hash extraído del XML (sin namespace): " . $hash);
+                return $hash;
+            }
+            
+            error_log("No se encontró DigestValue en el XML");
+            return null;
+        } catch (Exception $e) {
+            error_log("Error extrayendo hash del XML: " . $e->getMessage());
+            return null;
+        }
+    }
+    
+    /**
      * Guardar boleta completa con CDR de SUNAT
      */
-    private function guardarBoletaCompleta($rec_id, $invoice, $xml, $cdrZip, $estado, $descripcion, $cliente_data, $totales, $detalles) {
+    private function guardarBoletaCompleta($rec_id, $invoice, $xml, $cdrZip, $estado, $descripcion, $cliente_data, $totales, $detalles, $hash_cpe = null) {
         try {
             $conectar = parent::conexion();
             parent::set_names();
@@ -244,8 +283,8 @@ class Boleta extends Conectar {
             // Habilitar excepciones de PDO para capturar errores
             $conectar->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            // Insertar boleta usando stored procedure
-            $stmt = $conectar->prepare("CALL SP_BOL_INSERTAR(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            // Insertar boleta usando stored procedure (ahora incluye hash)
+            $stmt = $conectar->prepare("CALL SP_BOL_INSERTAR(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $result = $stmt->execute([
                 $rec_id,
                 $invoice->getTipoDoc(),
@@ -264,7 +303,8 @@ class Boleta extends Conectar {
                 $xml,
                 base64_encode($cdrZip),
                 $descripcion,
-                $this->usuario_id
+                $this->usuario_id,
+                $hash_cpe  // Nuevo parámetro: hash del comprobante
             ]);
             
             if (!$result) {
@@ -396,10 +436,15 @@ class Boleta extends Conectar {
             if (!empty($detalles_bd)) {
                 $detalles = [];
                 foreach ($detalles_bd as $det) {
+                    // Calcular precio con IGV (el que se cobró realmente)
+                    $precioSinIgv = floatval($det['bol_det_precio_unitario']);
+                    $precioConIgv = round($precioSinIgv * 1.18, 2);
+                    
                     $detalles[] = [
                         'cantidad' => $det['bol_det_cantidad'],
                         'descripcion' => $det['bol_det_descripcion'],
-                        'precio_unitario' => $det['bol_det_precio_unitario'],
+                        'precio_unitario' => $precioSinIgv,
+                        'precio_original' => $precioConIgv, // Precio con IGV incluido
                         'codigo' => $det['bol_det_codigo']
                     ];
                 }
@@ -786,14 +831,14 @@ class Boleta extends Conectar {
     // ==================== MÉTODOS PARA HISTORIAL DE COMPROBANTES ====================
     
     /**
-     * Listar comprobantes con filtros
+     * Listar comprobantes con filtros (Boletas + Facturas)
      */
     public function listarComprobantes($fecha_inicio, $fecha_fin, $tipo = '', $estado = '') {
         try {
             $conectar = parent::Conexion();
             parent::set_names();
             
-            $stmt = $conectar->prepare("CALL SP_BOL_LISTAR(?, ?, ?, ?)");
+            $stmt = $conectar->prepare("CALL SP_COMPROBANTE_LISTAR(?, ?, ?, ?)");
             $stmt->execute([$fecha_inicio, $fecha_fin, $tipo, $estado]);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $stmt->closeCursor();
@@ -806,14 +851,14 @@ class Boleta extends Conectar {
     }
     
     /**
-     * Obtener resumen de comprobantes
+     * Obtener resumen de comprobantes (Boletas + Facturas)
      */
     public function obtenerResumenComprobantes($fecha_inicio, $fecha_fin, $tipo = '', $estado = '') {
         try {
             $conectar = parent::Conexion();
             parent::set_names();
             
-            $stmt = $conectar->prepare("CALL SP_BOL_RESUMEN(?, ?, ?, ?)");
+            $stmt = $conectar->prepare("CALL SP_COMPROBANTE_RESUMEN(?, ?, ?, ?)");
             $stmt->execute([$fecha_inicio, $fecha_fin, $tipo, $estado]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             $stmt->closeCursor();
@@ -826,15 +871,15 @@ class Boleta extends Conectar {
     }
     
     /**
-     * Obtener comprobante por ID
+     * Obtener comprobante por ID (boleta o factura)
      */
-    public function obtenerComprobantePorId($bol_id) {
+    public function obtenerComprobantePorId($comp_id, $origen = 'boleta') {
         try {
             $conectar = parent::Conexion();
             parent::set_names();
             
-            $stmt = $conectar->prepare("CALL SP_BOL_OBTENER_POR_ID(?)");
-            $stmt->execute([$bol_id]);
+            $stmt = $conectar->prepare("CALL SP_COMPROBANTE_OBTENER_POR_ID(?, ?)");
+            $stmt->execute([$comp_id, $origen]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             $stmt->closeCursor();
             
@@ -846,15 +891,15 @@ class Boleta extends Conectar {
     }
     
     /**
-     * Obtener detalles de un comprobante
+     * Obtener detalles de un comprobante (boleta o factura)
      */
-    public function obtenerDetallesComprobante($bol_id) {
+    public function obtenerDetallesComprobante($comp_id, $origen = 'boleta') {
         try {
             $conectar = parent::Conexion();
             parent::set_names();
             
-            $stmt = $conectar->prepare("CALL SP_BOL_OBTENER_DETALLES(?)");
-            $stmt->execute([$bol_id]);
+            $stmt = $conectar->prepare("CALL SP_COMPROBANTE_OBTENER_DETALLES(?, ?)");
+            $stmt->execute([$comp_id, $origen]);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $stmt->closeCursor();
             

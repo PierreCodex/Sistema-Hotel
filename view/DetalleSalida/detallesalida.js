@@ -7,6 +7,10 @@ $(document).ready(function(){
   const recId = getParam('recepcion');
   if (!recId) return;
 
+  // Variable global para el tipo de comprobante
+  var tipoComprobante = '03'; // Por defecto Boleta
+  var nombreComprobante = 'Boleta';
+
   function num2(val){
     const n = parseFloat(val);
     return isNaN(n) ? '' : n.toFixed(2);
@@ -112,6 +116,17 @@ $(document).ready(function(){
         $('#txtcosto').val(num2(recData.PrecioInicial));
         $('#Adelanto').val(num2(recData.Adelanto));
         
+        // DEBUG: Ver qué datos vienen de la recepción
+        console.log('Datos recepción:', recData);
+        console.log('TipoComprobante raw:', recData.TipoComprobante);
+        
+        // Guardar tipo de comprobante de la recepción
+        // El valor viene como '01' (Factura) o '03' (Boleta)
+        tipoComprobante = (recData.TipoComprobante || '03').toString().trim();
+        nombreComprobante = (tipoComprobante === '01') ? 'Factura' : 'Boleta';
+        
+        console.log('Tipo comprobante final:', tipoComprobante, '- Nombre:', nombreComprobante);
+        
         // Mostrar fechas de entrada y salida
         $('#fecha_entrada').text(recData.FechaEntrada || recData.fecha_entrada || recData.Entrada || '');
         $('#fecha_salida').text(recData.FechaSalida || recData.fecha_salida || recData.Salida || '');
@@ -201,19 +216,28 @@ $(document).ready(function(){
       });
   });
 
-  // Función para generar boleta automáticamente
+  // Función para generar comprobante automáticamente (boleta o factura)
   function generarBoletaAutomatica(metodoPago) {
+    // Actualizar título del modal según tipo de comprobante
+    var iconoTipo = (tipoComprobante === '01') ? 'ri-file-text-line' : 'ri-file-list-3-line';
+    $('#titulo_comprobante').html('<i class="' + iconoTipo + ' me-2"></i>' + nombreComprobante + ': <span id="numero_comprobante">---</span>');
+    
     // Resetear modal a estado inicial
     $('#generando_contenido').show();
     $('#generado_contenido').hide();
     $('#error_contenido').hide();
     $('#numero_comprobante').text('---');
     $('#estado_boleta').removeClass('alert-success alert-danger').addClass('alert-info');
-    $('#mensaje_estado').html('<div class="spinner-border spinner-border-sm me-2" role="status"></div> Generando comprobante electrónico...');
+    $('#mensaje_estado').html('<div class="spinner-border spinner-border-sm me-2" role="status"></div> Generando ' + nombreComprobante.toLowerCase() + ' electrónica...');
     
-    $.post('../../controller/boleta.php?op=generar_boleta', {
+    // Determinar endpoint según tipo de comprobante
+    var endpoint = (tipoComprobante === '01') 
+      ? '../../controller/factura.php?op=emitir' 
+      : '../../controller/boleta.php?op=generar_boleta';
+    
+    $.post(endpoint, {
       rec_id: recId,
-      tipo_doc: '03', // Boleta
+      tipo_doc: tipoComprobante,
       metodo_pago: metodoPago
     })
     .done(function(resp){
@@ -222,13 +246,14 @@ $(document).ready(function(){
         
         if (r && r.success) {
           // Actualizar número de comprobante
-          var numComprobante = (r.serie || 'B001') + '-' + (r.correlativo || '00000000');
+          var seriePrefijo = (tipoComprobante === '01') ? 'F001' : 'B001';
+          var numComprobante = (r.serie || seriePrefijo) + '-' + (r.correlativo || '00000000');
           $('#numero_comprobante').text(numComprobante);
           
           // Mensaje según si ya existía o se generó nueva
           var mensaje = r.ya_existe 
-            ? 'Comprobante recuperado exitosamente' 
-            : (r.descripcion || 'Comprobante generado exitosamente');
+            ? nombreComprobante + ' recuperada exitosamente' 
+            : (r.descripcion || r.mensaje || nombreComprobante + ' generada exitosamente');
           
           $('#estado_boleta').removeClass('alert-info alert-danger').addClass('alert-success');
           $('#mensaje_estado').html('<i class="ri-checkbox-circle-line me-2"></i>' + mensaje);
@@ -237,15 +262,26 @@ $(document).ready(function(){
           $('#generando_contenido').hide();
           $('#generado_contenido').show();
           
+          // Mostrar botón A4 solo para facturas
+          if (tipoComprobante === '01') {
+            $('#btn_a4_container').show();
+          } else {
+            $('#btn_a4_container').hide();
+          }
+          
         } else {
-          // Error al generar
-          mostrarErrorBoleta(r.message || r.error || r.error_message || 'Error desconocido');
+          // Error al generar - buscar mensaje en diferentes propiedades
+          var errorMsg = r.mensaje || r.message || r.error || r.error_message || 'Error desconocido';
+          console.log('Error factura/boleta:', r);
+          mostrarErrorBoleta(errorMsg);
         }
       } catch(e) {
+        console.log('Error parseando respuesta:', e, resp);
         mostrarErrorBoleta('Error al procesar respuesta del servidor');
       }
     })
-    .fail(function(){
+    .fail(function(xhr, status, error){
+      console.log('Error AJAX:', status, error, xhr.responseText);
       mostrarErrorBoleta('Error de conexión con el servidor');
     });
   }
@@ -253,7 +289,7 @@ $(document).ready(function(){
   // Función para mostrar error en el modal
   function mostrarErrorBoleta(mensaje) {
     $('#estado_boleta').removeClass('alert-info alert-success').addClass('alert-danger');
-    $('#mensaje_estado').html('<i class="ri-error-warning-line me-2"></i> Error al generar comprobante');
+    $('#mensaje_estado').html('<i class="ri-error-warning-line me-2"></i> Error al generar ' + nombreComprobante.toLowerCase());
     $('#generando_contenido').hide();
     $('#error_contenido').show();
     $('#error_mensaje').text(mensaje);
@@ -268,7 +304,11 @@ $(document).ready(function(){
   // Botones de formato de descarga
   $(document).on('click', '.btn-formato', function(){
     var formato = $(this).data('formato');
-    window.open('../../controller/boleta.php?op=generar_pdf&rec_id=' + recId + '&tipo=' + formato, '_blank');
+    // Usar el endpoint correcto según tipo de comprobante
+    var pdfEndpoint = (tipoComprobante === '01') 
+      ? '../../controller/factura.php?op=pdf&rec_id=' + recId + '&tipo=' + formato
+      : '../../controller/boleta.php?op=generar_pdf&rec_id=' + recId + '&tipo=' + formato;
+    window.open(pdfEndpoint, '_blank');
   });
   
   // Enviar por WhatsApp (abrir WhatsApp Web con el PDF)

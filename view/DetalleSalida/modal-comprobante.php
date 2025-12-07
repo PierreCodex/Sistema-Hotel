@@ -2,15 +2,15 @@
 <div id="modal-comprobante" class="modal fade" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 overflow-hidden">
-            <!-- Header con número de comprobante -->
+            <!-- Header con número de comprobante (se actualiza dinámicamente) -->
             <div class="modal-header p-3 bg-primary">
                 <h4 class="card-title mb-0 text-white" id="titulo_comprobante">
-                    <i class="ri-file-list-3-line me-2"></i>Comprobante: <span id="numero_comprobante">---</span>
+                    <i class="ri-file-list-3-line me-2"></i><span id="tipo_comprobante_label">Comprobante</span>: <span id="numero_comprobante">---</span>
                 </h4>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             
-            <!-- Estado de la boleta -->
+            <!-- Estado del comprobante -->
             <div id="estado_boleta" class="alert alert-info rounded-0 mb-0 d-flex align-items-center">
                 <div class="spinner-border spinner-border-sm me-2" role="status"></div>
                 <span id="mensaje_estado">Generando comprobante electrónico...</span>
@@ -29,16 +29,23 @@
                 <div id="generado_contenido" style="display: none;">
                     <!-- Botones de formato de descarga -->
                     <div class="row g-2 mb-4">
+                        <!-- Botón A4 solo para Facturas -->
+                        <div class="col-12 mb-2" id="btn_a4_container" style="display: none;">
+                            <button type="button" class="btn btn-primary w-100 py-3 btn-formato" data-formato="a4">
+                                <i class="ri-file-text-line fs-2 d-block mb-1"></i>
+                                <span class="fw-semibold">A4 - Formato Completo</span>
+                            </button>
+                        </div>
                         <div class="col-6">
                             <button type="button" class="btn btn-soft-primary w-100 py-3 btn-formato" data-formato="80mm">
                                 <i class="ri-file-pdf-line fs-2 d-block mb-1"></i>
-                                <span class="fw-semibold">80MM</span>
+                                <span class="fw-semibold">Ticket 80MM</span>
                             </button>
                         </div>
                         <div class="col-6">
                             <button type="button" class="btn btn-soft-primary w-100 py-3 btn-formato" data-formato="50mm">
                                 <i class="ri-file-pdf-line fs-2 d-block mb-1"></i>
-                                <span class="fw-semibold">50MM</span>
+                                <span class="fw-semibold">Ticket 50MM</span>
                             </button>
                         </div>
                     </div>

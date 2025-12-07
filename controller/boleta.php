@@ -121,8 +121,10 @@ switch ($op) {
             // Preparar detalles (hospedaje + consumos)
             $detalles = [];
 
-            // Agregar hospedaje (precio sin IGV)
-            $subtotal_hospedaje = $recData['PrecioInicial'] / 1.18;
+            // Agregar hospedaje
+            // Guardamos el precio ORIGINAL (el que se cobra) y el precio sin IGV para SUNAT
+            $precioOriginalHospedaje = $recData['PrecioInicial'];
+            $precioSinIgvHospedaje = round($precioOriginalHospedaje / 1.18, 2);
             $numHabitacion = $recData['HAB_NUM'] ?? $recData['hab_num'] ?? $recData['NumeroHabitacion'] ?? 'N/A';
             $nombreTarifa = $recData['TARIFA_DESC'] ?? $recData['tarifa_desc'] ?? '';
 
@@ -135,21 +137,24 @@ switch ($op) {
             $detalles[] = [
                 'descripcion' => $descripcionHospedaje,
                 'cantidad' => 1,
-                'precio_unitario' => $subtotal_hospedaje
+                'precio_unitario' => $precioSinIgvHospedaje,
+                'precio_original' => $precioOriginalHospedaje // Precio real cobrado (con IGV)
             ];
 
             // Calcular totales iniciales (solo hospedaje)
-            $subtotal = $subtotal_hospedaje;
+            $subtotal = $precioSinIgvHospedaje;
 
             // Agregar penalidad si existe
             if (isset($recData['costo_penalidad']) && $recData['costo_penalidad'] > 0) {
-                $penalidad_subtotal = $recData['costo_penalidad'] / 1.18;
+                $precioOriginalPenalidad = $recData['costo_penalidad'];
+                $precioSinIgvPenalidad = round($precioOriginalPenalidad / 1.18, 2);
                 $detalles[] = [
                     'descripcion' => 'Penalidad por retraso',
                     'cantidad' => 1,
-                    'precio_unitario' => $penalidad_subtotal
+                    'precio_unitario' => $precioSinIgvPenalidad,
+                    'precio_original' => $precioOriginalPenalidad
                 ];
-                $subtotal += $penalidad_subtotal;
+                $subtotal += $precioSinIgvPenalidad;
             }
 
             // Agregar consumos/productos de la habitación (ventas)
@@ -158,14 +163,16 @@ switch ($op) {
                 if ($v['Estado'] != 'ANULADO') {
                     $detalles_venta = $venta->get_detalle_venta_x_id_venta($v['IdVenta']);
                     foreach ($detalles_venta as $dv) {
-                        // El precio ya incluye IGV, calcular sin IGV
-                        $precio_sin_igv = $dv['PROD_PVENTA'] / 1.18;
+                        // El precio de venta ya incluye IGV
+                        $precioOriginalProducto = $dv['PROD_PVENTA'];
+                        $precioSinIgvProducto = round($precioOriginalProducto / 1.18, 2);
                         $detalles[] = [
                             'descripcion' => $dv['PRO_NOM'],
                             'cantidad' => $dv['DETV_CANT'],
-                            'precio_unitario' => $precio_sin_igv
+                            'precio_unitario' => $precioSinIgvProducto,
+                            'precio_original' => $precioOriginalProducto
                         ];
-                        $subtotal += ($precio_sin_igv * $dv['DETV_CANT']);
+                        $subtotal += ($precioSinIgvProducto * $dv['DETV_CANT']);
                     }
                 }
             }

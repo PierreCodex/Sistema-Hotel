@@ -115,6 +115,15 @@ if (isset($_SESSION["IdUsuario"])) {
 
                                                     </div>
 
+                                                    <div class="col-lg-3 col-6">
+                                                        <label for="tipo_comprobante" class="text-muted mb-2">Tipo de Comprobante</label>
+                                                        <select id="tipo_comprobante" name="tipo_comprobante" class="form-control form-select">
+                                                            <option value="03" selected>Boleta</option>
+                                                            <option value="01">Factura</option>
+                                                        </select>
+                                                        <small class="text-muted" id="info_comprobante">DNI = Boleta | RUC = Factura</small>
+                                                    </div>
+
                                                 </div>
 
                                             </div>
@@ -238,6 +247,9 @@ if (isset($_SESSION["IdUsuario"])) {
         <?php require_once("../Cliente/mantenimiento.php"); ?>
         <?php require_once("../html/js.php"); ?>
 
+        <!-- Validaciones de cliente (centralizado) -->
+        <script type="text/javascript" src="../Cliente/mntcliente.js"></script>
+        <!-- Lógica específica de recepción -->
         <script type="text/javascript" src="mntrecepcion.js"></script>
     </body>
 

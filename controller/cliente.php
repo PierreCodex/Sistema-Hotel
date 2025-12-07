@@ -64,6 +64,21 @@ switch ($_GET["op"]) {
         echo json_encode($results);
         break;
 
+    /* Verificar si el documento ya existe */
+    case "verificar_documento":
+        header('Content-Type: application/json');
+        $cli_doc = isset($_POST['cli_doc']) ? trim($_POST['cli_doc']) : '';
+        $cli_id = isset($_POST['cli_id']) ? intval($_POST['cli_id']) : null;
+        
+        if (empty($cli_doc)) {
+            echo json_encode(['success' => false, 'message' => 'Documento vacío']);
+            break;
+        }
+        
+        $resultado = $cliente->verificar_documento_existe($cli_doc, $cli_id);
+        echo json_encode(['success' => true, 'data' => $resultado]);
+        break;
+
     /* TODO:Mostrar informacion de registro segun su ID */
     case "mostrar":
         $datos = $cliente->get_cliente_x_cli_id($_POST["cli_id"]);
@@ -106,19 +121,20 @@ switch ($_GET["op"]) {
             break;
         }
 
-        if (!defined('DECOLECTA_TOKEN') || empty(DECOLECTA_TOKEN)) {
-            echo json_encode(["success" => false, "message" => "Token RENIEC no configurado. Configure DECOLECTA_TOKEN en config/external.php"]);
+        if (!defined('CODART_TOKEN') || empty(CODART_TOKEN)) {
+            echo json_encode(["success" => false, "message" => "Token no configurado. Configure CODART_TOKEN en config/external.php"]);
             break;
         }
 
-        $url = "https://api.decolecta.com/v1/reniec/dni?numero=" . urlencode($dni);
+        $url = "https://api.codart.cgrt.net/api/v1/consultas/reniec/dni/" . urlencode($dni);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             "Content-Type: application/json",
-            "Authorization: Bearer " . DECOLECTA_TOKEN
+            "Authorization: Bearer " . CODART_TOKEN
         ]);
 
         $response = curl_exec($ch);
@@ -132,18 +148,77 @@ switch ($_GET["op"]) {
         }
 
         $data = json_decode($response, true);
-        if ($httpCode >= 200 && $httpCode < 300 && is_array($data)) {
+        if ($httpCode >= 200 && $httpCode < 300 && is_array($data) && isset($data["result"])) {
+            $info = $data["result"];
             echo json_encode([
                 "success" => true,
-                "first_name" => $data["first_name"] ?? "",
-                "first_last_name" => $data["first_last_name"] ?? "",
-                "second_last_name" => $data["second_last_name"] ?? "",
-                "second_last_name" => $data["second_last_name"] ?? "",
-                "full_name" => $data["full_name"] ?? "",
-                "document_number" => $data["document_number"] ?? $dni
+                "first_name" => $info["first_name"] ?? "",
+                "first_last_name" => $info["first_last_name"] ?? "",
+                "second_last_name" => $info["second_last_name"] ?? "",
+                "full_name" => $info["full_name"] ?? "",
+                "document_number" => $info["document_number"] ?? $dni
             ]);
         } else {
             $msg = $data["message"] ?? "Respuesta inválida de RENIEC";
+            echo json_encode(["success" => false, "message" => $msg, "status" => $httpCode]);
+        }
+        break;
+
+    case "consultar_ruc":
+        header('Content-Type: application/json');
+        $ruc = isset($_GET["numero"]) ? preg_replace('/\D/', '', $_GET["numero"]) : "";
+        if (empty($ruc) || strlen($ruc) !== 11) {
+            echo json_encode(["success" => false, "message" => "RUC inválido. Debe tener 11 dígitos."]);
+            break;
+        }
+
+        if (!defined('CODART_TOKEN') || empty(CODART_TOKEN)) {
+            echo json_encode(["success" => false, "message" => "Token no configurado. Configure CODART_TOKEN en config/external.php"]);
+            break;
+        }
+
+        $url = "https://api.codart.cgrt.net/api/v1/consultas/sunat/ruc/" . urlencode($ruc);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "Content-Type: application/json",
+            "Authorization: Bearer " . CODART_TOKEN
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlErr = curl_error($ch);
+        curl_close($ch);
+
+        if ($response === false) {
+            echo json_encode(["success" => false, "message" => "Error al consultar SUNAT: " . $curlErr]);
+            break;
+        }
+
+        $data = json_decode($response, true);
+        if ($httpCode >= 200 && $httpCode < 300 && is_array($data) && isset($data["result"])) {
+            $info = $data["result"];
+            echo json_encode([
+                "success" => true,
+                "ruc" => $info["numero_documento"] ?? $ruc,
+                "razon_social" => $info["razon_social"] ?? "",
+                "estado" => $info["estado"] ?? "",
+                "condicion" => $info["condicion"] ?? "",
+                "direccion" => $info["direccion"] ?? "",
+                "ubigeo" => $info["ubigeo"] ?? "",
+                "departamento" => $info["departamento"] ?? "",
+                "provincia" => $info["provincia"] ?? "",
+                "distrito" => $info["distrito"] ?? "",
+                "tipo" => $info["tipo"] ?? "",
+                "actividad_economica" => $info["actividad_economica"] ?? "",
+                "es_agente_retencion" => $info["es_agente_retencion"] ?? false,
+                "es_buen_contribuyente" => $info["es_buen_contribuyente"] ?? false
+            ]);
+        } else {
+            $msg = $data["message"] ?? "Respuesta inválida de SUNAT";
             echo json_encode(["success" => false, "message" => $msg, "status" => $httpCode]);
         }
         break;

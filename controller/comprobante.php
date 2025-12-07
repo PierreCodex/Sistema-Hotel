@@ -40,17 +40,18 @@ $operacion = $_POST['operacion'] ?? '';
             break;
             
         case 'obtener_detalle':
-            $bol_id = intval($_POST['bol_id'] ?? 0);
+            $comp_id = intval($_POST['comp_id'] ?? $_POST['bol_id'] ?? 0);
+            $origen = $_POST['origen'] ?? 'boleta';
             
             try {
-                $comprobante = $boleta->obtenerComprobantePorId($bol_id);
+                $comprobante = $boleta->obtenerComprobantePorId($comp_id, $origen);
                 
                 if (!$comprobante) {
                     echo json_encode(['status' => false, 'message' => 'Comprobante no encontrado']);
                     break;
                 }
                 
-                $detalles = $boleta->obtenerDetallesComprobante($bol_id);
+                $detalles = $boleta->obtenerDetallesComprobante($comp_id, $origen);
                 
                 echo json_encode([
                     'status' => true,
@@ -77,22 +78,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 $operacion = $_GET['operacion'] ?? '';    
     switch ($operacion) {
         case 'descargar_pdf':
-            $bol_id = intval($_GET['bol_id'] ?? 0);
+            $comp_id = intval($_GET['comp_id'] ?? $_GET['bol_id'] ?? 0);
+            $origen = $_GET['origen'] ?? 'boleta';
             
-            if ($bol_id <= 0) {
+            if ($comp_id <= 0) {
                 die('ID de comprobante no válido');
             }
             
-            // Redirigir al generador de PDF A4
-            header("Location: ../view/pdf/generar-pdf-a4.php?id=" . $bol_id);
+            // Redirigir al generador de PDF según origen
+            if ($origen === 'factura') {
+                header("Location: ../view/pdf/generar-pdf-factura.php?id=" . $comp_id);
+            } else {
+                header("Location: ../view/pdf/generar-pdf-a4.php?id=" . $comp_id);
+            }
             exit;
             break;
             
         case 'descargar_xml':
-            $bol_id = intval($_GET['bol_id'] ?? 0);
+            $comp_id = intval($_GET['comp_id'] ?? $_GET['bol_id'] ?? 0);
+            $origen = $_GET['origen'] ?? 'boleta';
             
             try {
-                $boleta->descargarXML($bol_id);
+                if ($origen === 'factura') {
+                    require_once("../models/Factura.php");
+                    $factura = new Factura();
+                    $factura->descargarXML($comp_id);
+                } else {
+                    $boleta->descargarXML($comp_id);
+                }
             } catch (Exception $e) {
                 die('Error al descargar XML: ' . $e->getMessage());
             }
@@ -140,20 +153,20 @@ function exportarExcel($boleta, $fecha_inicio, $fecha_fin, $tipo, $estado) {
         
         // Datos
         foreach ($lista as $item) {
-            $tipoDoc = $item['bol_tipo'] == '03' ? 'Boleta' : 'Factura';
+            $tipoDoc = $item['comp_tipo'] == '03' ? 'Boleta' : 'Factura';
             
             fputcsv($output, [
                 $tipoDoc,
-                $item['bol_serie'],
-                $item['bol_correlativo'],
-                $item['bol_fecha_emision'],
-                $item['bol_cliente_razon_social'],
-                $item['bol_cliente_num_doc'],
-                $item['bol_subtotal'],
-                $item['bol_igv'],
-                $item['bol_total'],
-                $item['bol_estado'],
-                $item['bol_metodo_pago']
+                $item['comp_serie'],
+                $item['comp_correlativo'],
+                $item['comp_fecha_emision'],
+                $item['comp_cliente_razon_social'],
+                $item['comp_cliente_num_doc'],
+                $item['comp_subtotal'],
+                $item['comp_igv'],
+                $item['comp_total'],
+                $item['comp_estado'],
+                $item['comp_metodo_pago']
             ], ';');
         }
         
@@ -271,24 +284,24 @@ function generarHTMLReporte($lista, $resumen, $fecha_inicio, $fecha_fin) {
     $totalGeneral = 0;
     
     foreach ($lista as $item) {
-        $tipoDoc = $item['bol_tipo'] == '03' ? 'BOL' : 'FAC';
-        $estadoClass = 'estado-' . strtolower($item['bol_estado']);
+        $tipoDoc = $item['comp_tipo'] == '03' ? 'BOL' : 'FAC';
+        $estadoClass = 'estado-' . strtolower($item['comp_estado']);
         
-        $totalSubtotal += floatval($item['bol_subtotal']);
-        $totalIgv += floatval($item['bol_igv']);
-        $totalGeneral += floatval($item['bol_total']);
+        $totalSubtotal += floatval($item['comp_subtotal']);
+        $totalIgv += floatval($item['comp_igv']);
+        $totalGeneral += floatval($item['comp_total']);
         
         $html .= '
                 <tr>
                     <td>' . $tipoDoc . '</td>
-                    <td>' . $item['bol_serie'] . '-' . $item['bol_correlativo'] . '</td>
-                    <td>' . date('d/m/Y', strtotime($item['bol_fecha_emision'])) . '</td>
-                    <td>' . substr($item['bol_cliente_razon_social'] ?? 'Cliente', 0, 25) . '</td>
-                    <td>' . ($item['bol_cliente_num_doc'] ?? '-') . '</td>
-                    <td class="text-right">S/ ' . number_format($item['bol_subtotal'], 2) . '</td>
-                    <td class="text-right">S/ ' . number_format($item['bol_igv'], 2) . '</td>
-                    <td class="text-right">S/ ' . number_format($item['bol_total'], 2) . '</td>
-                    <td class="' . $estadoClass . '">' . $item['bol_estado'] . '</td>
+                    <td>' . $item['comp_serie'] . '-' . $item['comp_correlativo'] . '</td>
+                    <td>' . date('d/m/Y', strtotime($item['comp_fecha_emision'])) . '</td>
+                    <td>' . substr($item['comp_cliente_razon_social'] ?? 'Cliente', 0, 25) . '</td>
+                    <td>' . ($item['comp_cliente_num_doc'] ?? '-') . '</td>
+                    <td class="text-right">S/ ' . number_format($item['comp_subtotal'], 2) . '</td>
+                    <td class="text-right">S/ ' . number_format($item['comp_igv'], 2) . '</td>
+                    <td class="text-right">S/ ' . number_format($item['comp_total'], 2) . '</td>
+                    <td class="' . $estadoClass . '">' . $item['comp_estado'] . '</td>
                 </tr>';
     }
     

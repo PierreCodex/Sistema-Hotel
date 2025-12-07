@@ -28,6 +28,12 @@
             $hab_id = isset($_POST['hab_id']) ? intval($_POST['hab_id']) : 0;
             $tar_id = isset($_POST['tar_id']) ? intval($_POST['tar_id']) : null;
             if ($tar_id === 0) $tar_id = null; // Convertir 0 a NULL
+            // Tipo de comprobante: '03' = Boleta (defecto), '01' = Factura
+            $tipo_comprobante = isset($_POST['tipo_comprobante']) ? trim($_POST['tipo_comprobante']) : '03';
+            // Validar que sea 01 o 03
+            if (!in_array($tipo_comprobante, ['01', '03'])) {
+                $tipo_comprobante = '03';
+            }
             // Precio inicial será calculado servidor (3 horas por defecto)
             $precio_inicial_post = isset($_POST['precio_inicial']) ? floatval($_POST['precio_inicial']) : 0.0;
             $adelanto = isset($_POST['adelanto']) ? floatval($_POST['adelanto']) : 0.0;
@@ -75,7 +81,7 @@
             }
 
             // Inserción usando precio determinado (sin forzar validación por HAB_PRE)
-            $rec_id = $recepcion->insert_recepcion($cli_id, $hab_id, $precio_inicial, $adelanto, $observacion, $fecha_salida_db, $tar_id);
+            $rec_id = $recepcion->insert_recepcion($cli_id, $hab_id, $precio_inicial, $adelanto, $observacion, $fecha_salida_db, $tar_id, $tipo_comprobante);
             echo json_encode(["success" => true, "rec_id" => $rec_id]);
             break;
 

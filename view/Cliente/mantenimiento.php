@@ -35,21 +35,25 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row gy-2">
-                        <div class="col-md-12">
+                    <div class="row gy-2" id="row_nombre_apellido">
+                        <div class="col-md-6" id="col_nombre">
                             <div>
-                                <label for="valueInput" class="form-label">Nombre</label>
+                                <label for="cli_nom" class="form-label" id="lbl_nombre">Nombre</label>
                                 <input type="text" class="form-control" id="cli_nom" name="cli_nom" />
                             </div>
                         </div>
+                        <div class="col-md-6" id="col_apellido">
+                            <div>
+                                <label for="cli_ape" class="form-label">Apellido</label>
+                                <input type="text" class="form-control" id="cli_ape" name="cli_ape" />
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="row gy-2">
+                    <div class="row gy-2" id="row_razon_social" style="display: none;">
                         <div class="col-md-12">
                             <div>
-                                <label for="valueInput" class="form-label">Apellido</label>
-                                <input type="text" class="form-control" id="cli_ape" name="cli_ape" />
-
+                                <label for="cli_razon_social" class="form-label">Razón Social / Nombre Completo</label>
+                                <input type="text" class="form-control" id="cli_razon_social" name="cli_razon_social" />
                             </div>
                         </div>
                     </div>

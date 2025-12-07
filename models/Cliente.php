@@ -24,7 +24,7 @@
         }
 
         /* TODO: Eliminar o cambiar estado a eliminado */
-        public function delete_cliente($cli_id){
+        public function delete_cliente($cli_id): void{
             $conectar=parent::Conexion();
             $sql="SP_D_CLIENTE_01 ?";
             $query=$conectar->prepare($sql);
@@ -52,7 +52,7 @@
         }
 
         /* TODO:Actualizar Datos */
-        public function update_cliente($cli_id,$cli_tipo_doc,$cli_doc,$cli_nom,$cli_ape,$cli_direcc){
+        public function update_cliente($cli_id,$cli_tipo_doc,$cli_doc,$cli_nom,$cli_ape,$cli_direcc): void{
             $conectar=parent::Conexion();
             $sql="CALL SP_U_CLIENTE_01( ?,?,?,?,?,?)";
             $query=$conectar->prepare($sql);
@@ -63,6 +63,44 @@
             $query->bindValue(5,$cli_ape);
             $query->bindValue(6,$cli_direcc);
             $query->execute();
+        }
+        
+        /* Verificar si existe un cliente con el mismo documento (DNI/RUC) */
+        public function verificar_documento_existe($cli_doc, $cli_id = null){
+            $conectar = parent::Conexion();
+            parent::set_names();
+            
+            // Buscar cliente activo con el mismo documento
+            if ($cli_id) {
+                // Excluir el cliente actual (para edición)
+                $sql = "SELECT IdCliente, TipoDocumento, Documento, Nombre, Apellido 
+                        FROM cliente 
+                        WHERE Documento = ? AND Estado = 1 AND IdCliente != ?
+                        LIMIT 1";
+                $query = $conectar->prepare($sql);
+                $query->bindValue(1, $cli_doc);
+                $query->bindValue(2, $cli_id, PDO::PARAM_INT);
+            } else {
+                // Buscar cualquier cliente con ese documento
+                $sql = "SELECT IdCliente, TipoDocumento, Documento, Nombre, Apellido 
+                        FROM cliente 
+                        WHERE Documento = ? AND Estado = 1
+                        LIMIT 1";
+                $query = $conectar->prepare($sql);
+                $query->bindValue(1, $cli_doc);
+            }
+            
+            $query->execute();
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+            
+            if ($result) {
+                return [
+                    'existe' => true,
+                    'cliente' => $result
+                ];
+            }
+            
+            return ['existe' => false];
         }
     }
 ?>

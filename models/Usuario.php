@@ -46,7 +46,7 @@ class Usuario extends Conectar
      * @param int $userId
      * @param string $plainPassword
      */
-    private function updatePasswordToHashed($userId, $plainPassword)
+    private function updatePasswordToHashed($userId, $plainPassword): void
     {
         $conectar = parent::conexion();
         parent::set_names();
