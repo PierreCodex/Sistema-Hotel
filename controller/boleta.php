@@ -55,22 +55,8 @@ switch ($op) {
             }
 
             // VERIFICAR SI YA EXISTE UNA BOLETA PARA ESTA RECEPCIÓN
-            // Usamos PDO directamente ya que la clase Conectar tiene el método protected
-            try {
-                $pdo = new PDO("mysql:host=localhost;dbname=db-hotel", "root", "");
-                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                $sqlCheck = "SELECT bol_id, bol_serie, bol_correlativo, bol_estado 
-                             FROM boleta 
-                             WHERE rec_id = ? AND bol_estado = 'ACEPTADA'
-                             ORDER BY bol_id DESC LIMIT 1";
-                $stmtCheck = $pdo->prepare($sqlCheck);
-                $stmtCheck->execute([$rec_id]);
-                $boletaExistente = $stmtCheck->fetch(PDO::FETCH_ASSOC);
-            } catch (PDOException $e) {
-                // Si falla la verificación, continuamos con la generación
-                $boletaExistente = null;
-            }
+            // Usamos el método del modelo que llama al Stored Procedure
+            $boletaExistente = $boleta->verificarBoleta($rec_id);
 
             if ($boletaExistente) {
                 echo json_encode([

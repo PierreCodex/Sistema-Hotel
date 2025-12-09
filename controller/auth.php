@@ -58,6 +58,12 @@ class AuthController {
         if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
             return ['valid' => false, 'error_code' => 5]; // Email inválido
         }
+
+        /* Validar si el correo existe en la base de datos */
+        $correo_exist = $this->usuarioModel->existe_usuario_correo($correo);
+        if(is_array($correo_exist) && count($correo_exist) == 0){
+            return ['valid' => false, 'error_code' => 6]; // No existe la cuenta
+        }
         
         return ['valid' => true];
     }

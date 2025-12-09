@@ -1,0 +1,93 @@
+/**
+ * Sistema Hotel - Custom Theme
+ * Colores profesionales para documentación hotelera
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+  /* Azul profesional - colores principales */
+  --ifm-color-primary: #0f3460;
+  --ifm-color-primary-dark: #0d2e56;
+  --ifm-color-primary-darker: #0c2b51;
+  --ifm-color-primary-darkest: #0a2343;
+  --ifm-color-primary-light: #113a6a;
+  --ifm-color-primary-lighter: #123d6f;
+  --ifm-color-primary-lightest: #15457d;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  /* Mejoras visuales */
+  --ifm-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --ifm-heading-font-weight: 700;
+  --ifm-navbar-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme='dark'] {
+  --ifm-color-primary: #e94560;
+  --ifm-color-primary-dark: #e62e4d;
+  --ifm-color-primary-darker: #e42345;
+  --ifm-color-primary-darkest: #c41738;
+  --ifm-color-primary-light: #ec5c73;
+  --ifm-color-primary-lighter: #ee677c;
+  --ifm-color-primary-lightest: #f38a9a;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-background-color: #1a1a2e;
+}
+
+/* Navbar styling */
+.navbar {
+  box-shadow: var(--ifm-navbar-shadow);
+}
+
+.navbar__title {
+  font-weight: 700;
+}
+
+/* Sidebar improvements */
+.menu__link {
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.menu__link:hover {
+  background: rgba(15, 52, 96, 0.1);
+}
+
+[data-theme='dark'] .menu__link:hover {
+  background: rgba(233, 69, 96, 0.1);
+}
+
+/* Code blocks */
+.prism-code {
+  border-radius: 8px;
+}
+
+/* Table improvements */
+table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th {
+  background: var(--ifm-color-primary);
+  color: white;
+}
+
+[data-theme='dark'] th {
+  background: rgba(233, 69, 96, 0.2);
+}
+
+/* Admonition (tips, warnings) */
+.alert {
+  border-radius: 8px;
+}
+
+/* Footer */
+.footer {
+  background: #0f3460;
+}
+
+[data-theme='dark'] .footer {
+  background: #0a0a14;
+}

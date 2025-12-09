@@ -106,6 +106,13 @@ if (isset($_POST["enviar"]) and $_POST["enviar"] == "si") {
                                                 </div>
                                         <?php
                                                     break;
+                                                case "6";
+                                                ?>
+                                                    <div class="alert alert-danger alert-solid" role="alert">
+                                                        <strong>No existe la cuenta como tal!</strong>
+                                                    </div>
+                                                <?php
+                                                    break;
                                             }
                                         }
                                         ?>

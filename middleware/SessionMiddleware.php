@@ -67,7 +67,7 @@ class SessionMiddleware {
         
         return $authCheck;
     }
-    
+
     /**
      * Endpoint AJAX para verificar estado de sesión
      */

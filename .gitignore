@@ -1,0 +1,20 @@
+# Dependencias
+/vendor/
+/node_modules/
+
+# Archivos de configuración con secretos
+run-sonar.bat
+sonar-project.properties
+
+# Reportes y logs
+.scannerwork/
+coverage/
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Sistema
+.DS_Store
+Thumbs.db

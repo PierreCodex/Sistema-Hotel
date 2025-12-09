@@ -12,6 +12,31 @@
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /* Obtener clientes activos con conteo de visitas (Paginado) */
+    public function get_cliente_con_conteo_paginado($search_value, $start, $limit){
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_L_CLIENTE_CON_CONTEO_PAGINADO(?, ?, ?)";
+        $query = $conectar->prepare($sql);
+        $query->bindValue(1, $search_value);
+        $query->bindValue(2, $start, PDO::PARAM_INT);
+        $query->bindValue(3, $limit, PDO::PARAM_INT);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /* Contar total de clientes (filtrado) */
+    public function count_clientes_con_conteo($search_value){
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_COUNT_CLIENTE_CON_CONTEO(?)";
+        $query = $conectar->prepare($sql);
+        $query->bindValue(1, $search_value);
+        $query->execute();
+        $row = $query->fetch(PDO::FETCH_ASSOC);
+        return $row['total'];
+    }
+
         /* TODO: Listar Registro por ID en especifico */
         public function get_cliente_x_cli_id($cli_id){
             $conectar=parent::conexion();

@@ -140,13 +140,23 @@ class Recepcion extends Conectar
     {
         $conectar = parent::Conexion();
         parent::set_names();
-        $sql = "SELECT COUNT(*) as total
-            FROM recepcion
-            WHERE IdCliente = ? AND Estado = 1";
+        $sql = "CALL SP_CHECK_RECEPCION_ACTIVA_CLIENTE(?)";
         $query = $conectar->prepare($sql);
         $query->bindValue(1, $cli_id);
         $query->execute();
         $result = $query->fetch(PDO::FETCH_ASSOC);
         return $result['total'] > 0;
+    }
+
+    // Obtener historial de recepciones finalizadas por cliente
+    public function get_historial_por_cliente($cli_id)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_L_RECEPCION_HISTORIAL_CLIENTE(?)";
+        $query = $conectar->prepare($sql);
+        $query->bindValue(1, $cli_id);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 }

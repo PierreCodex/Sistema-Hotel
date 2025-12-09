@@ -18,6 +18,19 @@ class Boleta extends Conectar {
     
     // Variable para almacenar el ID del usuario que genera la boleta
     private $usuario_id = null;
+
+    /**
+     * Verificar si ya existe una boleta para una recepción
+     */
+    public function verificarBoleta($rec_id) {
+        $conectar = parent::conexion();
+        parent::set_names();
+        
+        $sql = "CALL sp_verificar_boleta_existente(?)";
+        $stmt = $conectar->prepare($sql);
+        $stmt->execute([$rec_id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
     
     /**
      * Generar Boleta electrónica
@@ -928,5 +941,21 @@ class Boleta extends Conectar {
         } catch (Exception $e) {
             throw new Exception('Error al obtener comprobante: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Obtener boleta por ID de recepción
+     */
+    public function obtenerPorRecepcion($rec_id)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        
+        $stmt = $conectar->prepare("CALL SP_BOL_OBTENER_POR_RECEPCION(?)");
+        $stmt->execute([$rec_id]);
+        $boleta = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        
+        return $boleta;
     }
 }

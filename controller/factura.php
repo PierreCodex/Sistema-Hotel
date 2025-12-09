@@ -43,7 +43,7 @@ class FacturaController
             
             // Si no vienen datos del cliente, obtenerlos de la recepción
             if (empty($cliente_data['ruc'])) {
-                $cliente_data = $this->obtenerClienteDeRecepcion($rec_id);
+                $cliente_data = $this->factura->obtenerClienteDeRecepcion($rec_id);
             }
             
             // Validar RUC
@@ -52,7 +52,7 @@ class FacturaController
             }
             
             // Obtener detalles de la recepción
-            $detalles = $this->obtenerDetallesRecepcion($rec_id);
+            $detalles = $this->factura->obtenerDetallesRecepcion($rec_id);
             
             // Configurar modelo
             $this->factura->setUsuarioId($usuario_id);
@@ -77,83 +77,7 @@ class FacturaController
         }
     }
     
-    /**
-     * Obtener datos del cliente desde la recepción
-     */
-    private function obtenerClienteDeRecepcion($rec_id)
-    {
-        $con = new PDO("mysql:host=localhost;dbname=db-hotel", "root", "");
-        $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $con->exec("SET NAMES 'utf8'");
-        
-        // Obtener cliente de la recepción
-        $stmt = $con->prepare("
-            SELECT c.TipoDocumento, c.Documento, c.Nombre, c.Apellido, c.Direccion
-            FROM recepcion r
-            INNER JOIN cliente c ON r.IdCliente = c.IdCliente
-            WHERE r.IdRecepcion = ?
-        ");
-        $stmt->execute([$rec_id]);
-        $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if (!$cliente) {
-            return [
-                'ruc' => '',
-                'razon_social' => '',
-                'direccion' => '',
-                'ubigeo' => '',
-                'email' => ''
-            ];
-        }
-        
-        // Si el documento es RUC (11 dígitos), usarlo
-        $documento = $cliente['Documento'] ?? '';
-        $esRuc = strlen($documento) == 11;
-        
-        return [
-            'ruc' => $esRuc ? $documento : '',
-            'razon_social' => trim(($cliente['Nombre'] ?? '') . ' ' . ($cliente['Apellido'] ?? '')),
-            'direccion' => $cliente['Direccion'] ?? '',
-            'ubigeo' => '',
-            'email' => ''
-        ];
-    }
-    
-    /**
-     * Obtener detalles de la recepción para la factura
-     */
-    private function obtenerDetallesRecepcion($rec_id)
-    {
-        $con = new PDO("mysql:host=localhost;dbname=db-hotel", "root", "");
-        $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $con->exec("SET NAMES 'utf8'");
-        
-        // Obtener datos de la recepción
-        $stmt = $con->prepare("
-            SELECT r.*, h.Numero as NumeroHabitacion, t.Descripcion as TarifaDescripcion
-            FROM recepcion r
-            LEFT JOIN habitacion h ON r.IdHabitacion = h.IdHabitacion
-            LEFT JOIN tarifa t ON r.IdTarifa = t.IdTarifa
-            WHERE r.IdRecepcion = ?
-        ");
-        $stmt->execute([$rec_id]);
-        $recepcion = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if (!$recepcion) {
-            throw new Exception("Recepción no encontrada");
-        }
-        
-        // Calcular precio sin IGV (el total incluye IGV)
-        $total = floatval($recepcion['TotalPagado']);
-        $precioSinIgv = round($total / 1.18, 2);
-        
-        return [[
-            'cantidad' => 1,
-            'descripcion' => 'Servicio de Hospedaje - Habitación ' . ($recepcion['NumeroHabitacion'] ?? 'N/A') . 
-                           ' (' . ($recepcion['TarifaDescripcion'] ?? 'Tarifa estándar') . ')',
-            'precio_unitario' => $precioSinIgv
-        ]];
-    }
+
     
     /**
      * Generar PDF de factura
@@ -187,14 +111,7 @@ class FacturaController
                 throw new Exception("ID de recepción no proporcionado");
             }
             
-            $con = new PDO("mysql:host=localhost;dbname=db-hotel", "root", "");
-            $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $con->exec("SET NAMES 'utf8'");
-            
-            $stmt = $con->prepare("CALL SP_FAC_OBTENER_POR_RECEPCION(?)");
-            $stmt->execute([$rec_id]);
-            $factura = $stmt->fetch(PDO::FETCH_ASSOC);
-            $stmt->closeCursor();
+            $factura = $this->factura->obtenerPorRecepcion($rec_id);
             
             if ($factura) {
                 return json_encode([

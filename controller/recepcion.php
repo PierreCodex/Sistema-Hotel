@@ -3,10 +3,16 @@
 require_once("../config/conexion.php");
 require_once("../models/Recepcion.php");
 require_once("../models/Habitacion.php");
+require_once("../models/Venta.php");
+require_once("../models/Factura.php");
+require_once("../models/Boleta.php");
 
 /* TODO: Inicializando clase */
 $recepcion = new Recepcion();
 $habitacionModel = new Habitacion();
+$ventaModel = new Venta();
+$facturaModel = new Factura();
+$boletaModel = new Boleta();
 
 switch ($_GET["op"]) {
     // Listar ocupaciones activas (cliente actual por habitación)
@@ -122,6 +128,81 @@ switch ($_GET["op"]) {
             }
             $recepcion->confirmar_salida($rec_id, $costo_penalidad, $total_pagado, $fecha_confirmacion);
             echo json_encode(["success" => true]);
+        } catch (Exception $e) {
+            echo json_encode(["success" => false, "message" => $e->getMessage()]);
+        }
+        break;
+
+    case "listar_historial_cliente":
+        header('Content-Type: application/json');
+        $cli_id = isset($_GET['cli_id']) ? intval($_GET['cli_id']) : 0;
+        if ($cli_id <= 0) {
+            echo json_encode(["success" => false, "message" => "Cliente inválido"]);
+            break;
+        }
+        try {
+            $data = $recepcion->get_historial_por_cliente($cli_id);
+            // Formatear fechas y estados
+            $results = [];
+            foreach($data as $row) {
+                $status = $row['Estado'] == 1 ? 'Activo' : 'Finalizado';
+                $class = $row['Estado'] == 1 ? 'success' : 'secondary';
+                
+                $row['EstadoLabel'] = '<span class="badge bg-'.$class.'">'.$status.'</span>';
+                
+                // --- Logic to get Consumption (Products) ---
+                $ventas = $ventaModel->get_ventas_x_recepcion($row['IdRecepcion']);
+                $consumo = [];
+                if (is_array($ventas)) {
+                    foreach($ventas as $venta){
+                        $detalles = $ventaModel->get_detalle_venta_x_id_venta($venta['IdVenta']);
+                        if (is_array($detalles)) {
+                            foreach($detalles as $detalle){
+                                 $consumo[] = $detalle;
+                            }
+                        }
+                    }
+                }
+                $row['Consumo'] = $consumo;
+
+                // --- Logic to get Invoice ---
+                try {
+                    $factura = $facturaModel->obtenerPorRecepcion($row['IdRecepcion']);
+                    if ($factura) {
+                        $factura['tipo_doc'] = '01'; // Ensure we know it's a Factura
+                    }
+                    $row['Factura'] = $factura;
+                } catch (Exception $e) {
+                    $row['Factura'] = null; 
+                }
+                
+                // If no Factura, check detection of Boleta
+                if (empty($row['Factura'])) {
+                    try {
+                         // We suspect Boleta model might need a specific method or we try to use the SP directly if needed,
+                         // but assuming consistency, let's try obtaining by reception.
+                         // If the method doesn't exist publicly, we might need to rely on a different approach,
+                         // but looking at Factura.php it has it. Let's assume Boleta has it or we add it.
+                         // For now, I will assume it exists or I will add it to the model if missing.
+                         $boleta = $boletaModel->obtenerPorRecepcion($row['IdRecepcion']);
+                         if ($boleta) {
+                             // Normalize fields to match Factura for Frontend (fac_id, fac_serie, etc.)
+                             $row['Factura'] = [
+                                 'fac_id' => $boleta['bol_id'], // Map bol_id to fac_id
+                                 'fac_serie' => $boleta['bol_serie'],
+                                 'fac_correlativo' => $boleta['bol_correlativo'],
+                                 'IdVenta' => $boleta['bol_id'], // Fallback
+                                 'tipo_doc' => '03' // Mark as Boleta
+                             ];
+                         }
+                    } catch (Exception $e) {
+                        // Ignore
+                    }
+                }
+
+                $results[] = $row;
+            }
+            echo json_encode(["success" => true, "data" => $results]);
         } catch (Exception $e) {
             echo json_encode(["success" => false, "message" => $e->getMessage()]);
         }

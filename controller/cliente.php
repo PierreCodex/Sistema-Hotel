@@ -64,6 +64,41 @@ switch ($_GET["op"]) {
         echo json_encode($results);
         break;
 
+    /* TODO: Listado con conteo de visitas para Historial (Paginado) */
+    case "listar_con_conteo":
+        $start = isset($_GET['start']) ? intval($_GET['start']) : 0;
+        $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+        
+        // Obtener total de registros filtrados
+        $totalRecords = $cliente->count_clientes_con_conteo($search);
+        
+        // Obtener datos paginados
+        $datos = $cliente->get_cliente_con_conteo_paginado($search, $start, $limit);
+        
+        $data = [];
+        foreach ($datos as $row) {
+            $sub_array = [];
+            $sub_array[] = $row["TipoDocumento"];
+            $sub_array[] = $row["Documento"];
+            $sub_array[] = $row["Nombre"];
+            $sub_array[] = $row["Apellido"];
+            $sub_array[] = $row["Direccion"];
+            $sub_array[] = $row["TotalVisitas"];
+            $sub_array[] = $row["Estado"] == 1 ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>';
+            $sub_array[] = '<button type="button" onClick="editar(' . $row["IdCliente"] . ')" id="' . $row["IdCliente"] . '" class="btn btn-warning btn-icon waves-effect waves-light" title="Editar"><i class="ri-edit-2-line"></i></button>';
+            $data[] = $sub_array;
+        }
+
+        $results = [
+            "success" => true,
+            "aaData" => $data,
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $totalRecords // Required for some paginators, though we handle manually
+        ];
+        echo json_encode($results);
+        break;
+
     /* Verificar si el documento ya existe */
     case "verificar_documento":
         header('Content-Type: application/json');

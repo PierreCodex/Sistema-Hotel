@@ -704,4 +704,85 @@ class Factura extends Conectar
             throw new Exception("Error al descargar XML: " . $e->getMessage());
         }
     }
+    /**
+     * Obtener datos del cliente desde la recepción para la factura
+     */
+    public function obtenerClienteDeRecepcion($rec_id)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        
+        // Obtener cliente de la recepción
+        $stmt = $conectar->prepare("CALL SP_REC_OBTENER_CLIENTE_POR_RECEPCION(?)");
+        $stmt->execute([$rec_id]);
+        $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        
+        if (!$cliente) {
+            return [
+                'ruc' => '',
+                'razon_social' => '',
+                'direccion' => '',
+                'ubigeo' => '',
+                'email' => ''
+            ];
+        }
+        
+        // Si el documento es RUC (11 dígitos), usarlo
+        $documento = $cliente['Documento'] ?? '';
+        $esRuc = strlen($documento) == 11;
+        
+        return [
+            'ruc' => $esRuc ? $documento : '',
+            'razon_social' => trim(($cliente['Nombre'] ?? '') . ' ' . ($cliente['Apellido'] ?? '')),
+            'direccion' => $cliente['Direccion'] ?? '',
+            'ubigeo' => '',
+            'email' => ''
+        ];
+    }
+
+    /**
+     * Obtener detalles de la recepción para la factura
+     */
+    public function obtenerDetallesRecepcion($rec_id)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        
+        // Obtener datos de la recepción
+        $stmt = $conectar->prepare("CALL SP_REC_OBTENER_DETALLES_FACTURA(?)");
+        $stmt->execute([$rec_id]);
+        $recepcion = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        
+        if (!$recepcion) {
+            throw new Exception("Recepción no encontrada");
+        }
+        
+        // Calcular precio sin IGV (el total incluye IGV)
+        $total = floatval($recepcion['TotalPagado']);
+        $precioSinIgv = round($total / 1.18, 2);
+        
+        return [[
+            'cantidad' => 1,
+            'descripcion' => 'Servicio de Hospedaje - Habitación ' . ($recepcion['NumeroHabitacion'] ?? 'N/A') . 
+                           ' (' . ($recepcion['TarifaDescripcion'] ?? 'Tarifa estándar') . ')',
+            'precio_unitario' => $precioSinIgv
+        ]];
+    }
+    /**
+     * Obtener factura por ID de recepción
+     */
+    public function obtenerPorRecepcion($rec_id)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        
+        $stmt = $conectar->prepare("CALL SP_FAC_OBTENER_POR_RECEPCION(?)");
+        $stmt->execute([$rec_id]);
+        $factura = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        
+        return $factura;
+    }
 }
