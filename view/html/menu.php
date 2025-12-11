@@ -248,7 +248,25 @@ function tieneAccesoGrupo($datos, $grupo) {
                 </li> <!-- end Mantenimiento Clientes -->
                 <?php endif; ?>
 
+               <li class="menu-title"><span data-key="t-menu">Configuraciones</span></li>
+               <?php if (tieneAccesoGrupo($datos, 'Configuraciones')): ?>
+                <li class="nav-item">
 
+                                   <?php
+                foreach ($datos as $row) {
+                    if ($row["MEN_GRUPO"] == "Configuraciones" && $row["MEND_PERMI"] == "Si") {
+                ?>
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="<?php echo $row["MEN_RUTA"]; ?>">
+                                <i class=" ri-building-2-fill"></i> <span data-key="t-widgets"><?php echo $row["MEN_NOM"]; ?></span>
+                            </a>
+                        </li>
+                <?php
+                    }
+                }
+                ?>
+                </li> <!-- end Configuraciones -->
+                <?php endif; ?>                 
         </div>
 
     </div>

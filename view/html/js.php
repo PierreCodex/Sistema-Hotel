@@ -668,6 +668,9 @@
       <!-- Dashboard init -->
     <script src="../../assets/js/pages/dashboard-ecommerce.init.js"></script>
 
+     <!-- profile-setting init js -->
+    <script src="../../assets/js/pages/profile-setting.init.js"></script>
+
 <!-- Inicializar Session Manager -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {

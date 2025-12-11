@@ -7,19 +7,6 @@ ini_set('log_errors', 1);     // Pero sí logearlos
 // Iniciar sesión para obtener el ID del usuario
 session_start();
 
-// Capturar errores fatales para devolver JSON
-register_shutdown_function(function () {
-    $error = error_get_last();
-    if ($error !== null && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success' => false,
-            'message' => 'Error PHP: ' . $error['message'],
-            'file' => $error['file'],
-            'line' => $error['line']
-        ]);
-    }
-});
 
 require_once("../config/conexion.php");
 require_once("../models/Boleta.php");

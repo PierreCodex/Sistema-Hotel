@@ -57,7 +57,7 @@ BEGIN
         v.Estado,
         h.Numero AS NumeroHabitacion,
         CONCAT(c.Nombre, ' ', c.Apellido) AS NombreCliente,
-        CONCAT(u.Nombre, ' ', u.Apellido) AS NombreEmpleado,
+        COALESCE(CONCAT(u.Nombre, ' ', u.Apellido), CONCAT(u2.Nombre, ' ', u2.Apellido), 'No registrado') AS NombreEmpleado,
         (SELECT COUNT(*) FROM detalle_venta WHERE IdVenta = v.IdVenta) AS CantidadProductos
     FROM venta v
     INNER JOIN recepcion r ON v.IdRecepcion = r.IdRecepcion
@@ -65,6 +65,8 @@ BEGIN
     LEFT JOIN cliente c ON r.IdCliente = c.IdCliente
     LEFT JOIN boleta b ON r.IdRecepcion = b.rec_id
     LEFT JOIN usuario u ON b.bol_usuario_registro = u.IdUsuario
+    LEFT JOIN factura f ON r.IdRecepcion = f.rec_id
+    LEFT JOIN usuario u2 ON f.fac_usuario_registro = u2.IdUsuario
     WHERE DATE(v.FechaCreacion) BETWEEN p_fecha_inicio AND p_fecha_fin 
     AND v.Estado != 'BORRADOR'
     AND (p_estado = '' OR v.Estado = p_estado)
@@ -148,16 +150,18 @@ CREATE PROCEDURE SP_R_VENTAS_POR_EMPLEADO(
 )
 BEGIN
     SELECT 
-        COALESCE(CONCAT(u.Nombre, ' ', u.Apellido), 'No registrado') AS NombreEmpleado,
+        COALESCE(CONCAT(u.Nombre, ' ', u.Apellido), CONCAT(u2.Nombre, ' ', u2.Apellido), 'No registrado') AS NombreEmpleado,
         COUNT(v.IdVenta) AS CantidadVentas,
         COALESCE(SUM(v.Total), 0) AS TotalVentas
     FROM venta v
     INNER JOIN recepcion r ON v.IdRecepcion = r.IdRecepcion
     LEFT JOIN boleta b ON r.IdRecepcion = b.rec_id
     LEFT JOIN usuario u ON b.bol_usuario_registro = u.IdUsuario
+    LEFT JOIN factura f ON r.IdRecepcion = f.rec_id
+    LEFT JOIN usuario u2 ON f.fac_usuario_registro = u2.IdUsuario
     WHERE DATE(v.FechaCreacion) BETWEEN p_fecha_inicio AND p_fecha_fin 
     AND v.Estado != 'BORRADOR' AND v.Estado != 'ANULADO'
     AND (p_estado = '' OR v.Estado = p_estado)
-    GROUP BY u.IdUsuario
+    GROUP BY COALESCE(u.IdUsuario, u2.IdUsuario)
     ORDER BY TotalVentas DESC;
 END//

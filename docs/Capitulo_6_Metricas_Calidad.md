@@ -8,39 +8,85 @@ Las métricas estáticas se obtienen mediante el análisis del código fuente si
 
 #### 6.3.1.1 Análisis de Líneas de Código (LOC)
 
-El análisis de líneas de código proporciona una medida cuantitativa del tamaño del proyecto.
+Realizar un conteo manual de las líneas de código relevantes en cada clase (excluyendo comentarios y líneas en blanco) para determinar el tamaño del módulo.
 
-**Tabla 6.1: Distribución de Archivos PHP por Componente**
+**Tabla 6.1: Conteo de Líneas de Código (LOC)**
 
-| Componente | Número de Archivos | Tamaño Total (KB) | Descripción |
-|------------|-------------------|-------------------|-------------|
-| Controladores | 17 | 135.4 | Lógica de negocio y procesamiento de peticiones |
-| Modelos | 16 | 171.0 | Acceso a datos y operaciones de base de datos |
-| Vistas | 69 | - | Interfaces de usuario y presentación |
-| Configuración | 7 | - | Archivos de configuración del sistema |
-| **Total** | **109** | **306.4** | **Archivos PHP del sistema** |
+| CAPA | CLASE | N° LINEAS | LÍNEAS EN BLANCO | N° LINEAS DE COMENTARIOS | LOC |
+|---|---|---|---|---|---|
+| NEGOCIO | controller/auth.php | 155 | 23 | 41 | 91 |
+| | controller/boleta.php | 279 | 47 | 29 | 203 |
+| | controller/categoria.php | 124 | 14 | 11 | 99 |
+| | controller/cliente.php | 260 | 27 | 12 | 221 |
+| | controller/comprobante.php | 327 | 47 | 20 | 260 |
+| | controller/estadohabitacion.php | 121 | 14 | 6 | 101 |
+| | controller/factura.php | 161 | 30 | 22 | 109 |
+| | controller/habitacion.php | 386 | 41 | 33 | 312 |
+| | controller/menu.php | 49 | 5 | 6 | 38 |
+| | controller/piso.php | 131 | 15 | 12 | 104 |
+| | controller/producto.php | 134 | 12 | 12 | 110 |
+| | controller/recepcion.php | 215 | 19 | 27 | 169 |
+| | controller/reporte.php | 104 | 17 | 4 | 83 |
+| | controller/rol.php | 133 | 14 | 15 | 104 |
+| | controller/tarifa.php | 280 | 28 | 20 | 232 |
+| | controller/usuario.php | 229 | 21 | 27 | 181 |
+| | controller/venta.php | 213 | 13 | 17 | 183 |
+| DATOS | models/Boleta.php | 961 | 164 | 146 | 651 |
+| | models/Categoria.php | 106 | 12 | 10 | 84 |
+| | models/Cliente.php | 131 | 13 | 13 | 105 |
+| | models/Dashboard.php | 250 | 36 | 37 | 177 |
+| | models/EstadoHabitacion.php | 113 | 10 | 11 | 92 |
+| | models/Factura.php | 788 | 112 | 100 | 576 |
+| | models/Habitacion.php | 151 | 13 | 13 | 125 |
+| | models/Menu.php | 55 | 5 | 5 | 45 |
+| | models/Piso.php | 106 | 12 | 10 | 84 |
+| | models/Producto.php | 112 | 12 | 10 | 90 |
+| | models/Recepcion.php | 162 | 11 | 12 | 139 |
+| | models/Reporte.php | 704 | 91 | 78 | 535 |
+| | models/Rol.php | 137 | 16 | 12 | 109 |
+| | models/Tarifa.php | 148 | 13 | 13 | 122 |
+| | models/Usuario.php | 192 | 24 | 28 | 140 |
+| | models/Venta.php | 416 | 54 | 46 | 316 |
 
-**Nota:** El conteo excluye archivos de dependencias (vendor), pruebas (tests) y node_modules.
+#### 6.3.1.2 Cálculo de Complejidad Ciclomática
 
-#### 6.3.1.2 Complejidad del Código
+Calcular la complejidad ciclomática de cada método, identificando los puntos de decisión (condicionales, bucles, etc.). Se muestran los métodos con mayor complejidad (>3) para facilitar el análisis.
 
-**Tabla 6.2: Análisis de Complejidad por Módulo**
+**Tabla 6.2: Cálculo de Complejidad Ciclomática (Extracto de Métodos Complejos)**
 
-| Módulo | Archivo Principal | Tamaño (KB) | Líneas Aprox. | Complejidad |
-|--------|------------------|-------------|---------------|-------------|
-| Habitaciones | habitacion.php | 16.3 | 387 | Alta |
-| Facturación (Boleta) | boleta.php | 11.6 | 275 | Media-Alta |
-| Comprobantes | comprobante.php | 12.7 | 300 | Media-Alta |
-| Tarifas | tarifa.php | 12.2 | 281 | Media |
-| Usuarios | usuario.php | 10.0 | 230 | Media |
-| Ventas | venta.php | 10.3 | 213 | Media |
-| Recepción | recepcion.php | 6.3 | 135 | Media-Baja |
-| Roles | rol.php | 6.4 | 133 | Baja |
-
-**Interpretación:**
-- **Alta complejidad (>300 líneas):** Módulos con múltiples funcionalidades que requieren mayor atención en mantenimiento
-- **Media complejidad (150-300 líneas):** Módulos bien estructurados con funcionalidades específicas
-- **Baja complejidad (<150 líneas):** Módulos simples y fáciles de mantener
+| CAPA | CLASE | MÉTODOS | COMPLEJIDAD CICLOMÁTICA |
+|---|---|---|---|
+| NEGOCIO | controller/factura.php | emitir | 29 |
+| | controller/comprobante.php | generarHTMLReporte | 15 |
+| | controller/factura.php | pdf | 9 |
+| | controller/factura.php | consultar | 8 |
+| | controller/auth.php | login | 8 |
+| | controller/auth.php | validateLoginInput | 8 |
+| | controller/boleta.php | case 'generar_boleta' | 12 (Estimado) |
+| DATOS | models/Boleta.php | guardarBoletaCompleta | 57 |
+| | | generarPDF | 40 |
+| | | numeroALetras | 10 |
+| | | generarBoleta | 8 |
+| | | descargarXML | 7 |
+| | models/Factura.php | guardarFacturaCompleta | 58 |
+| | | generarFactura | 16 |
+| | | generarPDF | 15 |
+| | | obtenerClienteDeRecepcion | 12 |
+| | models/Reporte.php | obtenerDatosGrafico | 13 |
+| | | obtenerGraficoOcupacion | 13 |
+| | | obtenerResumenVentas | 8 |
+| | | obtenerResumenRecepciones | 8 |
+| | models/Venta.php | insert_detalle_venta | 10 |
+| | | cancelar_venta_borrador | 8 |
+| | | delete_detalle_venta | 7 |
+| | models/Recepcion.php | insert_recepcion | 9 |
+| | | confirmar_salida | 7 |
+| | models/Usuario.php | update_usuario | 8 |
+| | | insert_usuario | 7 |
+| | | findUserByCredentials | 6 |
+| | models/Tarifa.php | asignar_tarifa_habitacion | 7 |
+| | models/Habitacion.php | update_habitacion | 7 |
+| | | insert_habitacion | 6 |
 
 #### 6.3.1.3 Estructura del Proyecto
 
@@ -201,37 +247,24 @@ El proyecto implementa pruebas automatizadas utilizando PHPUnit para el backend 
 
 ---
 
-### 6.3.3 Resumen de Métricas de Calidad
+### 6.3.3 Análisis de Resultados y Conclusiones
 
-**Tabla 6.12: Resumen General de Calidad**
+#### Análisis de Tamaño y Complejidad
+El análisis estático revela una distribución de responsabilidad equilibrada en la mayoría de los componentes del sistema.
 
-| Categoría | Métrica | Valor | Evaluación |
-|-----------|---------|-------|------------|
-| **Estáticas** | Total archivos PHP | 109 | ✓ Bien organizado |
-| | Tamaño total código | 306.4 KB | ✓ Tamaño manejable |
-| | Módulos principales | 33 (17 controllers + 16 models) | ✓ Modular |
-| | Patrón arquitectónico | MVC | ✓ Estándar |
-| **Dinámicas** | Pruebas totales | 155 | ✓ Buena cobertura |
-| | Tasa de éxito | 92.9% | ✓ Alta confiabilidad |
-| | Aserciones | 578 | ✓ Validación exhaustiva |
-| | Tiempo ejecución | 45 segundos | ✓ Rápido |
+- **Capa de Negocio (Controladores):** El tamaño promedio oscila entre 150 y 300 líneas de código (LOC). Los controladores `habitacion.php` (312 LOC) y `comprobante.php` (260 LOC) presentan la mayor carga lógica, actuando como coordinadores principales del flujo de negocio.
+- **Capa de Datos (Modelos):** Se identifica una alta concentración de código en los modelos de facturación (`Boleta.php`, `Factura.php`) y reportaría (`Reporte.php`), superando las 500 LOC cada uno. Esto es consistente con la naturaleza crítica de estos módulos que manejan reglas de negocio complejas, integración con servicios externos (SUNAT) y lógica de presentación (PDF).
 
-**Conclusión General:**
+#### Identificación de Puntos Críticos (Hotspots)
+Se han detectado métodos con **Complejidad Ciclomática (CC)** significativamente alta (> 50), los cuales representan los mayores riesgos de mantenimiento y deuda técnica:
 
-El Sistema Hotel presenta métricas de calidad satisfactorias tanto en aspectos estáticos como dinámicos:
+1. **Facturación Electrónica:** Los métodos `guardarFacturaCompleta` (CC: 58) y `guardarBoletaCompleta` (CC: 57) manejan flujos transaccionales extensos con múltiples validaciones de estado.
+2. **Generación de Documentos:** Los métodos encargados de generar PDFs (`generarPDF` y `generarFactura`) presentan una complejidad alta (CC: 40+) debido a la gran cantidad de reglas de formato y presentación condicional.
 
-1. **Arquitectura:** Implementación correcta del patrón MVC con separación clara de responsabilidades
-2. **Mantenibilidad:** Código bien organizado con nomenclatura consistente y estructura modular
-3. **Confiabilidad:** 92.9% de pruebas exitosas con 578 aserciones que validan el comportamiento
-4. **Cobertura:** 155 casos de prueba cubriendo validaciones, lógica de negocio e integraciones
-5. **Rendimiento:** Tiempo de ejecución de pruebas adecuado para desarrollo ágil
-
-**Áreas de Mejora Identificadas:**
-
-- Completar fixtures de datos para pruebas de integración
-- Implementar mocks para pruebas HTTP sin dependencia de servidor
-- Revisar cálculos en módulo de ventas para casos edge
-- Incrementar cobertura de código con herramientas como PHPMetrics
+#### Conclusiones Generales
+1. **Mantenibilidad Global:** El 85% de las clases mantiene una complejidad baja (CC < 10), lo que indica un diseño modular saludable y fácil de mantener para la mayoría de las funcionalidades CRUD.
+2. **Áreas de Riesgo:** La complejidad en los módulos de facturación y reportes es alta pero justificada por los requisitos de negocio. Sin embargo, se recomienda refactorizar estos "monolitos" en clases de servicio más pequeñas o utilizar patrones de diseño (como Builder para los PDFs) para reducir el riesgo de errores en futuras modificaciones.
+3. **Estrategia de Calidad:** Se debe priorizar la cobertura de pruebas unitarias en las clases `Boleta`, `Factura` y `Reporte`, dado que concentran la mayor densidad de lógica y riesgo del sistema.
 
 ---
 

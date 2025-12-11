@@ -1,0 +1,232 @@
+--- LOC REPORT ---
+CAPA       | CLASE                          | N LINEAS   | BLANK      | COMMENT    | LOC  
+------------------------------------------------------------------------------------------
+NEGOCIO    | controller/auth.php            | 155        | 23         | 41         | 91   
+NEGOCIO    | controller/boleta.php          | 279        | 47         | 29         | 203  
+NEGOCIO    | controller/categoria.php       | 124        | 14         | 11         | 99   
+NEGOCIO    | controller/cliente.php         | 260        | 27         | 12         | 221  
+NEGOCIO    | controller/comprobante.php     | 327        | 47         | 20         | 260  
+NEGOCIO    | controller/estadohabitacion.php | 121        | 14         | 6          | 101  
+NEGOCIO    | controller/factura.php         | 161        | 30         | 22         | 109  
+NEGOCIO    | controller/habitacion.php      | 386        | 41         | 33         | 312  
+NEGOCIO    | controller/menu.php            | 49         | 5          | 6          | 38   
+NEGOCIO    | controller/piso.php            | 131        | 15         | 12         | 104  
+NEGOCIO    | controller/producto.php        | 134        | 12         | 12         | 110  
+NEGOCIO    | controller/recepcion.php       | 215        | 19         | 27         | 169  
+NEGOCIO    | controller/reporte.php         | 104        | 17         | 4          | 83   
+NEGOCIO    | controller/rol.php             | 133        | 14         | 15         | 104  
+NEGOCIO    | controller/tarifa.php          | 280        | 28         | 20         | 232  
+NEGOCIO    | controller/usuario.php         | 229        | 21         | 27         | 181  
+NEGOCIO    | controller/venta.php           | 213        | 13         | 17         | 183  
+DATOS      | models/Boleta.php              | 961        | 164        | 146        | 651  
+DATOS      | models/Categoria.php           | 106        | 12         | 10         | 84   
+DATOS      | models/Cliente.php             | 131        | 13         | 13         | 105  
+DATOS      | models/Dashboard.php           | 250        | 36         | 37         | 177  
+DATOS      | models/EstadoHabitacion.php    | 113        | 10         | 11         | 92   
+DATOS      | models/Factura.php             | 788        | 112        | 100        | 576  
+DATOS      | models/Habitacion.php          | 151        | 13         | 13         | 125  
+DATOS      | models/Menu.php                | 55         | 5          | 5          | 45   
+DATOS      | models/Piso.php                | 106        | 12         | 10         | 84   
+DATOS      | models/Producto.php            | 112        | 12         | 10         | 90   
+DATOS      | models/Recepcion.php           | 162        | 11         | 12         | 139  
+DATOS      | models/Reporte.php             | 704        | 91         | 78         | 535  
+DATOS      | models/Rol.php                 | 137        | 16         | 12         | 109  
+DATOS      | models/Tarifa.php              | 148        | 13         | 13         | 122  
+DATOS      | models/Usuario.php             | 192        | 24         | 28         | 140  
+DATOS      | models/Venta.php               | 416        | 54         | 46         | 316  
+
+--- COMPLEXITY REPORT ---
+CAPA       | CLASE                          | METODO                              | CC   
+------------------------------------------------------------------------------------------
+NEGOCIO    | controller/auth.php            | __construct                         | 1    
+NEGOCIO    | controller/auth.php            | login                               | 8    
+NEGOCIO    | controller/auth.php            | validateLoginInput                  | 8    
+NEGOCIO    | controller/auth.php            | authenticateUser                    | 3    
+NEGOCIO    | controller/auth.php            | setUserSession                      | 1    
+NEGOCIO    | controller/auth.php            | redirectToHome                      | 1    
+NEGOCIO    | controller/auth.php            | redirectWithError                   | 2    
+NEGOCIO    | controller/auth.php            | logout                              | 1    
+NEGOCIO    | controller/auth.php            | isAuthenticated                     | 1    
+NEGOCIO    | controller/auth.php            | getCurrentUser                      | 2    
+NEGOCIO    | controller/comprobante.php     | exportarExcel                       | 4    
+NEGOCIO    | controller/comprobante.php     | exportarPDFReporte                  | 2    
+NEGOCIO    | controller/comprobante.php     | generarHTMLReporte                  | 15   
+NEGOCIO    | controller/factura.php         | __construct                         | 1    
+NEGOCIO    | controller/factura.php         | emitir                              | 29   
+NEGOCIO    | controller/factura.php         | pdf                                 | 9    
+NEGOCIO    | controller/factura.php         | consultar                           | 8    
+DATOS      | models/Boleta.php              | verificarBoleta                     | 2    
+DATOS      | models/Boleta.php              | generarBoleta                       | 8    
+DATOS      | models/Boleta.php              | configurarSee                       | 1    
+DATOS      | models/Boleta.php              | crearCliente                        | 3    
+DATOS      | models/Boleta.php              | crearEmpresa                        | 1    
+DATOS      | models/Boleta.php              | crearInvoice                        | 2    
+DATOS      | models/Boleta.php              | crearDetalles                       | 2    
+DATOS      | models/Boleta.php              | obtenerSiguienteCorrelativo         | 2    
+DATOS      | models/Boleta.php              | extraerHashDelXML                   | 4    
+DATOS      | models/Boleta.php              | guardarBoletaCompleta               | 57   
+DATOS      | models/Boleta.php              | generarPDF                          | 40   
+DATOS      | models/Boleta.php              | guardarPDFEnStorage                 | 5    
+DATOS      | models/Boleta.php              | guardarXMLEnStorage                 | 5    
+DATOS      | models/Boleta.php              | guardarCDREnStorage                 | 5    
+DATOS      | models/Boleta.php              | descargarXML                        | 7    
+DATOS      | models/Boleta.php              | descargarCDR                        | 7    
+DATOS      | models/Boleta.php              | descargarPDF                        | 6    
+DATOS      | models/Boleta.php              | numeroALetras                       | 10   
+DATOS      | models/Boleta.php              | listarComprobantes                  | 6    
+DATOS      | models/Boleta.php              | obtenerResumenComprobantes          | 6    
+DATOS      | models/Boleta.php              | obtenerComprobantePorId             | 4    
+DATOS      | models/Boleta.php              | obtenerDetallesComprobante          | 4    
+DATOS      | models/Boleta.php              | obtenerComprobanteConRecepcion      | 3    
+DATOS      | models/Boleta.php              | obtenerPorRecepcion                 | 2    
+DATOS      | models/Categoria.php           | get_categoria                       | 1    
+DATOS      | models/Categoria.php           | get_categoria_activa                | 1    
+DATOS      | models/Categoria.php           | get_categoria_x_cat_id              | 2    
+DATOS      | models/Categoria.php           | delete_categoria                    | 2    
+DATOS      | models/Categoria.php           | insert_categoria                    | 2    
+DATOS      | models/Categoria.php           | update_categoria                    | 3    
+DATOS      | models/Categoria.php           | verificar_categoria_existente       | 5    
+DATOS      | models/Categoria.php           | cambiar_estado_categoria            | 3    
+DATOS      | models/Cliente.php             | get_cliente_activo                  | 1    
+DATOS      | models/Cliente.php             | get_cliente_con_conteo_paginado     | 4    
+DATOS      | models/Cliente.php             | count_clientes_con_conteo           | 2    
+DATOS      | models/Cliente.php             | get_cliente_x_cli_id                | 2    
+DATOS      | models/Cliente.php             | insert_cliente                      | 6    
+DATOS      | models/Cliente.php             | verificar_documento_existe          | 6    
+DATOS      | models/Dashboard.php           | obtenerEstadisticasAdmin            | 1    
+DATOS      | models/Dashboard.php           | obtenerEstadisticasEmpleado         | 1    
+DATOS      | models/Dashboard.php           | obtenerRecepcionesActivas           | 2    
+DATOS      | models/Dashboard.php           | obtenerUltimasVentas                | 2    
+DATOS      | models/Dashboard.php           | obtenerIngresosUltimos7Dias         | 1    
+DATOS      | models/EstadoHabitacion.php    | get_estado_habitacion               | 1    
+DATOS      | models/EstadoHabitacion.php    | get_estado_habitacion_activos       | 1    
+DATOS      | models/EstadoHabitacion.php    | get_estado_habitacion_x_id          | 2    
+DATOS      | models/EstadoHabitacion.php    | delete_estado_habitacion            | 2    
+DATOS      | models/EstadoHabitacion.php    | insert_estado_habitacion            | 2    
+DATOS      | models/EstadoHabitacion.php    | update_estado_habitacion            | 3    
+DATOS      | models/EstadoHabitacion.php    | verificar_estado_habitacion_existe  | 5    
+DATOS      | models/EstadoHabitacion.php    | cambiar_estado_estado_habitacion    | 3    
+DATOS      | models/Factura.php             | __construct                         | 1    
+DATOS      | models/Factura.php             | initGreenter                        | 2    
+DATOS      | models/Factura.php             | setUsuarioId                        | 1    
+DATOS      | models/Factura.php             | setMetodoPago                       | 1    
+DATOS      | models/Factura.php             | generarFactura                      | 16   
+DATOS      | models/Factura.php             | calcularTotales                     | 4    
+DATOS      | models/Factura.php             | obtenerSiguienteCorrelativo         | 2    
+DATOS      | models/Factura.php             | extraerHashDelXML                   | 4    
+DATOS      | models/Factura.php             | guardarFacturaCompleta              | 58   
+DATOS      | models/Factura.php             | guardarXMLEnStorage                 | 5    
+DATOS      | models/Factura.php             | guardarCDREnStorage                 | 5    
+DATOS      | models/Factura.php             | generarPDF                          | 15   
+DATOS      | models/Factura.php             | guardarPDFEnStorage                 | 5    
+DATOS      | models/Factura.php             | numeroALetras                       | 1    
+DATOS      | models/Factura.php             | descargarXML                        | 7    
+DATOS      | models/Factura.php             | obtenerClienteDeRecepcion           | 12   
+DATOS      | models/Factura.php             | obtenerDetallesRecepcion            | 7    
+DATOS      | models/Factura.php             | obtenerPorRecepcion                 | 2    
+DATOS      | models/Habitacion.php          | get_habitacion                      | 1    
+DATOS      | models/Habitacion.php          | get_habitacion_activa               | 1    
+DATOS      | models/Habitacion.php          | get_habitacion_ocupada              | 1    
+DATOS      | models/Habitacion.php          | get_habitacion_x_hab_id             | 2    
+DATOS      | models/Habitacion.php          | delete_habitacion                   | 2    
+DATOS      | models/Habitacion.php          | insert_habitacion                   | 6    
+DATOS      | models/Habitacion.php          | update_habitacion                   | 7    
+DATOS      | models/Habitacion.php          | verificar_habitacion_existente      | 5    
+DATOS      | models/Habitacion.php          | cambiar_estado_habitacion           | 3    
+DATOS      | models/Habitacion.php          | cambiar_tipo_estado_habitacion      | 3    
+DATOS      | models/Habitacion.php          | get_habitacion_x_piso               | 2    
+DATOS      | models/Menu.php                | get_menu_x_rol_id                   | 2    
+DATOS      | models/Menu.php                | insert_menu_detalle_x_rol_id        | 2    
+DATOS      | models/Menu.php                | update_menu_habilitar               | 2    
+DATOS      | models/Menu.php                | update_menu_deshabilitar            | 2    
+DATOS      | models/Menu.php                | get_tipo_usuario_descripcion        | 3    
+DATOS      | models/Piso.php                | get_piso                            | 1    
+DATOS      | models/Piso.php                | get_piso_activo                     | 1    
+DATOS      | models/Piso.php                | get_piso_x_piso_id                  | 2    
+DATOS      | models/Piso.php                | delete_piso                         | 2    
+DATOS      | models/Piso.php                | insert_piso                         | 2    
+DATOS      | models/Piso.php                | update_piso                         | 3    
+DATOS      | models/Piso.php                | verificar_piso_existente            | 5    
+DATOS      | models/Piso.php                | cambiar_estado_piso                 | 3    
+DATOS      | models/Producto.php            | get_producto                        | 1    
+DATOS      | models/Producto.php            | get_producto_activo                 | 1    
+DATOS      | models/Producto.php            | get_producto_x_id                   | 2    
+DATOS      | models/Producto.php            | delete_producto                     | 2    
+DATOS      | models/Producto.php            | insert_producto                     | 5    
+DATOS      | models/Producto.php            | update_producto                     | 6    
+DATOS      | models/Producto.php            | verificar_producto_existente        | 5    
+DATOS      | models/Producto.php            | cambiar_estado_producto             | 3    
+DATOS      | models/Recepcion.php           | insert_recepcion                    | 9    
+DATOS      | models/Recepcion.php           | listar_ocupaciones_activas          | 1    
+DATOS      | models/Recepcion.php           | get_recepcion_activa_por_habitacion | 3    
+DATOS      | models/Recepcion.php           | get_recepcion_x_id                  | 2    
+DATOS      | models/Recepcion.php           | confirmar_salida                    | 7    
+DATOS      | models/Recepcion.php           | cliente_tiene_recepcion_activa      | 2    
+DATOS      | models/Recepcion.php           | get_historial_por_cliente           | 2    
+DATOS      | models/Reporte.php             | obtenerReporteVentas                | 2    
+DATOS      | models/Reporte.php             | obtenerResumenVentas                | 8    
+DATOS      | models/Reporte.php             | obtenerListaVentas                  | 4    
+DATOS      | models/Reporte.php             | obtenerDatosGrafico                 | 13   
+DATOS      | models/Reporte.php             | obtenerTopProductos                 | 4    
+DATOS      | models/Reporte.php             | obtenerVentasPorEmpleado            | 4    
+DATOS      | models/Reporte.php             | obtenerReporteRecepciones           | 2    
+DATOS      | models/Reporte.php             | obtenerResumenRecepciones           | 8    
+DATOS      | models/Reporte.php             | obtenerListaRecepciones             | 4    
+DATOS      | models/Reporte.php             | obtenerGraficoOcupacion             | 13   
+DATOS      | models/Reporte.php             | obtenerGraficoPisos                 | 4    
+DATOS      | models/Reporte.php             | obtenerHabitacionesMasSolicitadas   | 4    
+DATOS      | models/Reporte.php             | obtenerIngresosPorTarifa            | 4    
+DATOS      | models/Reporte.php             | obtenerClientesFrecuentes           | 3    
+DATOS      | models/Reporte.php             | obtenerOcupacionPorPiso             | 4    
+DATOS      | models/Reporte.php             | exportarExcelRecepciones            | 7    
+DATOS      | models/Rol.php                 | get_rol                             | 1    
+DATOS      | models/Rol.php                 | get_rol_activo                      | 1    
+DATOS      | models/Rol.php                 | get_rol_x_rol_id                    | 2    
+DATOS      | models/Rol.php                 | delete_rol                          | 2    
+DATOS      | models/Rol.php                 | insert_rol                          | 2    
+DATOS      | models/Rol.php                 | update_rol                          | 3    
+DATOS      | models/Rol.php                 | verificar_rol_existente             | 5    
+DATOS      | models/Rol.php                 | validarLongitud                     | 2    
+DATOS      | models/Rol.php                 | validar_acceso_rol                  | 3    
+DATOS      | models/Rol.php                 | cambiar_estado_rol                  | 3    
+DATOS      | models/Tarifa.php              | get_tarifa                          | 1    
+DATOS      | models/Tarifa.php              | get_tarifas_activas                 | 1    
+DATOS      | models/Tarifa.php              | get_tarifa_x_tar_id                 | 2    
+DATOS      | models/Tarifa.php              | get_tarifas_asignadas_por_habitacion | 2    
+DATOS      | models/Tarifa.php              | asignar_tarifa_habitacion           | 7    
+DATOS      | models/Tarifa.php              | actualizar_vigencia_tarifa_habitacion | 4    
+DATOS      | models/Tarifa.php              | eliminar_tarifa_habitacion          | 2    
+DATOS      | models/Tarifa.php              | insert_tarifa                       | 3    
+DATOS      | models/Tarifa.php              | update_tarifa                       | 4    
+DATOS      | models/Tarifa.php              | verificar_tarifa_existente          | 4    
+DATOS      | models/Tarifa.php              | cambiar_estado_tarifa               | 3    
+DATOS      | models/Tarifa.php              | delete_tarifa                       | 2    
+DATOS      | models/Usuario.php             | findUserByCredentials               | 6    
+DATOS      | models/Usuario.php             | get_usuario                         | 2    
+DATOS      | models/Usuario.php             | get_usuario_x_usu_id                | 2    
+DATOS      | models/Usuario.php             | delete_usuario                      | 2    
+DATOS      | models/Usuario.php             | insert_usuario                      | 7    
+DATOS      | models/Usuario.php             | update_usuario                      | 8    
+DATOS      | models/Usuario.php             | update_usuario_pass                 | 3    
+DATOS      | models/Usuario.php             | existe_usuario_correo               | 2    
+DATOS      | models/Usuario.php             | existe_usuario_dni                  | 2    
+DATOS      | models/Usuario.php             | cambiar_estado_usuario              | 3    
+DATOS      | models/Venta.php               | insert_venta                        | 2    
+DATOS      | models/Venta.php               | get_venta_borrador_por_recepcion    | 3    
+DATOS      | models/Venta.php               | get_or_create_venta_borrador        | 2    
+DATOS      | models/Venta.php               | insert_detalle_venta                | 10   
+DATOS      | models/Venta.php               | get_venta_detalle                   | 3    
+DATOS      | models/Venta.php               | get_venta_x_id                      | 2    
+DATOS      | models/Venta.php               | get_detalle_venta_x_id_venta        | 2    
+DATOS      | models/Venta.php               | get_ventas                          | 1    
+DATOS      | models/Venta.php               | get_ventas_x_recepcion              | 2    
+DATOS      | models/Venta.php               | update_venta_total                  | 3    
+DATOS      | models/Venta.php               | update_venta_estado                 | 3    
+DATOS      | models/Venta.php               | delete_venta                        | 2    
+DATOS      | models/Venta.php               | delete_detalle_venta                | 7    
+DATOS      | models/Venta.php               | update_detalle_venta                | 4    
+DATOS      | models/Venta.php               | get_total_detalles_por_venta        | 2    
+DATOS      | models/Venta.php               | calcular_totales_y_actualizar       | 5    
+DATOS      | models/Venta.php               | finalizar_venta                     | 2    
+DATOS      | models/Venta.php               | cancelar_venta_borrador             | 8    
+DATOS      | models/Venta.php               | limpiar_borradores_antiguos         | 6    

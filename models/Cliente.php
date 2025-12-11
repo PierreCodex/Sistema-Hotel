@@ -48,15 +48,7 @@
             return $query->fetchAll(PDO::FETCH_ASSOC);
         }
 
-        /* TODO: Eliminar o cambiar estado a eliminado */
-        public function delete_cliente($cli_id): void{
-            $conectar=parent::Conexion();
-            $sql="SP_D_CLIENTE_01 ?";
-            $query=$conectar->prepare($sql);
-            $query->bindValue(1,$cli_id);
-            $query->execute();
-        }
-
+ 
         /* TODO: Registro de datos */
         public function insert_cliente($cli_tipo_doc,$cli_doc,$cli_nom,$cli_ape,$cli_direcc){
             $conectar=parent::Conexion();
@@ -76,20 +68,7 @@
             return $result['id'];
         }
 
-        /* TODO:Actualizar Datos */
-        public function update_cliente($cli_id,$cli_tipo_doc,$cli_doc,$cli_nom,$cli_ape,$cli_direcc): void{
-            $conectar=parent::Conexion();
-            $sql="CALL SP_U_CLIENTE_01( ?,?,?,?,?,?)";
-            $query=$conectar->prepare($sql);
-            $query->bindValue(1,$cli_id);
-            $query->bindValue(2,$cli_tipo_doc);
-            $query->bindValue(3,$cli_doc);
-            $query->bindValue(4,$cli_nom);
-            $query->bindValue(5,$cli_ape);
-            $query->bindValue(6,$cli_direcc);
-            $query->execute();
-        }
-        
+
         /* Verificar si existe un cliente con el mismo documento (DNI/RUC) */
         public function verificar_documento_existe($cli_doc, $cli_id = null){
             $conectar = parent::Conexion();

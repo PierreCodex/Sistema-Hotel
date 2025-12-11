@@ -23,15 +23,7 @@ switch ($_GET["op"]) {
             );
             echo json_encode(["success" => true, "cli_id" => $cli_id]);
         } else {
-            $cliente->update_cliente(
-                $_POST["cli_id"],
-                $_POST["cli_tipo_doc"],
-                $_POST["cli_doc"],
-                $_POST["cli_nom"],
-                $_POST["cli_ape"],
-                $_POST["cli_direcc"]
-            );
-            echo json_encode(["success" => true]);
+           
         }
         break;
 
@@ -130,10 +122,6 @@ switch ($_GET["op"]) {
         }
         break;
 
-    /* TODO: Cambiar Estado a 0 del Registro */
-    case "eliminar";
-
-        break;
 
     /* TODO: Combo de Listado de Clientes */
     case "combo";
