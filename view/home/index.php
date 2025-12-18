@@ -54,23 +54,6 @@ if($esAdmin) {
                         </div>
                     </div>
 
-                    <!-- Alerta de sesión anterior cerrada (US062) -->
-                    <?php if (isset($_SESSION["previous_session_closed"]) && $_SESSION["previous_session_closed"] === true): ?>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                <i class="ri-alert-line me-2"></i>
-                                <strong>Se ha cerrado sesión en otro dispositivo.</strong> Solo se permite tener una sesión activa, por lo que se ha cerrado sesión en otro dispositivo.
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        </div>
-                    </div>
-                    <?php 
-                        // Limpiar el flag después de mostrarlo
-                        unset($_SESSION["previous_session_closed"]);
-                    endif; 
-                    ?>
-
                     <?php if($esAdmin): // ================== VISTA ADMINISTRADOR ================== ?>
                     
                     <!-- Tarjetas principales -->

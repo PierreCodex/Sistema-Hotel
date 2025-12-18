@@ -547,6 +547,76 @@ $(document).on('click', '#btnBuscarDoc', function (e) {
 // FUNCIONES NUEVAS PARA MANTENIMIENTO (US050 y US051)
 // ==========================================
 
+// Función para ver detalles del cliente
+function verDetalles(cli_id) {
+    $.ajax({
+        url: "../../controller/cliente.php?op=obtener_detalles",
+        type: "POST",
+        data: { cli_id: cli_id },
+        dataType: 'json',
+        success: function (data) {
+            if (!data || data.error) {
+                Swal.fire('Error', data.error || 'No se pudo obtener los detalles', 'error');
+                return;
+            }
+
+            // Información Personal
+            var tipoDoc = data.TipoDocumento === 'DNI' ? 'DNI' : 'RUC';
+            var nombreCompleto = (data.Nombre || '') + ' ' + (data.Apellido || '');
+            $('#det_nombre_completo').text(nombreCompleto.trim() || '-');
+            $('#det_tipo_doc').text(tipoDoc);
+            $('#det_documento').text(data.Documento || '-');
+            $('#det_nombre').text(data.Nombre || '-');
+            $('#det_apellido').text(data.Apellido || '-');
+            $('#det_direccion').text(data.Direccion || 'No registrada');
+
+            // Estado
+            var estadoActivo = data.Estado == 1;
+            if (estadoActivo) {
+                $('#det_estado_badge').removeClass('bg-danger').addClass('bg-success').text('ACTIVO');
+            } else {
+                $('#det_estado_badge').removeClass('bg-success').addClass('bg-danger').text('INACTIVO');
+            }
+
+            // Estadísticas
+            $('#det_total_visitas').text(data.TotalVisitas || '0');
+            $('#det_ultima_visita').text(data.UltimaVisita ? formatearFecha(data.UltimaVisita) : 'Sin visitas');
+
+            // Auditoría
+            $('#det_fecha_creacion').text(data.FechaCreacion ? formatearFechaHora(data.FechaCreacion) : 'No registrada');
+            $('#det_usuario_creacion').text(data.UsuarioCreacion || 'Sistema');
+            $('#det_fecha_modificacion').text(data.FechaModificacion ? formatearFechaHora(data.FechaModificacion) : 'Sin modificaciones');
+            $('#det_usuario_modificacion').text(data.UsuarioModificacion || 'N/A');
+
+            // Abrir modal
+            $('#modalDetalles').modal('show');
+        },
+        error: function (xhr) {
+            Swal.fire('Error', 'No se pudo cargar los detalles del cliente', 'error');
+        }
+    });
+}
+
+// Función para formatear fecha
+function formatearFecha(fechaStr) {
+    if (!fechaStr) return '-';
+    var fecha = new Date(fechaStr);
+    return fecha.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+// Función para formatear fecha con hora
+function formatearFechaHora(fechaStr) {
+    if (!fechaStr) return '-';
+    var fecha = new Date(fechaStr);
+    return fecha.toLocaleDateString('es-PE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
 // Función para editar cliente (US050)
 function editar(cli_id) {
     $.post("../../controller/cliente.php?op=mostrar", { cli_id: cli_id }, function (data) {

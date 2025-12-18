@@ -200,4 +200,83 @@ class Usuario extends Conectar
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
     }
     
+    /**
+     * Genera un token de sesión único
+     * @return string Token aleatorio de 64 caracteres
+     */
+    public function generar_session_token() {
+        return bin2hex(random_bytes(32)); // Genera un token de 64 caracteres hexadecimales
+    }
+    
+    /**
+     * Actualiza el token de sesión del usuario en la base de datos
+     * @param int $usu_id ID del usuario
+     * @param string|null $token Token de sesión a guardar, o NULL para limpiar
+     * @return bool True si se actualizó correctamente
+     */
+    public function actualizar_session_token($usu_id, $token) {
+        $conectar = parent::conexion();
+        parent::set_names();
+        
+        // Si el token es NULL, limpiar ambos campos
+        if ($token === NULL) {
+            $sql = "UPDATE usuario SET session_token = NULL, session_created_at = NULL WHERE IdUsuario = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $usu_id);
+        } else {
+            // Si hay token, actualizar con timestamp
+            $sql = "UPDATE usuario SET session_token = ?, session_created_at = NOW() WHERE IdUsuario = ?";
+            $stmt = $conectar->prepare($sql);
+            $stmt->bindValue(1, $token);
+            $stmt->bindValue(2, $usu_id);
+        }
+        
+        return $stmt->execute();
+    }
+    
+    /**
+     * Verifica si el token de sesión del usuario coincide con el almacenado en BD
+     * @param int $usu_id ID del usuario
+     * @param string $token Token de sesión a verificar
+     * @return bool True si el token coincide, False si no
+     */
+    public function verificar_session_token($usu_id, $token) {
+        $conectar = parent::conexion();
+        parent::set_names();
+        
+        $sql = "SELECT session_token FROM usuario WHERE IdUsuario = ? AND Estado = 1";
+        $stmt = $conectar->prepare($sql);
+        $stmt->bindValue(1, $usu_id);
+        $stmt->execute();
+        
+        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($resultado && isset($resultado['session_token'])) {
+            // Comparar el token de la sesión con el de la BD
+            return $resultado['session_token'] === $token;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Verifica si el usuario tiene un token de sesión anterior (sesión activa en otro dispositivo)
+     * @param int $usu_id ID del usuario
+     * @return bool True si existe un token anterior, False si no
+     */
+    public function tiene_session_token_anterior($usu_id) {
+        $conectar = parent::conexion();
+        parent::set_names();
+        
+        $sql = "SELECT session_token FROM usuario WHERE IdUsuario = ? AND Estado = 1";
+        $stmt = $conectar->prepare($sql);
+        $stmt->bindValue(1, $usu_id);
+        $stmt->execute();
+        
+        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Retorna true si existe un token (no vacío y no null)
+        return ($resultado && isset($resultado['session_token']) && !empty($resultado['session_token']));
+    }
+    
 }

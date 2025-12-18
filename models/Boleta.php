@@ -497,21 +497,20 @@ class Boleta extends Conectar {
             $encargado = trim(($boleta['usuario_nombre'] ?? '') . ' ' . ($boleta['usuario_apellido'] ?? ''));
             $encargado = !empty($encargado) ? $encargado : 'No registrado';
             
-            // Generar código QR
-            $qr_text = sprintf(
-                "%s|%s|%s|%s|%s|%s|%s|%s",
-                $empresa['ruc'],
-                $tipo_documento,
-                $serie,
-                $correlativo,
-                number_format($igv, 2),
-                number_format($total, 2),
-                date('Y-m-d', strtotime($boleta['bol_fecha_emision'])),
-                $cliente['tipo_doc'] . $cliente['num_doc']
-            );
-            
-            // QR deshabilitado temporalmente
-            $qr_data = null;
+            // Generar código QR usando phpqrcode
+            require_once(__DIR__ . '/../helpers/QRHelper.php');
+            $qr_data = QRHelper::generarQRComprobante([
+                'ruc_emisor' => $empresa['ruc'],
+                'tipo_doc' => $tipo_documento,
+                'serie' => $serie,
+                'correlativo' => $correlativo,
+                'igv' => $igv,
+                'total' => $total,
+                'fecha_emision' => date('Y-m-d', strtotime($boleta['bol_fecha_emision'])),
+                'tipo_doc_cliente' => $cliente['tipo_doc'],
+                'num_doc_cliente' => $cliente['num_doc'],
+                'hash' => $hash_cpe
+            ]);
             
             // Determinar formato y dimensiones
             $formatos = [
@@ -528,11 +527,13 @@ class Boleta extends Conectar {
             $html = ob_get_clean();
             
             // Generar PDF con dompdf
-            $dompdf = new \Dompdf\Dompdf([
-                'enable_remote' => true,
-                'isHtml5ParserEnabled' => true,
-                'isPhpEnabled' => true
-            ]);
+            $options = new \Dompdf\Options();
+            $options->set('enable_remote', true);
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('isPhpEnabled', true);
+            $options->set('chroot', __DIR__ . '/../'); // Permite acceso a archivos locales
+            
+            $dompdf = new \Dompdf\Dompdf($options);
             $dompdf->loadHtml($html);
             $dompdf->setPaper([0, 0, $formato['ancho'], 1000], 'portrait');
             $dompdf->render();

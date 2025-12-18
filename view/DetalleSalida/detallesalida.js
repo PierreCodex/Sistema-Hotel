@@ -196,8 +196,11 @@ $(document).ready(function () {
             $('#metodo_pago').prop('disabled', true);
 
             // Abrir modal y generar boleta automáticamente
+            // Pequeño delay para asegurar que la BD haya procesado la confirmación
             $('#modal-comprobante').modal('show');
-            generarBoletaAutomatica(metodoPago);
+            setTimeout(function () {
+              generarBoletaAutomatica(metodoPago);
+            }, 500);
             return;
           }
         } catch (e) {

@@ -19,10 +19,17 @@ if (isset($_SESSION['IdUsuario']) && isset($_SESSION['session_token'])) {
     
     if (!$token_valido) {
         // Token no coincide - sesión cerrada desde otro dispositivo
+        // Esta es la sesión ANTERIOR, establecer flag y cerrar
+        $flag_sesion_cerrada = true;
+        
         session_unset();
         session_destroy();
         
-        // Redirigir a login
+        // Iniciar nueva sesión temporal solo para el flag
+        session_start();
+        $_SESSION['previous_session_closed'] = $flag_sesion_cerrada;
+        
+        // Redirigir a login CON mensaje
         header("Location: " . Conectar::ruta() . "index.php");
         exit();
     }

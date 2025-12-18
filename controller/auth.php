@@ -100,6 +100,17 @@ class AuthController {
         $_SESSION["IdRol"] = $user["IdRol"];
         $_SESSION["Correo"] = $user["Correo"];
         
+        // Generar nuevo token
+        $session_token = $this->usuarioModel->generar_session_token();
+        
+        // Guardar el nuevo token en BD y obtener si había uno anterior
+        $this->usuarioModel->actualizar_session_token($user["IdUsuario"], $session_token);
+        $_SESSION["session_token"] = $session_token;
+        
+        // NO mostrar mensaje - el usuario simplemente está iniciando sesión
+        // El mensaje de "sesión cerrada" solo aparecerá en la sesión ANTERIOR
+        // cuando intente hacer algo y session_check detecte que el token no coincide
+        
         // Renovar sesión al iniciar sesión
         SessionManager::renewSession();
     }
@@ -125,6 +136,11 @@ class AuthController {
      * Cierra la sesión del usuario
      */
     public function logout() {
+        // Limpiar el token de sesión en BD antes de destruir la sesión
+        if (isset($_SESSION["IdUsuario"])) {
+            $this->usuarioModel->actualizar_session_token($_SESSION["IdUsuario"], NULL);
+        }
+        
         SessionManager::destroy();
         header("Location: " . Conectar::ruta() . "index.php");
         exit();

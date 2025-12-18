@@ -17,7 +17,7 @@ php_value error_log logs/php_errors.log
     Header set X-Content-Type-Options "nosniff"
     
     # Content Security Policy básico
-    Header set Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://code.jquery.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://code.jquery.com https://cdn.jsdelivr.net;"
+    Header set Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://code.jquery.com https://cdn.jsdelivr.net https://cdn.datatables.net https://cdnjs.cloudflare.com https://cdn.lordicon.com https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://code.jquery.com https://cdn.jsdelivr.net https://cdn.datatables.net https://cdnjs.cloudflare.com https://cdn.lordicon.com; style-src 'self' 'unsafe-inline' https://cdn.datatables.net https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:;"
     
     # XSS Protection
     Header set X-XSS-Protection "1; mode=block"

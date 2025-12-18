@@ -129,6 +129,19 @@ if (isset($_POST["enviar"]) and $_POST["enviar"] == "si") {
                                                     break;
                                             }
                                         }
+                                        
+                                        // Mensaje de sesión cerrada desde otro dispositivo
+                                        if (isset($_SESSION["previous_session_closed"]) && $_SESSION["previous_session_closed"] === true):
+                                        ?>
+                                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                                <i class="ri-information-line me-2"></i>
+                                                <strong>Sesión cerrada.</strong> Se ha iniciado sesión desde otro dispositivo.
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>
+                                        <?php
+                                            // Limpiar el flag después de mostrarlo
+                                            unset($_SESSION["previous_session_closed"]);
+                                        endif;
                                         ?>
                                         <div class="mt-4">
                                             <form action="" method="post" id="login_form">

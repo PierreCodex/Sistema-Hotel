@@ -62,6 +62,12 @@ class AuthorizationMiddleware {
      * @param string $deniedRedirectUrl URL de redirección si no tiene permiso (opcional)
      */
     public static function requirePermission($moduleIdentifier, $deniedRedirectUrl = null) {
+        // PRIMERO: Verificar sesión única (solo en páginas, no en AJAX)
+        if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest') {
+            require_once(__DIR__ . "/../config/session_check.php");
+        }
+        
+        // SEGUNDO: Verificar permisos
         $permissionCheck = self::checkPermission($moduleIdentifier, $deniedRedirectUrl);
         
         if (!$permissionCheck['authorized']) {

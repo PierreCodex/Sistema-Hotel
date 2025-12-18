@@ -283,6 +283,13 @@
         </div>
     <?php } ?>
 
+    <!-- Código QR -->
+    <?php if (isset($qr_data) && $qr_data) { ?>
+    <div style="text-align: center; margin: 3mm 0; padding: 2mm 0; border-top: 1px dashed #aaa;">
+        <img src="<?php echo $qr_data; ?>" alt="Código QR" style="width: 25mm; height: 25mm;">
+    </div>
+    <?php } ?>
+
     <div class="footer">
         Representación impresa de la <?php echo $tipo_documento == '03' ? 'Boleta' : 'Factura'; ?> Electrónica<br>
         Consulte su comprobante en:<br>

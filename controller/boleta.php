@@ -1,13 +1,13 @@
 <?php
+// Limpiar cualquier output previo
+ob_start();
+
 // Ocultar warnings deprecated de bibliotecas de terceros
 error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
 ini_set('display_errors', 0); // No mostrar errores en output
 ini_set('log_errors', 1);     // Pero sí logearlos
 
-// Iniciar sesión para obtener el ID del usuario
-session_start();
-
-
+// Conexión ya maneja la sesión automáticamente
 require_once("../config/conexion.php");
 require_once("../models/Boleta.php");
 require_once("../models/Recepcion.php");
@@ -27,16 +27,24 @@ $op = $_GET["op"] ?? '';
 switch ($op) {
 
     case "generar_boleta":
+        // LIMPIAR cualquier output previo (warnings, deprecated, etc.)
+        ob_end_clean();
+        ob_start();
+        
         header('Content-Type: application/json');
-
-        // Debug: registrar que llegó la petición
-        error_log("Boleta Controller: Iniciando generar_boleta - rec_id: " . ($_POST['rec_id'] ?? 'no definido'));
+        error_log("POST: " . print_r($_POST, true));
+        error_log("SESSION: " . print_r($_SESSION, true));
+        error_log("rec_id: " . ($_POST['rec_id'] ?? 'NO DEFINIDO'));
 
         try {
             $rec_id = isset($_POST['rec_id']) ? intval($_POST['rec_id']) : 0;
             $tipo_doc = $_POST['tipo_doc'] ?? '03'; // 03=Boleta
             $metodo_pago = $_POST['metodo_pago'] ?? 'EFECTIVO';
+            
+            error_log("rec_id procesado: $rec_id, tipo_doc: $tipo_doc, metodo_pago: $metodo_pago");
+            
             if ($rec_id <= 0) {
+                error_log("ERROR: rec_id invalido");
                 echo json_encode(["success" => false, "message" => "ID de recepción inválido"]);
                 break;
             }
@@ -164,8 +172,11 @@ switch ($op) {
             // Generar Boleta electrónica (incluye ID del usuario que genera)
             $resultado = $boleta->generarBoleta($rec_id, $cliente_boleta, $detalles, $totales, $tipo_doc, $metodo_pago, $usuario_id);
 
+            // LIMPIAR cualquier output previo (warnings de Greenter)
+            ob_end_clean();
             echo json_encode($resultado);
         } catch (Exception $e) {
+            ob_end_clean();
             echo json_encode([
                 "success" => false,
                 "message" => "Error al generar boleta: " . $e->getMessage()

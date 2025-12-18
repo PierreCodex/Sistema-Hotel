@@ -445,8 +445,8 @@
         <!-- ================= TOTALES Y QR ================= -->
         <div class="totals-section clearfix">
             <div class="qr-section">
-                <?php if(isset($comprobante['qr_code'])) { ?>
-                <img src="<?php echo $comprobante['qr_code']; ?>" alt="QR Code">
+                <?php if(isset($qr_data) && $qr_data) { ?>
+                <img src="<?php echo $qr_data; ?>" alt="QR Code">
                 <?php } else { ?>
                 <div style="width: 100px; height: 100px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
                     <span style="font-size: 10px; color: #999;">QR</span>

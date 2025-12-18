@@ -57,6 +57,30 @@
             $query->execute();
             return $query->fetchAll(PDO::FETCH_ASSOC);
         }
+        
+        /* Obtener detalles completos del cliente con auditoría */
+        public function get_cliente_detalles($cli_id){
+            $conectar = parent::conexion();
+            parent::set_names();
+            
+            $sql = "SELECT 
+                        c.*,
+                        uc.Nombre as UsuarioCreacionNombre,
+                        uc.Apellido as UsuarioCreacionApellido,
+                        um.Nombre as UsuarioModificacionNombre,
+                        um.Apellido as UsuarioModificacionApellido,
+                        (SELECT COUNT(*) FROM recepcion r WHERE r.IdCliente = c.IdCliente) as TotalVisitas,
+                        (SELECT MAX(r.FechaEntrada) FROM recepcion r WHERE r.IdCliente = c.IdCliente) as UltimaVisita
+                    FROM cliente c
+                    LEFT JOIN usuario uc ON c.IdUsuarioCreacion = uc.IdUsuario
+                    LEFT JOIN usuario um ON c.IdUsuarioModificacion = um.IdUsuario
+                    WHERE c.IdCliente = ?";
+            
+            $query = $conectar->prepare($sql);
+            $query->bindValue(1, $cli_id, PDO::PARAM_INT);
+            $query->execute();
+            return $query->fetch(PDO::FETCH_ASSOC);
+        }
 
  
         /* Insertar nuevo cliente con auditoría */

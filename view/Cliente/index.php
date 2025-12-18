@@ -56,7 +56,7 @@
                                                     <th>Direccion</th>  
                                                     <th>Estado</th>
                                                     <th></th> <!-- Editar -->
-                                                    <th>Activar/Desactivar</th>
+                                                   
                                                 </tr>
                                             </thead>
                                             <tbody>

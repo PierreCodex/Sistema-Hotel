@@ -49,6 +49,8 @@ switch ($_GET["op"]) {
             $sub_array[] = $row["CLI_APE"];
             $sub_array[] = $row["CLI_DIR"];
             $sub_array[] = $row["EST"] == 1 ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>';
+            // Botón editar
+            $sub_array[] = '<button type="button" onClick="editar(' . $row["CLI_ID"] . ')" class="btn btn-warning btn-icon waves-effect waves-light" title="Editar"><i class="ri-edit-2-line"></i></button>';
             $data[] = $sub_array;
         }
 
@@ -73,6 +75,9 @@ switch ($_GET["op"]) {
             $sub_array[] = $row["CLI_APE"];
             $sub_array[] = $row["CLI_DIR"];
             $sub_array[] = $row["EST"] == 1 ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>';
+            
+            // Botón ver detalles (ojito)
+            $sub_array[] = '<button type="button" onClick="verDetalles(' . $row["CLI_ID"] . ')" class="btn btn-info btn-icon waves-effect waves-light" title="Ver Detalles"><i class="ri-eye-line"></i></button>';
             
             // Botón editar (US050)
             if ($row["EST"] == 1) {
@@ -298,6 +303,60 @@ switch ($_GET["op"]) {
         echo json_encode([
             "status" => "success", 
             "message" => "Estado actualizado correctamente"
+        ]);
+        break;
+    
+    /* Obtener detalles completos del cliente para modal */
+    case "obtener_detalles":
+        header('Content-Type: application/json');
+        $cli_id = isset($_POST["cli_id"]) ? intval($_POST["cli_id"]) : 0;
+        
+        if ($cli_id <= 0) {
+            echo json_encode(["error" => "ID de cliente inválido"]);
+            break;
+        }
+        
+        try {
+            // Usar el nuevo método que incluye auditoría
+            $row = $cliente->get_cliente_detalles($cli_id);
+            
+            if (!$row) {
+                echo json_encode(["error" => "Cliente no encontrado"]);
+                break;
+            }
+            
+            // Formar nombre de usuarios
+            $usuarioCreacion = trim(($row['UsuarioCreacionNombre'] ?? '') . ' ' . ($row['UsuarioCreacionApellido'] ?? ''));
+            $usuarioModificacion = trim(($row['UsuarioModificacionNombre'] ?? '') . ' ' . ($row['UsuarioModificacionApellido'] ?? ''));
+            
+            echo json_encode([
+                "IdCliente" => $row['IdCliente'],
+                "TipoDocumento" => $row['TipoDocumento'] ?? '',
+                "Documento" => $row['Documento'] ?? '',
+                "Nombre" => $row['Nombre'] ?? '',
+                "Apellido" => $row['Apellido'] ?? '',
+                "Direccion" => $row['Direccion'] ?? '',
+                "Estado" => $row['Estado'] ?? 1,
+                "FechaCreacion" => $row['FechaCreacion'] ?? null,
+                "UsuarioCreacion" => $usuarioCreacion ?: 'Sistema',
+                "FechaModificacion" => $row['FechaModificacion'] ?? null,
+                "UsuarioModificacion" => $usuarioModificacion ?: 'N/A',
+                "TotalVisitas" => $row['TotalVisitas'] ?? 0,
+                "UltimaVisita" => $row['UltimaVisita'] ?? null
+            ]);
+        } catch (Exception $e) {
+            echo json_encode(["error" => "Error: " . $e->getMessage()]);
+        }
+        break;
+        
+    /* Verificar recepciones activas */
+    case "verificar_recepciones_activas":
+        header('Content-Type: application/json');
+        $cli_id = isset($_POST["cli_id"]) ? intval($_POST["cli_id"]) : 0;
+        $resultado = $cliente->tiene_recepciones_activas($cli_id);
+        echo json_encode([
+            "tiene_recepciones_activas" => $resultado['tiene_activas'],
+            "cantidad" => $resultado['cantidad']
         ]);
         break;
 }

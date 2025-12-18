@@ -1,0 +1,12 @@
+# URLs amigables para tickets
+# Convierte: /ticket/B001-00000001 -> /ticket/index.php?t=B001-00000001
+
+RewriteEngine On
+
+# Si el archivo existe, servirlo directamente
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Rewrite de tickets
+RewriteRule ^([A-Z][0-9]{3}-[0-9]+)$ index.php?t=$1 [L,QSA]
