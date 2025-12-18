@@ -14,6 +14,7 @@ switch ($_GET["op"]) {
     case "guardaryeditar":
         header('Content-Type: application/json');
         if (empty($_POST["cli_id"])) {
+            // INSERTAR
             $cli_id = $cliente->insert_cliente(
                 $_POST["cli_tipo_doc"],
                 $_POST["cli_doc"],
@@ -21,13 +22,22 @@ switch ($_GET["op"]) {
                 $_POST["cli_ape"],
                 $_POST["cli_direcc"]
             );
-            echo json_encode(["success" => true, "cli_id" => $cli_id]);
+            echo json_encode(["success" => true, "cli_id" => $cli_id, "message" => "Cliente registrado correctamente"]);
         } else {
-           
+            // ACTUALIZAR (US050)
+            $cliente->update_cliente(
+                $_POST["cli_id"],
+                $_POST["cli_tipo_doc"],
+                $_POST["cli_doc"],
+                $_POST["cli_nom"],
+                $_POST["cli_ape"],
+                $_POST["cli_direcc"]
+            );
+            echo json_encode(["success" => true, "message" => "Cliente actualizado correctamente"]);
         }
         break;
 
-    /* TODO: Listado de registros formato JSON para Datatable JS */
+    /* Listado de clientes activos (para vista empleado - solo lectura) */
     case "listar":
         $datos = $cliente->get_cliente_activo();
         $data = [];
@@ -39,11 +49,45 @@ switch ($_GET["op"]) {
             $sub_array[] = $row["CLI_APE"];
             $sub_array[] = $row["CLI_DIR"];
             $sub_array[] = $row["EST"] == 1 ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>';
+            $data[] = $sub_array;
+        }
+
+        $results = [
+            "sEcho" => 1,
+            "iTotalRecords" => count($data),
+            "iTotalDisplayRecords" => count($data),
+            "aaData" => $data
+        ];
+        echo json_encode($results);
+        break;
+
+    /* Listado de TODOS los clientes (para vista admin - con CRUD) */
+    case "listar_todos":
+        $datos = $cliente->get_cliente();
+        $data = [];
+        foreach ($datos as $row) {
+            $sub_array = [];
+            $sub_array[] = $row["CLI_TIPO_DOC"];
+            $sub_array[] = $row["CLI_DOC"];
+            $sub_array[] = $row["CLI_NOM"];
+            $sub_array[] = $row["CLI_APE"];
+            $sub_array[] = $row["CLI_DIR"];
+            $sub_array[] = $row["EST"] == 1 ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>';
+            
+            // Botón editar (US050)
             if ($row["EST"] == 1) {
-                $sub_array[] = '<button type="button" onClick="editar(' . $row["CLI_ID"] . ')" id="' . $row["CLI_ID"] . '" class="btn btn-warning btn-icon waves-effect waves-light" title="Editar rol"><i class="ri-edit-2-line"></i></button>';
+                $sub_array[] = '<button type="button" onClick="editar(' . $row["CLI_ID"] . ')" class="btn btn-warning btn-icon waves-effect waves-light" title="Editar"><i class="ri-edit-2-line"></i></button>';
             } else {
-                $sub_array[] = '<button type="button" class="btn btn-warning btn-icon waves-effect waves-light" disabled title="Para editar, primero active el rol"><i class="ri-edit-2-line"></i></button>';
+                $sub_array[] = '<button type="button" class="btn btn-warning btn-icon waves-effect waves-light" disabled title="Para editar, primero active el cliente"><i class="ri-edit-2-line"></i></button>';
             }
+            
+            // Switch activar/desactivar (US051)
+            $checked = $row["EST"] == 1 ? 'checked' : '';
+            $sub_array[] = '<div class="form-check form-switch form-switch-custom form-switch-success">
+                                <input class="form-check-input" type="checkbox" role="switch" id="switch' . $row["CLI_ID"] . '" ' . $checked . ' onchange="cambiarEstado(' . $row["CLI_ID"] . ', this.checked)">
+                                <label class="form-check-label" for="switch' . $row["CLI_ID"] . '">Yes/No</label>   
+                            </div>';
+            
             $data[] = $sub_array;
         }
 
@@ -244,5 +288,16 @@ switch ($_GET["op"]) {
             $msg = $data["message"] ?? "Respuesta inválida de SUNAT";
             echo json_encode(["success" => false, "message" => $msg, "status" => $httpCode]);
         }
+        break;
+
+    /* Cambiar estado del cliente (activar/desactivar) - US051 */
+    case "cambiar_estado":
+        header('Content-Type: application/json');
+        $nuevo_estado = $_POST["estado"] == 'true' ? 1 : 0;
+        $cliente->cambiar_estado_cliente($_POST["cli_id"], $nuevo_estado);
+        echo json_encode([
+            "status" => "success", 
+            "message" => "Estado actualizado correctamente"
+        ]);
         break;
 }

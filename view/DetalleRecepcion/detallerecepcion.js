@@ -1,13 +1,10 @@
 $(document).ready(function(){
-  console.log('DOM cargado, iniciando carga de datos...');
-  // Util: obtener parámetro de query
   function getParam(name){
     const params = new URLSearchParams(window.location.search);
     return params.get(name);
   }
 
   const recId = getParam('recepcion');
-  console.log('Parámetro recepción obtenido:', recId);
   if (!recId) {
     console.error('Sin parámetro recepcion en URL');
     return;
@@ -17,12 +14,10 @@ $(document).ready(function(){
   function cargarVentasPorRecepcion(recId){
     return $.post('../../controller/venta.php?op=listar_por_recepcion', { rec_id: recId })
       .then(function(resp){
-        console.log('Respuesta ventas cruda:', resp);
         let parsed = resp;
         if (typeof resp === 'string') {
           try { parsed = JSON.parse(resp); } catch(e) {}
         }
-        console.log('Ventas parseadas:', parsed);
         const ventas = (parsed && parsed.success && Array.isArray(parsed.data)) ? parsed.data : [];
         return ventas;
       });
@@ -79,13 +74,11 @@ $(document).ready(function(){
   function cargarRecepcion(recId){
     return $.post('../../controller/recepcion.php?op=obtener_x_id', { rec_id: recId })
       .then(function(resp){
-        console.log('Respuesta recepción cruda:', resp);
         let parsed = resp;
         // Si es string, intentar parsear
         if (typeof resp === 'string') {
           try { parsed = JSON.parse(resp); } catch(e) {}
         }
-        console.log('Recepción parseada:', parsed);
         if (parsed && parsed.success && parsed.data) {
           return parsed.data;
         }
@@ -94,7 +87,6 @@ $(document).ready(function(){
   }
 
   function renderResumenHabitacion(hab){
-    console.log('Renderizando habitación:', hab);
     $('#txtnombre').text(hab && (hab.HAB_NUM || hab.Numero || ''));
     $('#txtdetalle').text(hab && (hab.HAB_DET || hab.Detalle || ''));
     $('#txtcategoria').text(hab && (hab.CAT_NOM || hab.CategoriaNombre || hab.Categoria || ''));
@@ -102,7 +94,6 @@ $(document).ready(function(){
   }
 
   function renderCliente(cli){
-    console.log('Renderizando cliente:', cli);
     const nombre = ((cli && (cli.CLI_NOM || cli.CLI_NOMBRE)) || '') + ' ' + ((cli && cli.CLI_APE) || '');
     $('#txtcliente').text(nombre.trim());
     $('#txtdocumento').text((cli && (cli.CLI_DOC || cli.Documento)) || '');
@@ -128,9 +119,6 @@ $(document).ready(function(){
       if (typeof cliData === 'string') {
         try { cliData = JSON.parse(cliData); } catch (e) {}
       }
-      
-      console.log('Datos de habitación:', habData);
-      console.log('Datos de cliente:', cliData);
       renderResumenHabitacion(habData || {});
       renderCliente(cliData || {});
     });
@@ -140,10 +128,8 @@ $(document).ready(function(){
     const append = opts && opts.append === true;
     return $.post('../../controller/venta.php?op=listardetalle', { vent_id: ventId })
       .then(function(resp){
-        console.log('Respuesta detalles cruda:', resp);
         let data = resp;
         if (typeof resp === 'string') { try { data = JSON.parse(resp); } catch(e) {} }
-        console.log('Detalles parseados:', data);
         const tbody = $('#table_data tbody');
         if (!append) tbody.empty();
         const rows = Array.isArray(data.aaData)
@@ -171,7 +157,6 @@ $(document).ready(function(){
   $.when(cargarRecepcion(recId), cargarVentasPorRecepcion(recId))
     .then(function(recData, ventas){
       if (recData) {
-        console.log('Datos de recepción:', recData);
         const feOut = recData.FechaSalida || '';
         $('#fecha_salida').val(feOut);
         function num(val){ const n = parseFloat(val); return isNaN(n) ? '' : n.toFixed(2); }
@@ -195,5 +180,4 @@ $(document).ready(function(){
     .catch(function(err){
       console.error('Error cargando DetalleRecepcion:', err);
     });
-  console.log('Carga de DetalleRecepcion completada');
 });

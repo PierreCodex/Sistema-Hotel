@@ -104,12 +104,26 @@ if (isset($_POST["enviar"]) and $_POST["enviar"] == "si") {
                                                 <div class="alert alert-warning alert-solid" role="alert">
                                                 <strong>El email estan vacios!</strong>
                                                 </div>
+                                                <?php
+                                                    break;
+                                                case "4";
+                                                ?>
+                                                <div class="alert alert-warning alert-solid" role="alert">
+                                                <strong>El password estan vacios!</strong>
+                                                </div>
                                         <?php
                                                     break;
                                                 case "6";
                                                 ?>
                                                     <div class="alert alert-danger alert-solid" role="alert">
                                                         <strong>No existe la cuenta como tal!</strong>
+                                                    </div>
+                                                <?php
+                                                    break;
+                                                case "7";
+                                                ?>
+                                                    <div class="alert alert-warning alert-solid" role="alert">
+                                                        <strong>Usuario inactivo!</strong> Su cuenta ha sido desactivada. Contacte al administrador.
                                                     </div>
                                                 <?php
                                                     break;

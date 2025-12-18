@@ -62,6 +62,11 @@ class AuthController {
         /* Validar si el correo existe en la base de datos */
         $correo_exist = $this->usuarioModel->existe_usuario_correo($correo);
         if(is_array($correo_exist) && count($correo_exist) == 0){
+            // Verificar si el usuario existe pero está inactivo (estado 0)
+            $correo_inactivo = $this->usuarioModel->existe_usuario_correo_inactivo($correo);
+            if(is_array($correo_inactivo) && count($correo_inactivo) > 0){
+                return ['valid' => false, 'error_code' => 7]; // Usuario inactivo
+            }
             return ['valid' => false, 'error_code' => 6]; // No existe la cuenta
         }
         

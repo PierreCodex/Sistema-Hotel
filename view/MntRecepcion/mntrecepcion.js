@@ -69,9 +69,6 @@ $(document).ready(function(){
                         tipoDoc = 'DNI';
                     }
                 }
-                
-                console.log('Tipo Doc detectado:', tipoDoc, 'Número:', numDoc);
-                
                 $('#cli_tipo_doc').val(tipoDoc);
                 $('#cli_doc').val(numDoc);
                 $('#cli_direcc').val(data.CLI_DIR || 'No especificada');

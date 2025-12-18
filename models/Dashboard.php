@@ -157,8 +157,10 @@ class Dashboard extends Conectar {
     
     /**
      * Obtiene las últimas recepciones activas
+     * @param int $limit Número de registros a retornar
+     * @param int|null $usuarioId ID del usuario para filtrar (null = todas)
      */
-    public function obtenerRecepcionesActivas($limit = 5) {
+    public function obtenerRecepcionesActivas($limit = 5, $usuarioId = null) {
         $conectar = parent::Conexion();
         parent::set_names();
         
@@ -172,12 +174,22 @@ class Dashboard extends Conectar {
                 FROM recepcion r
                 INNER JOIN cliente c ON r.IdCliente = c.IdCliente
                 INNER JOIN habitacion h ON r.IdHabitacion = h.IdHabitacion
-                WHERE r.Estado = 1
-                ORDER BY r.FechaEntrada DESC
-                LIMIT ?";
+                WHERE r.Estado = 1";
+        
+        // Si se proporciona usuarioId, filtrar por usuario
+        if ($usuarioId !== null) {
+            $sql .= " AND r.IdUsuario = :usuarioId";
+        }
+        
+        $sql .= " ORDER BY r.FechaEntrada DESC LIMIT :limit";
         
         $stmt = $conectar->prepare($sql);
-        $stmt->bindValue(1, $limit, PDO::PARAM_INT);
+        
+        if ($usuarioId !== null) {
+            $stmt->bindValue(':usuarioId', $usuarioId, PDO::PARAM_INT);
+        }
+        
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
         
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -1,4 +1,7 @@
 <?php
+    // Incluir el manejador de errores PRIMERO
+    require_once(__DIR__ . "/error_handler.php");
+    
     // Configurar zona horaria de Perú
     date_default_timezone_set('America/Lima');
     
@@ -18,8 +21,19 @@
 				$this->dbh->exec("SET time_zone = '-05:00'");
 				return $this->dbh;	
 			} catch (Exception $e) {
-				print "¡Error BD!: " . $e->getMessage() . "<br/>";
-				die();	
+				// Registrar el error en el log
+				logError("Error de conexión a la base de datos", [
+					'message' => $e->getMessage(),
+					'code' => $e->getCode()
+				]);
+				
+				// En producción, mostrar mensaje genérico
+				if (ENVIRONMENT === 'production') {
+					die("Error al conectar con la base de datos. Por favor, contacte al administrador.");
+				} else {
+					// En desarrollo, mostrar detalles
+					die("¡Error BD!: " . $e->getMessage() . "<br/>");
+				}
 			}
         }
 

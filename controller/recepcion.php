@@ -208,6 +208,76 @@ switch ($_GET["op"]) {
         }
         break;
 
+    /* Listar recepciones finalizadas del usuario para DataTable (Historial de Ventas) */
+    case "listar_recepciones_usuario_datatable":
+        header('Content-Type: application/json');
+        
+        // Iniciar sesión solo si no está activa
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        $usuario_id = $_SESSION['IdUsuario'] ?? 0;
+        
+        if($usuario_id <= 0){
+            echo json_encode(["aaData" => []]);
+            break;
+        }
+        
+        try {
+            $datos = $recepcion->listar_recepciones_finalizadas_por_usuario($usuario_id);
+            $data = [];
+            
+            foreach($datos as $row){
+                $sub_array = [];
+                $sub_array[] = $row['IdRecepcion'];
+                $sub_array[] = 'Hab. ' . ($row['NumeroHabitacion'] ?? 'N/A');
+                
+                $cliente_nombre = $row['ClienteNombre'] ?? '';
+                $cliente_apellido = $row['ClienteApellido'] ?? '';
+                $cliente = trim($cliente_nombre . ' ' . $cliente_apellido);
+                if(empty($cliente)) $cliente = 'Sin nombre';
+                $sub_array[] = $cliente;
+                
+                $sub_array[] = isset($row['FechaEntrada']) ? date('d/m/Y H:i', strtotime($row['FechaEntrada'])) : '-';
+                $sub_array[] = isset($row['FechaSalidaConfirmacion']) ? date('d/m/Y H:i', strtotime($row['FechaSalidaConfirmacion'])) : '-';
+                
+                // Calcular total de ventas (excluyendo ANULADO)
+                $ventas = $ventaModel->get_ventas_x_recepcion($row['IdRecepcion']);
+                $total_ventas = 0;
+                $num_productos = 0;
+                
+                foreach($ventas as $venta){
+                    if($venta['Estado'] != 'ANULADO'){
+                        $total_ventas += floatval($venta['Total']);
+                        $detalles = $ventaModel->get_detalle_venta_x_id_venta($venta['IdVenta']);
+                        $num_productos += count($detalles);
+                    }
+                }
+                
+                $sub_array[] = 'S/ ' . number_format($total_ventas, 2);
+                
+                // Botón ver productos
+                $fecha_salida_formatted = isset($row['FechaSalidaConfirmacion']) ? date('d/m/Y', strtotime($row['FechaSalidaConfirmacion'])) : '-';
+                $sub_array[] = '<button type="button" onClick="verProductos(' . $row['IdRecepcion'] . ', \'' . ($row['NumeroHabitacion'] ?? 'N/A') . '\', \'' . addslashes($cliente) . '\', \'' . $fecha_salida_formatted . '\')" class="btn btn-info btn-sm" title="Ver Productos"><i class="ri-eye-line"></i> Ver Productos (' . $num_productos . ')</button>';
+                
+                $data[] = $sub_array;
+            }
+            
+            echo json_encode([
+                "sEcho" => 1,
+                "iTotalRecords" => count($data),
+                "iTotalDisplayRecords" => count($data),
+                "aaData" => $data
+            ]);
+        } catch (Exception $e) {
+            echo json_encode([
+                "error" => $e->getMessage(),
+                "aaData" => []
+            ]);
+        }
+        break;
+
     default:
         header('Content-Type: application/json');
         echo json_encode(["success" => false, "message" => "Operación no soportada"]);

@@ -1,23 +1,25 @@
 <?php
-    require_once("../../config/conexion.php");
-    require_once("../../config/session.php");
-    require_once("../../models/Dashboard.php");
-    
-    // Verificar autenticación
-    if(isset($_SESSION["IdUsuario"])){
-        
-        $dashboard = new Dashboard();
-        $esAdmin = ($_SESSION["IdRol"] == 1); // Verificar si es Administrador por rol
-        
-        if($esAdmin) {
-            $stats = $dashboard->obtenerEstadisticasAdmin();
-            $recepcionesActivas = $dashboard->obtenerRecepcionesActivas(5);
-            $ultimasVentas = $dashboard->obtenerUltimasVentas(5);
-            $ingresos7dias = $dashboard->obtenerIngresosUltimos7Dias();
-        } else {
-            $stats = $dashboard->obtenerEstadisticasEmpleado();
-            $recepcionesActivas = $dashboard->obtenerRecepcionesActivas(5);
-        }
+require_once("../../config/conexion.php");
+require_once("../../middleware/AuthorizationMiddleware.php");
+require_once("../../config/session.php");
+require_once("../../models/Dashboard.php");
+
+// Validar que el usuario tenga permiso para acceder al dashboard
+AuthorizationMiddleware::requirePermission('dashboard');
+
+$dashboard = new Dashboard();
+$esAdmin = ($_SESSION["IdRol"] == 1); // Verificar si es Administrador por rol
+$usuarioId = $_SESSION["IdUsuario"]; // ID del usuario actual
+
+if($esAdmin) {
+    $stats = $dashboard->obtenerEstadisticasAdmin();
+    $recepcionesActivas = $dashboard->obtenerRecepcionesActivas(5); // Admin ve todas
+    $ultimasVentas = $dashboard->obtenerUltimasVentas(5);
+    $ingresos7dias = $dashboard->obtenerIngresosUltimos7Dias();
+} else {
+    $stats = $dashboard->obtenerEstadisticasEmpleado();
+    $recepcionesActivas = $dashboard->obtenerRecepcionesActivas(5, $usuarioId); // Empleado solo ve las suyas
+}
 ?>
 
 <!doctype html>
@@ -51,6 +53,23 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Alerta de sesión anterior cerrada (US062) -->
+                    <?php if (isset($_SESSION["previous_session_closed"]) && $_SESSION["previous_session_closed"] === true): ?>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                <i class="ri-alert-line me-2"></i>
+                                <strong>Se ha cerrado sesión en otro dispositivo.</strong> Solo se permite tener una sesión activa, por lo que se ha cerrado sesión en otro dispositivo.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        </div>
+                    </div>
+                    <?php 
+                        // Limpiar el flag después de mostrarlo
+                        unset($_SESSION["previous_session_closed"]);
+                    endif; 
+                    ?>
 
                     <?php if($esAdmin): // ================== VISTA ADMINISTRADOR ================== ?>
                     
@@ -680,7 +699,7 @@
                                             </a>
                                         </div>
                                         <div class="col-md-3 col-6">
-                                            <a href="../MntVender/" class="btn btn-success btn-lg w-100">
+                                            <a href="../ListVender/" class="btn btn-success btn-lg w-100">
                                                 <i class="bx bx-cart me-2 d-block d-md-inline fs-3 mb-1 mb-md-0"></i>
                                                 <span>Nueva Venta</span>
                                             </a>
@@ -854,8 +873,3 @@
 
 </body>
 </html>
-<?php
-    }else{
-        header("Location:".Conectar::ruta()."view/404/");
-    }
-?>

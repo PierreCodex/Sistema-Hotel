@@ -205,20 +205,58 @@ function tieneAccesoGrupo($datos, $grupo) {
 
                 <!-- Mantenimiento CLientes -->
                  
-                <?php
-                foreach ($datos as $row) {
-                    if ($row["MEN_GRUPO"] == "Clientes" && $row["MEND_PERMI"] == "Si") {
-                ?>
-                        <li class="nav-item">
-                            <a class="nav-link menu-link" href="<?php echo $row["MEN_RUTA"]; ?>">
-                                <i class="ri-honour-line"></i> <span data-key="t-widgets"><?php echo $row["MEN_NOM"]; ?></span>
-                            </a>
-                        </li>
-                <?php
-                    }
-                }
-                ?>
+            
+                <?php if (tieneAccesoGrupo($datos, 'Clientes')): ?>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarClientes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarClientes">
+                        <i class="bx bxs-report"></i> <span data-key="t-mantenimiento"> Clientes </span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarClientes">
+                        <ul class="nav nav-sm flex-column">
+                            <?php
+                            foreach ($datos as $row) {
+                                if ($row["MEN_GRUPO"] == "Clientes" && $row["MEND_PERMI"] == "Si") {
+                            ?>
+                                    <li class="nav-item">
+                                        <a href="<?php echo $row["MEN_RUTA"]; ?>" class="nav-link" data-key="t-<?php echo strtolower($row["MEN_NOM"]); ?>">
+                                            <?php echo $row["MEN_NOM"]; ?>
+                                        </a>
+                                    </li>
+                            <?php
+                                }
+                            }
+                            ?>
+                        </ul>
+                    </div>
+                </li> <!-- end Mantenimiento Clientes -->
+                <?php endif; ?>
 
+     <!-- Modulo de Reportes -->
+                  
+                <?php if (tieneAccesoGrupo($datos, 'Historial')): ?>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarHistorial" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarHistorial">
+                        <i class="bx bxs-report"></i> <span data-key="t-mantenimiento"> Historial </span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarHistorial">
+                        <ul class="nav nav-sm flex-column">
+                            <?php
+                            foreach ($datos as $row) {
+                                if ($row["MEN_GRUPO"] == "Historial" && $row["MEND_PERMI"] == "Si") {
+                            ?>
+                                    <li class="nav-item">
+                                        <a href="<?php echo $row["MEN_RUTA"]; ?>" class="nav-link" data-key="t-<?php echo strtolower($row["MEN_NOM"]); ?>">
+                                            <?php echo $row["MEN_NOM"]; ?>
+                                        </a>
+                                    </li>
+                            <?php
+                                }
+                            }
+                            ?>
+                        </ul>
+                    </div>
+                </li> <!-- end Mantenimiento Clientes -->
+                <?php endif; ?>
 
      <!-- Modulo de Reportes -->
 

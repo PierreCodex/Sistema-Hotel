@@ -1,6 +1,8 @@
 <?php
 require_once("../../config/conexion.php");
-if (isset($_SESSION["IdUsuario"])) {
+require_once("../../middleware/AuthorizationMiddleware.php");
+// Validar que el usuario tenga permiso para acceder a este módulo
+AuthorizationMiddleware::requirePermission('gst-recepcion');
 ?>
 
     <!doctype html>
@@ -309,8 +311,3 @@ if (isset($_SESSION["IdUsuario"])) {
     </body>
 
     </html>
-<?php
-} else {
-    header("Location:" . Conectar::ruta() . "view/404/");
-}
-?>

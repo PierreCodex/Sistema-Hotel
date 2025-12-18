@@ -39,24 +39,31 @@
 
                         <div class="col-lg-12">
                             <div class="card">
-                            
+                                <div class="card-header">
+                                    <button type="button" id="btnnuevo" class="btn btn-primary">
+                                        <i class="bx bx-plus me-1"></i> Nuevo Cliente
+                                    </button>
+                                </div>
                                 <div class="card-body">
-                                    <table id="table_data" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
-                                        <thead>
-                                            <tr>
-                                                <th>T. Documento</th>
-                                                <th>Documento</th>
-                                                <th>Nombre</th>
-                                                <th>Apellido</th>
-                                                <th>Direccion</th>  
-                                                <th>Estado</th>
-                                              
-                                            </tr>
-                                        </thead>
-                                        <tbody>
+                                    <div class="table-responsive">
+                                        <table id="table_data" class="table nowrap align-middle" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>T. Documento</th>
+                                                    <th>Documento</th>
+                                                    <th>Nombre</th>
+                                                    <th>Apellido</th>
+                                                    <th>Direccion</th>  
+                                                    <th>Estado</th>
+                                                    <th></th> <!-- Editar -->
+                                                    <th>Activar/Desactivar</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
 
-                                        </tbody>
-                                    </table>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>

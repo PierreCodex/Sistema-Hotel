@@ -103,7 +103,28 @@ switch ($_GET["op"]) {
         break;
 
     case "eliminar":
-        $piso->delete_piso($_POST["piso_id"]);
+        try {
+            $piso->delete_piso($_POST["piso_id"]);
+            echo json_encode([
+                'status' => 'success',
+                'message' => 'Piso eliminado correctamente'
+            ]);
+        } catch (Exception $e) {
+            // Capturar errores de foreign key u otros errores de BD
+            $errorMessage = $e->getMessage();
+            
+            if (strpos($errorMessage, 'foreign key') !== false || strpos($errorMessage, '1451') !== false) {
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'No se puede eliminar el piso porque tiene habitaciones asociadas. Primero debe reasignar o eliminar las habitaciones.'
+                ]);
+            } else {
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Error al eliminar el piso'
+                ]);
+            }
+        }
         break;
 
     /* TODO: Activar piso (cambiar estado a 1) */

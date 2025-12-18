@@ -180,7 +180,6 @@ function eliminar(pro_id){
     }).then((result)=>{
         if (result.value){
             $.post("../../controller/producto.php?op=eliminar",{pro_id:pro_id},function(data){
-                console.log(data);
             });
 
             $('#table_data').DataTable().ajax.reload();

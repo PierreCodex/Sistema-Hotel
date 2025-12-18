@@ -206,6 +206,137 @@
             }
             break;
 
+        /* Listar ventas por recepción para DataTable (Historial de Ventas) */
+        case "listar_ventas_por_recepcion":
+            try {
+                $rec_id = intval($_POST["rec_id"] ?? 0);
+                if ($rec_id <= 0) {
+                    echo json_encode(["aaData" => []]);
+                    break;
+                }
+                
+                $ventas = $venta->get_ventas_x_recepcion($rec_id);
+                $data = [];
+                
+                foreach ($ventas as $row) {
+                    $sub_array = [];
+                    $sub_array[] = $row["IdVenta"];
+                    $sub_array[] = isset($row["FechaCreacion"]) ? date('d/m/Y H:i', strtotime($row["FechaCreacion"])) : '-';
+                    $sub_array[] = 'S/ ' . number_format($row["Total"], 2);
+                    
+                    // Badge de estado
+                    $estado_badge = '';
+                    switch($row["Estado"]){
+                        case 'ACTIVO':
+                            $estado_badge = '<span class="badge bg-success">ACTIVO</span>';
+                            break;
+                        case 'PENDIENTE':
+                            $estado_badge = '<span class="badge bg-warning">PENDIENTE</span>';
+                            break;
+                        case 'BORRADOR':
+                            $estado_badge = '<span class="badge bg-secondary">BORRADOR</span>';
+                            break;
+                        default:
+                            $estado_badge = '<span class="badge bg-info">' . htmlspecialchars($row["Estado"]) . '</span>';
+                    }
+                    $sub_array[] = $estado_badge;
+                    
+                    // Contar productos
+                    $detalles = $venta->get_detalle_venta_x_id_venta($row["IdVenta"]);
+                    $num_productos = count($detalles);
+                    $sub_array[] = $num_productos . ' producto(s)';
+                    
+                    // Botón ver detalles
+                    $sub_array[] = '<button type="button" onClick="verDetalles(' . $row["IdVenta"] . ')" class="btn btn-info btn-sm" title="Ver Detalles"><i class="ri-eye-line"></i> Ver</button>';
+                    
+                    $data[] = $sub_array;
+                }
+                
+                echo json_encode([
+                    "sEcho" => 1,
+                    "iTotalRecords" => count($data),
+                    "iTotalDisplayRecords" => count($data),
+                    "aaData" => $data
+                ]);
+            } catch (Exception $e) {
+                echo json_encode(["success" => false, "message" => $e->getMessage()]);
+            }
+            break;
+
+        /* Mostrar venta completa con detalles (para modal) */
+        case "mostrar_venta_completa":
+            try {
+                $vent_id = intval($_POST["vent_id"] ?? 0);
+                if ($vent_id <= 0) {
+                    echo json_encode(["error" => "Id de venta inválido"]);
+                    break;
+                }
+                
+                $venta_data = $venta->get_venta_x_id($vent_id);
+                if(empty($venta_data)){
+                    echo json_encode(["error" => "Venta no encontrada"]);
+                    break;
+                }
+                
+                $venta_info = $venta_data[0];
+                $detalles = $venta->get_detalle_venta_x_id_venta($vent_id);
+                
+                $venta_info['detalles'] = $detalles;
+                
+                echo json_encode($venta_info);
+            } catch (Exception $e) {
+                echo json_encode(["error" => $e->getMessage()]);
+            }
+            break;
+
+        /* Listar productos vendidos por recepción (para modal de historial) */
+        case "listar_productos_por_recepcion":
+            try {
+                $rec_id = intval($_POST["rec_id"] ?? 0);
+                error_log("DEBUG: listar_productos_por_recepcion - rec_id: " . $rec_id);
+                
+                if ($rec_id <= 0) {
+                    echo json_encode(["error" => "ID de recepción inválido"]);
+                    break;
+                }
+                
+                $ventas = $venta->get_ventas_x_recepcion($rec_id);
+                error_log("DEBUG: Ventas encontradas: " . count($ventas));
+                
+                $productos = [];
+                
+                foreach ($ventas as $v) {
+                    error_log("DEBUG: Procesando venta ID: " . $v['IdVenta'] . " Estado: " . $v['Estado']);
+                    
+                    // Excluir ventas BORRADOR y ANULADO
+                    if ($v['Estado'] != 'ANULADO' && $v['Estado'] != 'BORRADOR') {
+                        $detalles_venta = $venta->get_detalle_venta_x_id_venta($v['IdVenta']);
+                        error_log("DEBUG: Detalles encontrados para venta " . $v['IdVenta'] . ": " . count($detalles_venta));
+                        
+                        foreach ($detalles_venta as $dv) {
+                            $productos[] = [
+                                'producto' => $dv['PRO_NOM'],
+                                'cantidad' => $dv['DETV_CANT'],
+                                'precio_unitario' => $dv['PROD_PVENTA'],
+                                'subtotal' => $dv['DETV_TOTAL'],
+                                'estado_venta' => $v['Estado']
+                            ];
+                        }
+                    }
+                }
+                
+                error_log("DEBUG: Total productos a devolver: " . count($productos));
+                
+                echo json_encode([
+                    "success" => true,
+                    "productos" => $productos
+                ]);
+            } catch (Exception $e) {
+                error_log("ERROR en listar_productos_por_recepcion: " . $e->getMessage());
+                echo json_encode(["error" => $e->getMessage()]);
+            }
+            break;
+
         default:
             echo json_encode(["success" => false, "message" => "Operación no soportada"]);
             break;

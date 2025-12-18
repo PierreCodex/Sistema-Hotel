@@ -38,7 +38,6 @@ function initBootstrapValidation() {
         if ($(this).attr('data-editing') === 'true') {
             // En modo edición, el campo funciona normalmente
             // La contraseña se muestra con puntos por ser tipo password
-            console.log('Campo contraseña enfocado en modo edición');
         }
     });
     
@@ -326,13 +325,10 @@ function guardaryeditar(e){
         formData.set('usu_pass', currentPassword);
         
         if (currentPassword === originalPassword) {
-            console.log('Modo edición: Manteniendo contraseña original');
         } else {
-            console.log('Modo edición: Usando nueva contraseña modificada');
         }
     } else {
         // MODO NUEVO REGISTRO: Usar la contraseña ingresada
-        console.log('Modo nuevo registro: Usando contraseña ingresada');
     }
     
     $.ajax({
@@ -549,10 +545,6 @@ function editar(usu_id){
         $('#usu_pass').removeClass('bg-light');
         $('#usu_pass').attr('title', 'Puede modificar la contraseña o mantener la actual');
         $('#usu_pass').attr('placeholder', 'Modifique la contraseña si desea cambiarla');
-        
-        console.log('Modo edición activado: Contraseña protegida');
-        
-        // Validar campos cargados para mostrar estado válido
         setTimeout(() => {
             validateTextField(document.getElementById('usu_nom'), 2, 50);
             validateTextField(document.getElementById('usu_ape'), 2, 50);
@@ -576,7 +568,6 @@ function eliminar(usu_id){
     }).then((result)=>{
         if (result.value){
             $.post("../../controller/usuario.php?op=eliminar",{usu_id:usu_id},function(data){
-                console.log(data);
             });
 
             $('#table_data').DataTable().ajax.reload();
@@ -657,10 +648,6 @@ $(document).on("click","#btnnuevo",function(){
     $('#usu_pass').removeAttr('placeholder');
     $('#usu_pass').prop('readonly', false);
     $('#usu_pass').removeClass('bg-light');
-    
-    console.log('Modo nuevo registro: Campo contraseña habilitado para edición');
-    
-    // Limpiar clases de validación
     const form = document.getElementById('mantenimiento_form');
     form.classList.remove('was-validated');
     clearValidationClasses();

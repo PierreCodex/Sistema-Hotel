@@ -3,13 +3,18 @@ class Recepcion extends Conectar
 {
 
     // Inserta una recepción y retorna el Id generado
-    public function insert_recepcion($cli_id, $hab_id, $precio_inicial, $adelanto, $observacion, $fecha_salida = null, $tar_id = null, $tipo_comprobante = '03')
+    public function insert_recepcion($cli_id, $hab_id, $precio_inicial, $adelanto, $observacion, $fecha_salida = null, $tar_id = null, $tipo_comprobante = '03', $usuario_id = null)
     {
         $conectar = parent::Conexion();
         parent::set_names();
 
-        // Llamada al stored procedure con variable de salida (incluyendo tarifa y tipo de comprobante)
-        $sql = "CALL SP_I_RECEPCION_03(?,?,?,?,?,?,?,?,@p_id_recepcion)";
+        // Si no se proporciona usuario_id, intentar obtenerlo de la sesión
+        if ($usuario_id === null && isset($_SESSION['IdUsuario'])) {
+            $usuario_id = intval($_SESSION['IdUsuario']);
+        }
+
+        // Llamada al stored procedure con variable de salida (incluyendo tarifa, tipo de comprobante y usuario)
+        $sql = "CALL SP_I_RECEPCION_03(?,?,?,?,?,?,?,?,?,@p_id_recepcion)";
         $query = $conectar->prepare($sql);
         $query->bindValue(1, $cli_id);
         $query->bindValue(2, $hab_id);
@@ -19,6 +24,7 @@ class Recepcion extends Conectar
         $query->bindValue(6, $observacion);
         $query->bindValue(7, $fecha_salida);
         $query->bindValue(8, $tipo_comprobante);
+        $query->bindValue(9, $usuario_id, PDO::PARAM_INT);
         $query->execute();
 
         // Obtener el ID de la recepción insertada
@@ -47,6 +53,36 @@ class Recepcion extends Conectar
                     WHERE r.Estado = 1
                     ORDER BY r.FechaEntrada DESC";
         $query = $conectar->prepare($sql);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Lista recepciones finalizadas del usuario logueado (para historial de ventas)
+    public function listar_recepciones_finalizadas_por_usuario($usuario_id)
+    {
+        $conectar = parent::conexion();
+        parent::set_names();
+        
+        $sql = "SELECT 
+                    r.IdRecepcion,
+                    r.IdHabitacion,
+                    r.IdCliente,
+                    r.FechaEntrada,
+                    r.FechaSalida,
+                    r.FechaSalidaConfirmacion,
+                    h.Numero AS NumeroHabitacion,
+                    c.Nombre AS ClienteNombre,
+                    c.Apellido AS ClienteApellido
+                FROM recepcion r
+                INNER JOIN habitacion h ON r.IdHabitacion = h.IdHabitacion
+                INNER JOIN cliente c ON r.IdCliente = c.IdCliente
+                WHERE r.Estado = 0 
+                AND r.IdUsuario = ?
+                ORDER BY r.FechaSalidaConfirmacion DESC
+                LIMIT 100";
+        
+        $query = $conectar->prepare($sql);
+        $query->bindValue(1, $usuario_id, PDO::PARAM_INT);
         $query->execute();
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }

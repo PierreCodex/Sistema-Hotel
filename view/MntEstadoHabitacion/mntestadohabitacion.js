@@ -176,7 +176,6 @@ function eliminar(est_hab_id){
     }).then((result)=>{
         if (result.value){
             $.post("../../controller/estadohabitacion.php?op=eliminar",{est_hab_id:est_hab_id},function(data){
-                console.log(data);
             });
 
             $('#table_data').DataTable().ajax.reload();

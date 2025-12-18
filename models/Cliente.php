@@ -2,11 +2,21 @@
     class Cliente extends Conectar{
         /* TODO: Listar Registros activos e inactivos */
 
-/* TODO: Listar Registros activos  */
-    public function get_cliente_activo(){
+/* Listar todos los clientes (activos e inactivos) - Para mantenimiento admin */
+    public function get_cliente(){
         $conectar = parent::conexion();
         parent::set_names();
         $sql = "CALL SP_L_CLIENTE_01()";
+        $sql = $conectar->prepare($sql);
+        $sql->execute();
+        return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /* Listar solo clientes activos - Para combos y vista empleado */
+    public function get_cliente_activo(){
+        $conectar = parent::conexion();
+        parent::set_names();
+        $sql = "CALL SP_L_CLIENTE_03()";
         $sql = $conectar->prepare($sql);
         $sql->execute();
         return $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
@@ -49,25 +59,100 @@
         }
 
  
-        /* TODO: Registro de datos */
+        /* Insertar nuevo cliente con auditoría */
         public function insert_cliente($cli_tipo_doc,$cli_doc,$cli_nom,$cli_ape,$cli_direcc){
             $conectar=parent::Conexion();
-            $sql="CALL SP_I_CLIENTE_01(?,?,?,?,?, @p_id_cliente)";
+            parent::set_names();
+            
+            // Obtener ID del usuario actual
+            $usuario_id = isset($_SESSION["IdUsuario"]) ? $_SESSION["IdUsuario"] : null;
+            
+            $sql="CALL SP_I_CLIENTE_01(?,?,?,?,?,?)";
             $query=$conectar->prepare($sql);
             $query->bindValue(1,$cli_tipo_doc);
             $query->bindValue(2,$cli_doc);
             $query->bindValue(3,$cli_nom);
             $query->bindValue(4,$cli_ape);
             $query->bindValue(5,$cli_direcc);
+            $query->bindValue(6,$usuario_id);
             $query->execute();
             
-            // Obtener el ID del cliente insertado
-            $query=$conectar->prepare("SELECT @p_id_cliente as id");
-            $query->execute();
+            // Obtener el resultado del SP
             $result = $query->fetch(PDO::FETCH_ASSOC);
-            return $result['id'];
+            return $result['IdCliente'];
         }
 
+        /* Actualizar cliente existente con auditoría (US050) */
+        public function update_cliente($cli_id,$cli_tipo_doc,$cli_doc,$cli_nom,$cli_ape,$cli_direcc){
+            $conectar=parent::Conexion();
+            parent::set_names();
+            
+            // Obtener ID del usuario actual
+            $usuario_id = isset($_SESSION["IdUsuario"]) ? $_SESSION["IdUsuario"] : null;
+            
+            $sql="CALL SP_U_CLIENTE_01(?,?,?,?,?,?,?)";
+            $query=$conectar->prepare($sql);
+            $query->bindValue(1,$cli_id);
+            $query->bindValue(2,$cli_tipo_doc);
+            $query->bindValue(3,$cli_doc);
+            $query->bindValue(4,$cli_nom);
+            $query->bindValue(5,$cli_ape);
+            $query->bindValue(6,$cli_direcc);
+            $query->bindValue(7,$usuario_id);
+            $query->execute();
+            return true;
+        }
+
+        /* Eliminar cliente */
+        public function delete_cliente($cli_id){
+            $conectar=parent::Conexion();
+            parent::set_names();
+            $sql="CALL SP_D_CLIENTE_01(?)";
+            $query=$conectar->prepare($sql);
+            $query->bindValue(1,$cli_id);
+            $query->execute();
+            return $resultado = $query->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        /* Cambiar estado del cliente (activar/desactivar) con auditoría (US051) */
+        public function cambiar_estado_cliente($cli_id, $nuevo_estado){
+            $conectar=parent::Conexion();
+            parent::set_names();
+            
+            // Obtener ID del usuario actual
+            $usuario_id = isset($_SESSION["IdUsuario"]) ? $_SESSION["IdUsuario"] : null;
+            
+            $sql="CALL SP_CAMBIAR_ESTADO_CLIENTE_01(?,?,?)";
+            $query=$conectar->prepare($sql);
+            $query->bindValue(1,$cli_id);
+            $query->bindValue(2,$nuevo_estado);
+            $query->bindValue(3,$usuario_id);
+            $query->execute();
+            return $resultado = $query->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+
+        /* Verificar si el cliente tiene recepciones activas (hospedado actualmente) */
+        public function tiene_recepciones_activas($cli_id){
+            $conectar = parent::Conexion();
+            parent::set_names();
+            
+            $sql = "SELECT COUNT(*) as cantidad 
+                    FROM recepcion 
+                    WHERE IdCliente = ? 
+                    AND Estado = 'Ocupado'
+                    LIMIT 1";
+            
+            $query = $conectar->prepare($sql);
+            $query->bindValue(1, $cli_id);
+            $query->execute();
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+            
+            return [
+                'tiene_activas' => ($result['cantidad'] > 0),
+                'cantidad' => $result['cantidad']
+            ];
+        }
 
         /* Verificar si existe un cliente con el mismo documento (DNI/RUC) */
         public function verificar_documento_existe($cli_doc, $cli_id = null){

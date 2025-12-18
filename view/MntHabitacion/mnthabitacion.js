@@ -242,7 +242,6 @@ function eliminar(hab_id){
     }).then((result)=>{
         if (result.value){
             $.post("../../controller/habitacion.php?op=eliminar",{hab_id:hab_id},function(data){
-                console.log(data);
             });
 
             $('#table_data').DataTable().ajax.reload();
@@ -397,8 +396,7 @@ function combo_estado_habitacion(){
   //  $.post("../../controller/habitacion.php?op=filtrar_por_piso", {piso_id: piso_id}, function(data){
  //       var habitaciones = JSON.parse(data);
  //       // Aquí puedes implementar la lógica para mostrar los resultados filtrados
-       // console.log(habitaciones);
-  //  });
+       // //  });
 //}
 
 // Función para filtrar habitaciones por categoría
@@ -414,8 +412,7 @@ function combo_estado_habitacion(){
  //   $.post("../../controller/habitacion.php?op=filtrar_por_estado", {est_id: est_id}, function(data){
       //  var habitaciones = JSON.parse(data);
         // Aquí puedes implementar la lógica para mostrar los resultados filtrados
-     //   console.log(habitaciones);
-//    });
+     //   //    });
 //}
 
 init();

@@ -232,7 +232,6 @@ function eliminar(rol_id){
     }).then((result)=>{
         if (result.value){
             $.post("../../controller/rol.php?op=eliminar",{rol_id:rol_id},function(data){
-                console.log(data);
             });
 
             $('#table_data').DataTable().ajax.reload();
@@ -290,7 +289,6 @@ $(document).on('input', '#rol_nom', function(){
 function permiso(rol_id){
 
     $.post("../../controller/menu.php?op=insert",{rol_id:rol_id},function(data){
-        console.log(data);
     });
 
     $('#permisos_data').DataTable({

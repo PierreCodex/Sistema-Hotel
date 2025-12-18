@@ -1,6 +1,8 @@
 <?php
-    require_once("../../config/conexion.php");
-    if(isset($_SESSION["IdUsuario"])){
+require_once("../../config/conexion.php");
+require_once("../../middleware/AuthorizationMiddleware.php");
+// Validar que el usuario tenga permiso para acceder a este módulo
+AuthorizationMiddleware::requirePermission('dashboard');
 ?>
 
 <!doctype html>
@@ -555,8 +557,3 @@
 </body>
 
 </html>
-<?php
-    }else{
-        header("Location:".Conectar::ruta()."view/404/");
-    }
-?>

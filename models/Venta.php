@@ -311,15 +311,24 @@ class Venta extends Conectar{
             $conectar->beginTransaction();
             
             // 1. Verificar que la venta esté en estado BORRADOR
-            $sql_check = "SELECT Estado FROM venta WHERE IdVenta = ?";
+            $sql_check = "SELECT IdVenta, Estado FROM venta WHERE IdVenta = ?";
             $stmt_check = $conectar->prepare($sql_check);
             $stmt_check->bindValue(1, $id_venta, PDO::PARAM_INT);
             $stmt_check->execute();
             $venta_info = $stmt_check->fetch(PDO::FETCH_ASSOC);
             
-            if (!$venta_info || $venta_info['Estado'] !== 'BORRADOR') {
+            error_log("DEBUG cancelar_venta_borrador - Venta ID: $id_venta, Info: " . json_encode($venta_info));
+            
+            if (!$venta_info) {
                 $conectar->rollBack();
-                return false; // No es borrador, no hacer nada
+                error_log("ERROR: Venta $id_venta no encontrada");
+                return false;
+            }
+            
+            if ($venta_info['Estado'] !== 'BORRADOR') {
+                $conectar->rollBack();
+                error_log("ERROR: Venta $id_venta no es BORRADOR, estado actual: " . $venta_info['Estado']);
+                return false;
             }
             
             // 2. Restaurar stock de todos los detalles
@@ -330,24 +339,60 @@ class Venta extends Conectar{
             $stmt_restore = $conectar->prepare($sql_restore);
             $stmt_restore->bindValue(1, $id_venta, PDO::PARAM_INT);
             $stmt_restore->execute();
+            $stock_restaurado = $stmt_restore->rowCount();
+            error_log("DEBUG: Stock restaurado para $stock_restaurado productos");
             
-            // 3. Eliminar todos los detalles
+            // 3. Eliminar todos los detalles PRIMERO (por restricción de FK)
             $sql_del_det = "DELETE FROM detalle_venta WHERE IdVenta = ?";
             $stmt_del_det = $conectar->prepare($sql_del_det);
             $stmt_del_det->bindValue(1, $id_venta, PDO::PARAM_INT);
             $stmt_del_det->execute();
+            $detalles_eliminados = $stmt_del_det->rowCount();
+            error_log("DEBUG: Detalles eliminados: $detalles_eliminados");
             
-            // 4. Eliminar la venta borrador
-            $sql_del_venta = "DELETE FROM venta WHERE IdVenta = ? AND Estado = 'BORRADOR'";
+            // 4. Verificar que NO queden detalles
+            $sql_verify = "SELECT COUNT(*) as total FROM detalle_venta WHERE IdVenta = ?";
+            $stmt_verify = $conectar->prepare($sql_verify);
+            $stmt_verify->bindValue(1, $id_venta, PDO::PARAM_INT);
+            $stmt_verify->execute();
+            $detalles_restantes = $stmt_verify->fetch(PDO::FETCH_ASSOC)['total'];
+            error_log("DEBUG: Detalles restantes después de DELETE: $detalles_restantes");
+            
+            if ($detalles_restantes > 0) {
+                $conectar->rollBack();
+                error_log("ERROR: Aún quedan $detalles_restantes detalles, no se puede eliminar venta");
+                return false;
+            }
+            
+            // 5. Eliminar la venta borrador
+            $sql_del_venta = "DELETE FROM venta WHERE IdVenta = ?";
             $stmt_del_venta = $conectar->prepare($sql_del_venta);
             $stmt_del_venta->bindValue(1, $id_venta, PDO::PARAM_INT);
             $stmt_del_venta->execute();
+            $venta_eliminada = $stmt_del_venta->rowCount();
+            error_log("DEBUG: Venta eliminada (rowCount): $venta_eliminada");
+            
+            // 6. Verificar que la venta se eliminó
+            $sql_verify_venta = "SELECT COUNT(*) as total FROM venta WHERE IdVenta = ?";
+            $stmt_verify_venta = $conectar->prepare($sql_verify_venta);
+            $stmt_verify_venta->bindValue(1, $id_venta, PDO::PARAM_INT);
+            $stmt_verify_venta->execute();
+            $venta_existe = $stmt_verify_venta->fetch(PDO::FETCH_ASSOC)['total'];
+            error_log("DEBUG: Venta existe después de DELETE: $venta_existe");
+            
+            if ($venta_existe > 0) {
+                $conectar->rollBack();
+                error_log("ERROR: La venta $id_venta NO se eliminó, aún existe en BD");
+                return false;
+            }
             
             $conectar->commit();
+            error_log("SUCCESS: Venta $id_venta eliminada correctamente");
             return true;
             
         } catch (Exception $e) {
             $conectar->rollBack();
+            error_log("EXCEPTION al cancelar venta borrador: " . $e->getMessage());
             throw $e;
         }
     }

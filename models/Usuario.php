@@ -167,6 +167,17 @@ class Usuario extends Conectar
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /* Validar si el usuario existe pero está inactivo */
+    public function existe_usuario_correo_inactivo($usu_correo){
+        $conectar=parent::Conexion();
+        parent::set_names();
+        $sql="CALL SP_L_USUARIO_CORREO_INACTIVO_01(?)";
+        $query=$conectar->prepare($sql);
+        $query->bindValue(1,$usu_correo);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     /* Validar si el DNI ya existe en la base de datos */
     public function existe_usuario_dni($usu_dni){
         $conectar=parent::Conexion();

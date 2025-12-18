@@ -103,7 +103,6 @@ function loadClients(query = '', page = 1) {
             }
         },
         error: function (e) {
-            console.log("Error loading clients: " + e.responseText);
         }
     });
 }
@@ -206,7 +205,6 @@ function verHistorial(cli_id, clientName) {
             }
         },
         error: function (e) {
-            console.log("Error loading history: " + e.responseText);
             container.html('<div class="col-12 text-center text-danger p-5">Error al cargar historial.</div>');
         }
     });

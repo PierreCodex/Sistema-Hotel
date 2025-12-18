@@ -117,17 +117,9 @@ $(document).ready(function () {
         $('#Adelanto').val(num2(recData.Adelanto));
 
         // DEBUG: Ver qué datos vienen de la recepción
-        console.log('Datos recepción:', recData);
-        console.log('TipoComprobante raw:', recData.TipoComprobante);
-
-        // Guardar tipo de comprobante de la recepción
         // El valor viene como '01' (Factura) o '03' (Boleta)
         tipoComprobante = (recData.TipoComprobante || '03').toString().trim();
         nombreComprobante = (tipoComprobante === '01') ? 'Factura' : 'Boleta';
-
-        console.log('Tipo comprobante final:', tipoComprobante, '- Nombre:', nombreComprobante);
-
-        // Mostrar fechas de entrada y salida
         $('#fecha_entrada').text(recData.FechaEntrada || recData.fecha_entrada || recData.Entrada || '');
         $('#fecha_salida').text(recData.FechaSalida || recData.fecha_salida || recData.Salida || '');
 
@@ -277,16 +269,13 @@ $(document).ready(function () {
           } else {
             // Error al generar - buscar mensaje en diferentes propiedades
             var errorMsg = r.mensaje || r.message || r.error || r.error_message || 'Error desconocido';
-            console.log('Error factura/boleta:', r);
             mostrarErrorBoleta(errorMsg);
           }
         } catch (e) {
-          console.log('Error parseando respuesta:', e, resp);
           mostrarErrorBoleta('Error al procesar respuesta del servidor');
         }
       })
       .fail(function (xhr, status, error) {
-        console.log('Error AJAX:', status, error, xhr.responseText);
         mostrarErrorBoleta('Error de conexión con el servidor');
       });
   }
